@@ -10,7 +10,7 @@ package Sound_Gen_Interfaces is
 
    type Generator is abstract tagged record
       Current_Sample_Nb : Period := 0;
-      Memo_Sample : Sample;
+      Memo_Sample : Sample := 0.0;
    end record;
    type Generator_Access is access all Generator'Class;
 
