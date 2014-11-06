@@ -26,6 +26,9 @@ package Effects is
       Level_Provider : Generator_Access;
    end record;
 
+   function VCA (G : Generator_Access) return access Dyn_Attenuator
+   is (new Dyn_Attenuator'(Level_Provider => G));
+
    overriding function Process
      (Self : in out Dyn_Attenuator; S : Sample) return Sample
    is
@@ -58,12 +61,18 @@ package Effects is
       Length : Natural := 0;
    end record;
 
+   type Generators_Arg_Array is array (Natural range <>) of Mixer_Generator;
+   No_Generators : constant Generators_Arg_Array (1 .. 0) := (others => <>);
+
+   function Create_Mixer
+     (Sources : Generators_Arg_Array) return access Mixer;
+
    function Add_Generator
      (Self : in out Mixer; G : access Generator'Class; Level : Float) return Natural;
 
    procedure Add_Generator
      (Self : in out Mixer; G : access Generator'Class; Level : Float);
 
-   overriding function Next_Sample (Self : in out Mixer) return Sample;
+   overriding function Next_Sample_Impl (Self : in out Mixer) return Sample;
 
 end Effects;
