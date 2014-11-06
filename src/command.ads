@@ -28,7 +28,7 @@ package Command is
    end record;
 
    function Create_Sequencer
-     (Nb_Steps, BPM : Natural) return access Simple_Sequencer;
+     (Nb_Steps, BPM : Natural; Measures : Natural := 1) return access Simple_Sequencer;
 
    overriding function Next_Message_Impl
      (Self: in out Simple_Sequencer) return Note_Signal;

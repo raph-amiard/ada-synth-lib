@@ -41,12 +41,13 @@ package body Command is
    ----------------------
 
    function Create_Sequencer
-     (Nb_Steps, BPM : Natural) return access Simple_Sequencer
+     (Nb_Steps, BPM : Natural;
+      Measures : Natural := 1) return access Simple_Sequencer
    is
       Ret : access Simple_Sequencer :=
         new Simple_Sequencer'
           (BPM => BPM,
-           Nb_Steps => Nb_Steps,
+           Nb_Steps => Nb_Steps * Measures,
            Interval => Period ((BPM * Natural (SAMPLE_RATE)) / 60 / Nb_Steps),
            others => <>);
    begin
