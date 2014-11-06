@@ -14,7 +14,8 @@ package Sound_Gen_Interfaces is
    end record;
    type Generator_Access is access all Generator'Class;
 
-   function Next_Sample_Impl (Self : in out Generator) return Sample is abstract;
+   function Next_Sample_Impl
+     (Self : in out Generator) return Sample is abstract;
 
    function Next_Sample (Self : in out Generator) return Sample;
    ----------------------
@@ -46,7 +47,8 @@ package Sound_Gen_Interfaces is
    end record;
    type Note_Generator_Access is access all Note_Generator'Class;
 
-   function Next_Message_Impl (Self : in out Note_Generator) return Note_Signal is abstract;
+   function Next_Message_Impl
+     (Self : in out Note_Generator) return Note_Signal is abstract;
    function Next_Message (Self : in out Note_Generator) return Note_Signal;
 
 end Sound_Gen_Interfaces;

@@ -1,7 +1,4 @@
 with Utils; use Utils;
-with Waves; use Waves;
-with Ada.Containers.Indefinite_Holders;
-with Ada.Containers.Bounded_Vectors;
 with Sound_Gen_Interfaces; use Sound_Gen_Interfaces;
 
 package Effects is
@@ -68,7 +65,8 @@ package Effects is
      (Sources : Generators_Arg_Array) return access Mixer;
 
    function Add_Generator
-     (Self : in out Mixer; G : access Generator'Class; Level : Float) return Natural;
+     (Self : in out Mixer; G : access Generator'Class;
+      Level : Float) return Natural;
 
    procedure Add_Generator
      (Self : in out Mixer; G : access Generator'Class; Level : Float);

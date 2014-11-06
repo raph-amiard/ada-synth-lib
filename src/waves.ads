@@ -1,6 +1,5 @@
 with Utils; use Utils;
 with Sound_Gen_Interfaces; use Sound_Gen_Interfaces;
-with Ada.Finalization; use Ada.Finalization;
 with GNAT.Random_Numbers;
 
 package Waves is
@@ -19,8 +18,10 @@ package Waves is
       Step : Float;
    end record;
 
-   function Create_Saw (Freq_Provider : Generator_Access) return access Saw_Generator;
-   overriding function Next_Sample_Impl (Self : in out Saw_Generator) return Sample;
+   function Create_Saw
+     (Freq_Provider : Generator_Access) return access Saw_Generator;
+   overriding function Next_Sample_Impl
+     (Self : in out Saw_Generator) return Sample;
 
    ----------------------
    -- Square_Generator --
@@ -31,7 +32,8 @@ package Waves is
       Current_Sample : Period;
    end record;
 
-   function Create_Square (Freq_Provider : Generator_Access) return access Square_Generator;
+   function Create_Square
+     (Freq_Provider : Generator_Access) return access Square_Generator;
    overriding function Next_Sample_Impl
      (Self : in out Square_Generator) return Sample;
 
@@ -44,7 +46,8 @@ package Waves is
       Current_P : Period;
    end record;
 
-   function Create_Sine (Freq_Provider : Generator_Access) return access Sine_Generator;
+   function Create_Sine
+     (Freq_Provider : Generator_Access) return access Sine_Generator;
    overriding function Next_Sample_Impl
      (Self : in out Sine_Generator) return Sample;
 
@@ -92,7 +95,9 @@ package Waves is
       Proc : Generator_Access := null;
    end record;
 
-   function Fixed (F : Frequency; Proc : Generator_Access := null) return access Fixed_Gen is
+   function Fixed
+     (F : Frequency; Proc : Generator_Access := null) return access Fixed_Gen
+   is
      (new Fixed_Gen'(Val => Sample (F), Proc => Proc, others => <>));
 
    overriding function Next_Sample_Impl
@@ -106,7 +111,8 @@ package Waves is
    -- Chain --
    -----------
 
-   type Signal_Processors is array (Natural range <>) of Signal_Processor_Access;
+   type Signal_Processors is
+     array (Natural range <>) of Signal_Processor_Access;
    No_Signal_Processors : Signal_Processors (1 .. 0) := (others => <>);
 
    type Signal_Processor_Vector is
@@ -120,7 +126,8 @@ package Waves is
 
    function Create_Chain
      (Gen : access Generator'Class;
-      Sig_Procs : Signal_Processors := No_Signal_Processors) return access Chain;
+      Sig_Procs : Signal_Processors
+         := No_Signal_Processors) return access Chain;
 
    procedure Add_Processor
      (Self : in out Chain; P : Signal_Processor_Access);

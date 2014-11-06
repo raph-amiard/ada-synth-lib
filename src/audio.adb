@@ -5,20 +5,23 @@ with Waves; use Waves;
 with Effects; use Effects;
 with Sound_Gen_Interfaces; use Sound_Gen_Interfaces;
 with Command; use Command;
-with Ada.Finalization; use Ada.Finalization;
 
 procedure Audio is
 
    Int_Smp : Short_Integer := 0;
    function Sample_To_Uint16 is new Sample_To_Int (Short_Integer);
    Ignore : Integer;
+   pragma Unreferenced (Ignore);
 
    BPM : constant := 120;
 
-   Kick_Seq : access Simple_Sequencer := Create_Sequencer (16, BPM, 2);
-   Kick_Source : Note_Generator_Access := Note_Generator_Access (Kick_Seq);
-   Kick_VCA : Signal_Processor_Access := VCA (Create_ADSR (10, 1000, 200, 0.2, Kick_Source));
-   Kick : access Mixer :=
+   Kick_Seq : constant access Simple_Sequencer :=
+     Create_Sequencer (16, BPM, 2);
+   Kick_Source : constant Note_Generator_Access :=
+     Note_Generator_Access (Kick_Seq);
+   Kick_VCA : constant Signal_Processor_Access :=
+     VCA (Create_ADSR (10, 1000, 200, 0.2, Kick_Source));
+   Kick : constant access Mixer :=
      Create_Mixer
        ((
         1 => (Create_Chain
@@ -39,10 +42,13 @@ procedure Audio is
               0.7)
        ));
 
-   Snare_Seq : access Simple_Sequencer := Create_Sequencer (16, BPM);
-   Snare_Source : Note_Generator_Access := Note_Generator_Access (Snare_Seq);
-   Snare_VCA : Signal_Processor_Access := VCA (Create_ADSR (0, 100, 100, 0.2, Snare_Source));
-   Snare : access Mixer :=
+   Snare_Seq : constant access Simple_Sequencer :=
+     Create_Sequencer (16, BPM);
+   Snare_Source : constant Note_Generator_Access :=
+     Note_Generator_Access (Snare_Seq);
+   Snare_VCA : constant Signal_Processor_Access :=
+     VCA (Create_ADSR (0, 100, 100, 0.2, Snare_Source));
+   Snare : constant access Mixer :=
      Create_Mixer
        ((
         1 => (Create_Chain
@@ -59,42 +65,48 @@ procedure Audio is
               0.1)
        ));
 
-   Hat_Seq : access Simple_Sequencer := Create_Sequencer (16, BPM);
-   Hat_Source : Note_Generator_Access := Note_Generator_Access (Hat_Seq);
-   Hat_VCA : Signal_Processor_Access := VCA (Create_ADSR (0, 20, 0, 0.0, Hat_Source));
-   Hat : access Mixer :=
+   Hat_Seq : constant access Simple_Sequencer := Create_Sequencer (16, BPM);
+   Hat_Source : constant Note_Generator_Access :=
+     Note_Generator_Access (Hat_Seq);
+   Hat_VCA : constant Signal_Processor_Access :=
+     VCA (Create_ADSR (0, 20, 0, 0.0, Hat_Source));
+   Hat : constant access Mixer :=
      Create_Mixer
        ((
         1 => (Create_Chain
               (Create_Noise, (1 => Hat_VCA)), 0.5)
        ));
 
-   Synth_Seq : access Simple_Sequencer := Create_Sequencer (8, BPM, 2);
-   Synth_Source : Note_Generator_Access := Note_Generator_Access (Synth_Seq);
-   Synth_VCA : Signal_Processor_Access := VCA (Create_ADSR (200, 200, 600, 0.4, Synth_Source));
-   Synth_LFO : Signal_Processor_Access := VCA (LFO (6.0, 0.5));
-   Synth : access Mixer :=
+   Synth_Seq : constant access Simple_Sequencer :=
+     Create_Sequencer (8, BPM, 2);
+   Synth_Source : constant Note_Generator_Access :=
+     Note_Generator_Access (Synth_Seq);
+   Synth_VCA : constant Signal_Processor_Access :=
+     VCA (Create_ADSR (200, 200, 600, 0.4, Synth_Source));
+   Synth_LFO : constant Signal_Processor_Access := VCA (LFO (6.0, 0.5));
+   Synth : constant access Mixer :=
      Create_Mixer
        ((
         1 => (Create_Chain
-              (Create_Square (Create_Pitch_Gen (-12, Synth_Source)),
+              (Create_Sine (Create_Pitch_Gen (-12, Synth_Source)),
                  (1 => Synth_VCA, 2 => Synth_LFO)), 0.5),
         2 => (Create_Chain
-              (Create_Square (Create_Pitch_Gen (-12 + 7, Synth_Source)),
+              (Create_Sine (Create_Pitch_Gen (-12 + 7, Synth_Source)),
                  (1 => Synth_VCA, 2 => Synth_LFO)), 0.5)
        ));
 
-   Main_Mixer : access Mixer :=
+   Main_Mixer : constant access Mixer :=
      Create_Mixer ((1 => (Kick, 0.5),
                     2 => (Snare, 0.5),
                     3 => (Hat, 0.5),
                     4 => (Synth, 0.2)));
 
-   o : Sequencer_Note := No_Seq_Note;
-   K : Sequencer_Note := ((G, 3), 8000);
+   o : constant Sequencer_Note := No_Seq_Note;
+   K : constant Sequencer_Note := ((G, 3), 8000);
 begin
    Kick_Seq.Notes  := (K, o, o, K, o, o, K, o, o, o, K, o, o, o, o, o,
                        K, o, o, K, o, o, K, o, o, o, K, o, o, o, o, K);
+
    Snare_Seq.Notes := (o, o, o, o, K, o, o, o, o, o, o, o, K, o, o, o);
    Hat_Seq.Notes   := (K, o, K, K, K, o, K, K, K, o, K, K, K, o, K, K);
    Synth_Seq.Notes := (((C, 4), 8000), o, o, o, o, ((F, 4), 8000), o, o,

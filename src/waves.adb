@@ -5,6 +5,8 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body Waves is
 
+   procedure Update_Period (Self : in out Wave_Generator'Class);
+
    -------------------
    -- Update_Period --
    -------------------
@@ -12,14 +14,16 @@ package body Waves is
    procedure Update_Period (Self : in out Wave_Generator'Class) is
    begin
       Self.P :=
-        Utils.Period_In_Samples (Frequency (Self.Frequency_Provider.Next_Sample));
+        Utils.Period_In_Samples
+          (Frequency (Self.Frequency_Provider.Next_Sample));
    end Update_Period;
 
    ------------
    -- Create --
    ------------
 
-   function Create_Saw (Freq_Provider : Generator_Access) return access Saw_Generator
+   function Create_Saw
+     (Freq_Provider : Generator_Access) return access Saw_Generator
    is
    begin
       return new Saw_Generator'(Frequency_Provider => Freq_Provider,
@@ -30,7 +34,8 @@ package body Waves is
    -- Next_Sample --
    -----------------
 
-   overriding function Next_Sample_Impl (Self : in out Saw_Generator) return Sample is
+   overriding function Next_Sample_Impl
+     (Self : in out Saw_Generator) return Sample is
    begin
       Update_Period (Self);
       Self.Step := 2.0 / Float (Self.P);
@@ -45,7 +50,8 @@ package body Waves is
    -- Create --
    ------------
 
-   function Create_Square (Freq_Provider : Generator_Access) return access Square_Generator is
+   function Create_Square
+     (Freq_Provider : Generator_Access) return access Square_Generator is
    begin
       return new Square_Generator'(Frequency_Provider => Freq_Provider,
                                    Is_High => True,
@@ -73,9 +79,10 @@ package body Waves is
    -- Create --
    ------------
 
-   function Create_Sine (Freq_Provider : Generator_Access) return access Sine_Generator
+   function Create_Sine
+     (Freq_Provider : Generator_Access) return access Sine_Generator
    is
-      Ret : access Sine_Generator :=
+      Ret : constant access Sine_Generator :=
         new Sine_Generator'(Frequency_Provider => Freq_Provider,
                             Current_Sample => 0,
                             Current_P => 0,
@@ -111,9 +118,11 @@ package body Waves is
 
    function Create_Chain
      (Gen : access Generator'Class;
-      Sig_Procs : Signal_Processors := No_Signal_Processors) return access Chain
+      Sig_Procs : Signal_Processors
+        := No_Signal_Processors) return access Chain
    is
-      Ret : access Chain := new Chain'(Gen => Generator_Access (Gen), others => <>);
+      Ret : constant access Chain :=
+        new Chain'(Gen => Generator_Access (Gen), others => <>);
    begin
       for P of Sig_Procs loop
          Ret.Add_Processor (P);
@@ -154,14 +163,13 @@ package body Waves is
 
    function LFO (Freq : Frequency; Amplitude : Float) return Generator_Access
    is
-      Sin : Generator_Access := Create_Sine (Fixed (Freq));
-      LFO_Chain : access Chain := Create_Chain (Sin);
+      Sin : constant Generator_Access := Create_Sine (Fixed (Freq));
+      LFO_Chain : constant access Chain := Create_Chain (Sin);
    begin
       LFO_Chain.Add_Processor (new Attenuator'(Level => Amplitude));
       LFO_Chain.Add_Processor (new Transposer'(others => <>));
       return Generator_Access (LFO_Chain);
    end LFO;
-
 
    ------------
    -- Create --
@@ -210,7 +218,8 @@ package body Waves is
               Self.Current_P in Self.Attack + 1 .. Self.Attack + Self.Decay
             then
                Ret :=
-                 (Sample ((Self.Decay - (Self.Current_P - Self.Attack))) / Sample (Self.Decay)
+                 (Sample ((Self.Decay - (Self.Current_P - Self.Attack)))
+                  / Sample (Self.Decay)
                   * Sample (1.0 - Self.Sustain))
                    + Sample (Self.Sustain);
             else
@@ -237,7 +246,7 @@ package body Waves is
    overriding function Next_Sample_Impl
      (Self : in out Pitch_Gen) return Sample
    is
-      Note_Sig : Note_Signal := Self.Source.Next_Message;
+      Note_Sig : constant Note_Signal := Self.Source.Next_Message;
       Ret : Sample;
    begin
       case Note_Sig.Kind is
@@ -261,7 +270,7 @@ package body Waves is
 
    function Create_Noise return access Noise_Generator
    is
-      N : access Noise_Generator := new Noise_Generator;
+      N : constant access Noise_Generator := new Noise_Generator;
    begin
       N.Gen := new GNAT.Random_Numbers.Generator;
       GNAT.Random_Numbers.Reset (N.Gen.all);

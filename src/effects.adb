@@ -1,6 +1,7 @@
-with Ada.Text_IO; use Ada.Text_IO;
-
 package body Effects is
+
+   function Add_Generator
+     (Self : in out Mixer; G : Mixer_Generator) return Natural;
 
    -------------------
    -- Add_Generator --
@@ -20,9 +21,10 @@ package body Effects is
    -------------------
 
    function Add_Generator
-     (Self : in out Mixer; G : access Generator'Class; Level : Float) return Natural
+     (Self : in out Mixer; G : access Generator'Class;
+      Level : Float) return Natural
    is
-      MG : Mixer_Generator := Mixer_Generator'(Gen   => G,
+      MG : constant Mixer_Generator := Mixer_Generator'(Gen   => G,
                                                Level => Level);
    begin
       return Add_Generator (Self, MG);
@@ -35,7 +37,8 @@ package body Effects is
    procedure Add_Generator
      (Self : in out Mixer; G : access Generator'Class; Level : Float)
    is
-      Discard : Natural := Add_Generator (Self, G, Level);
+      Discard : constant Natural := Add_Generator (Self, G, Level);
+      pragma Unreferenced (Discard);
    begin
       null;
    end Add_Generator;
@@ -44,7 +47,7 @@ package body Effects is
    -- Next_Sample_Impl --
    ----------------------
 
-   function Next_Sample_Impl (Self : in out Mixer) return Sample
+   overriding function Next_Sample_Impl (Self : in out Mixer) return Sample
    is
       Ret, Tmp : Sample := 0.0;
 
@@ -64,14 +67,14 @@ package body Effects is
    function Create_Mixer
      (Sources : Generators_Arg_Array) return access Mixer
    is
-      Ret : access Mixer := new Mixer;
+      Ret : constant access Mixer := new Mixer;
       Discard : Natural;
+      pragma Unreferenced (Discard);
    begin
       for Source of Sources loop
          Discard := Add_Generator (Ret.all, Source);
       end loop;
       return Ret;
    end Create_Mixer;
-
 
 end Effects;

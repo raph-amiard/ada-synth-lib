@@ -1,4 +1,3 @@
-with Ada.Finalization; use Ada.Finalization;
 with Config; use Config;
 
 package body Command is
@@ -8,7 +7,9 @@ package body Command is
    ---------------------------
 
    function Create_Simple_Command
-     (On_Period, Off_Period : Period; Note : Note_T) return Note_Generator_Access is
+     (On_Period, Off_Period : Period;
+      Note : Note_T) return Note_Generator_Access
+   is
    begin
       return new Simple_Command'(Note              => Note,
                                  Current_Sample_Nb => <>,
@@ -23,7 +24,7 @@ package body Command is
    -----------------------
 
    overriding function Next_Message_Impl
-     (Self: in out Simple_Command) return Note_Signal
+     (Self : in out Simple_Command) return Note_Signal
    is
    begin
       Self.Current_P := Self.Current_P + 1;
@@ -44,7 +45,7 @@ package body Command is
      (Nb_Steps, BPM : Natural;
       Measures : Natural := 1) return access Simple_Sequencer
    is
-      Ret : access Simple_Sequencer :=
+      Ret : constant access Simple_Sequencer :=
         new Simple_Sequencer'
           (BPM => BPM,
            Nb_Steps => Nb_Steps * Measures,
@@ -59,13 +60,12 @@ package body Command is
    -----------------------
 
    overriding function Next_Message_Impl
-     (Self: in out Simple_Sequencer) return Note_Signal
+     (Self : in out Simple_Sequencer) return Note_Signal
    is
-      Cur_Note : Sequencer_Note := Self.Notes (Self.Current_Note + 1);
+      Cur_Note : constant Sequencer_Note := Self.Notes (Self.Current_Note + 1);
    begin
       Self.Current_P := Self.Current_P + 1;
-      if Self.Current_P = 1 and then Cur_Note /= No_Seq_Note
-      then
+      if Self.Current_P = 1 and then Cur_Note /= No_Seq_Note then
          return Note_Signal'(Kind => On,
                              Note => Cur_Note.Note);
       elsif Self.Current_P = Cur_Note.Duration + 1 then
@@ -80,4 +80,3 @@ package body Command is
    end Next_Message_Impl;
 
 end Command;
-

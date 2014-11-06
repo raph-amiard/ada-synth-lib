@@ -8,9 +8,11 @@ package Command is
    end record;
 
    function Create_Simple_Command
-     (On_Period, Off_Period : Period; Note : Note_T) return Note_Generator_Access;
+     (On_Period, Off_Period : Period;
+      Note : Note_T) return Note_Generator_Access;
 
-   overriding function Next_Message_Impl (Self: in out Simple_Command) return Note_Signal;
+   overriding function Next_Message_Impl
+     (Self : in out Simple_Command) return Note_Signal;
 
    type Sequencer_Note is record
       Note : Note_T;
@@ -28,9 +30,10 @@ package Command is
    end record;
 
    function Create_Sequencer
-     (Nb_Steps, BPM : Natural; Measures : Natural := 1) return access Simple_Sequencer;
+     (Nb_Steps, BPM : Natural;
+      Measures : Natural := 1) return access Simple_Sequencer;
 
    overriding function Next_Message_Impl
-     (Self: in out Simple_Sequencer) return Note_Signal;
+     (Self : in out Simple_Sequencer) return Note_Signal;
 
 end Command;

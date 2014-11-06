@@ -18,7 +18,8 @@ package Utils is
 
    No_Note : constant Note_T := (A, -1);
 
-   function Note_To_Freq (N : Note_T; Rel_Pitch : Integer := 0) return Frequency;
+   function Note_To_Freq
+     (N : Note_T; Rel_Pitch : Integer := 0) return Frequency;
 
    function Period_In_Samples (Rate_In_Hertz : Frequency) return Period
    is (Period (SAMPLE_RATE / Rate_In_Hertz));
