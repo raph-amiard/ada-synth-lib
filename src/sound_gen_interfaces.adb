@@ -1,5 +1,9 @@
 package body Sound_Gen_Interfaces is
 
+   -----------------
+   -- Next_Sample --
+   -----------------
+
    function Next_Sample
      (Self : in out Generator) return Sample is
    begin
@@ -15,6 +19,10 @@ package body Sound_Gen_Interfaces is
 
       return Self.Memo_Sample;
    end Next_Sample;
+
+   ------------------
+   -- Next_Message --
+   ------------------
 
    function Next_Message
      (Self : in out Note_Generator) return Note_Signal

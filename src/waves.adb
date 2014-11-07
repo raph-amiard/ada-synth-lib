@@ -1,7 +1,6 @@
 with Ada.Numerics; use Ada.Numerics;
 with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
 with Effects; use Effects;
-with Ada.Text_IO; use Ada.Text_IO;
 
 package body Waves is
 
@@ -137,7 +136,7 @@ package body Waves is
    procedure Add_Processor
      (Self : in out Chain; P : Signal_Processor_Access) is
    begin
-      Put_Line (Standard_Error, Self.Nb_Processors'Img);
+--        Put_Line (Standard_Error, Self.Nb_Processors'Img);
       Self.Processors (Self.Nb_Processors) := P;
       Self.Nb_Processors := Self.Nb_Processors + 1;
    end Add_Processor;

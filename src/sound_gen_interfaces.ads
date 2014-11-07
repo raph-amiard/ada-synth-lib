@@ -18,6 +18,7 @@ package Sound_Gen_Interfaces is
      (Self : in out Generator) return Sample is abstract;
 
    function Next_Sample (Self : in out Generator) return Sample;
+
    ----------------------
    -- Signal_Processor --
    ----------------------
@@ -33,12 +34,9 @@ package Sound_Gen_Interfaces is
 
    type Note_Signal_T is (On, Off, No_Signal);
 
-   type Note_Signal (Kind : Note_Signal_T := No_Signal) is record
-      case Kind is
-         when On =>
-            Note : Note_T;
-         when others => null;
-      end case;
+   type Note_Signal is record
+      Note : Note_T;
+      Kind : Note_Signal_T := No_Signal;
    end record;
 
    type Note_Generator is abstract tagged record

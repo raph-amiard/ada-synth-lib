@@ -42,6 +42,20 @@ package Effects is
    is
      ((S + 1.0) / 2.0);
 
+   type Low_Pass_Filter is new Signal_Processor with record
+      Cut_Freq : Float;
+      Cut_Freq_Provider : Generator_Access;
+      Res : Float;
+      A0, A1, A2, B1, B2 : Float;
+      D1, D2, D3, D4 : Float := 0.0;
+   end record;
+
+   function Create_LP (Cut_Freq_Provider : Generator_Access;
+                    Res : Float) return access Low_Pass_Filter;
+
+   overriding function Process
+     (Self : in out Low_Pass_Filter; S : Sample) return Sample;
+
    -----------
    -- Mixer --
    -----------

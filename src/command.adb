@@ -31,9 +31,9 @@ package body Command is
       if Self.Current_P = Self.On_Period then
          return Note_Signal'(Kind => On, Note => Self.Note);
       elsif Self.Current_P = Self.Off_Period then
-         return Note_Signal'(Kind => Off);
+         return Note_Signal'(Kind => Off, Note => <>);
       else
-         return Note_Signal'(Kind => No_Signal);
+         return Note_Signal'(Kind => No_Signal, Note => <>);
       end if;
    end Next_Message_Impl;
 
@@ -65,18 +65,22 @@ package body Command is
       Cur_Note : constant Sequencer_Note := Self.Notes (Self.Current_Note + 1);
    begin
       Self.Current_P := Self.Current_P + 1;
+
       if Self.Current_P = 1 and then Cur_Note /= No_Seq_Note then
          return Note_Signal'(Kind => On,
                              Note => Cur_Note.Note);
-      elsif Self.Current_P = Cur_Note.Duration + 1 then
-         return Note_Signal'(Kind => Off);
+      elsif Cur_Note /= No_Seq_Note
+        and then Self.Current_P = Cur_Note.Duration + 1
+      then
+         return Note_Signal'(Kind => Off, Note => <>);
       else
-         if Self.Current_P = Self.Interval then
+         if Self.Current_P >= Self.Interval then
             Self.Current_P := 0;
             Self.Current_Note := (Self.Current_Note + 1) mod Self.Nb_Steps;
          end if;
-         return Note_Signal'(Kind => No_Signal);
+         return Note_Signal'(Kind => No_Signal, Note => <>);
       end if;
+
    end Next_Message_Impl;
 
 end Command;
