@@ -99,7 +99,7 @@ procedure Audio is
      Create_Mixer ((1 => (Kick, 0.5),
                     2 => (Snare, 0.5),
                     3 => (Hat, 0.5),
-                    4 => (Synth, 0.2)));
+                    4 => (Synth, 0.1)));
 
    o : constant Sequencer_Note := No_Seq_Note;
    K : constant Sequencer_Note := ((G, 3), 8000);
