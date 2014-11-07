@@ -8,6 +8,7 @@ project Ada_Audio is
    end Builder;
 
    package Compiler is
-      for Default_Switches ("Ada") use ("-O3", "-g", "-gnatwaCJ", "-gnatygO");
+      for Default_Switches ("Ada") use
+        ("-O3", "-g", "-gnatwaCJ", "-gnatygO", "-gnatp");
    end Compiler;
 end Ada_Audio;

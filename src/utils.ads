@@ -16,6 +16,9 @@ package Utils is
       Octave : Octave_T;
    end record;
 
+   function Note_Img (N : Note_T) return String is
+      (N.Scale_Degree'Img & " " & N.Octave'Img);
+
    No_Note : constant Note_T := (A, -1);
 
    function Note_To_Freq
@@ -35,5 +38,7 @@ package Utils is
 
    function Msec_To_Period (Ms : Millisecond) return Period is
      (Period (Float (Ms) / 1000.0 * Float (SAMPLE_RATE)));
+
+   function Sin (N : Float) return Float;
 
 end Utils;

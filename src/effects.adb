@@ -56,13 +56,25 @@ package body Effects is
    overriding function Next_Sample_Impl (Self : in out Mixer) return Sample
    is
       Ret, Tmp : Sample := 0.0;
-
+      Env_Level : Sample;
    begin
+      if Self.Env /= null then
+         Env_Level := Self.Env.Next_Sample;
+         if Env_Level = 0.0 then
+            return 0.0;
+         end if;
+      end if;
+
       for I in 0 .. Self.Length - 1 loop
          Tmp := Self.Generators (I).Gen.Next_Sample;
          Tmp := Tmp * Sample (Self.Generators (I).Level);
          Ret := Ret + Tmp;
       end loop;
+
+      if Self.Env /= null then
+         Ret := Ret * Env_Level;
+      end if;
+
       return Saturate (Ret);
    end Next_Sample_Impl;
 
@@ -71,7 +83,8 @@ package body Effects is
    ------------------
 
    function Create_Mixer
-     (Sources : Generators_Arg_Array) return access Mixer
+     (Sources : Generators_Arg_Array;
+      Env : access ADSR := null) return access Mixer
    is
       Ret : constant access Mixer := new Mixer;
       Discard : Natural;
@@ -80,6 +93,7 @@ package body Effects is
       for Source of Sources loop
          Discard := Add_Generator (Ret.all, Source);
       end loop;
+      Ret.Env := Env;
       return Ret;
    end Create_Mixer;
 
@@ -151,6 +165,54 @@ package body Effects is
       Self.D4 := Self.A2 * X + Self.B2 * Y;
 
       return Sample (Y);
+   end Process;
+
+   ----------------------
+   -- Create_Digi_Dist --
+   ----------------------
+
+   function Create_Digi_Dist
+     (Clip_Level : Float) return access Digital_Disto is
+   begin
+      return new Digital_Disto'(Clip_Level => Sample (Clip_Level));
+   end Create_Digi_Dist;
+
+   -------------
+   -- Process --
+   -------------
+
+   overriding function Process
+     (Self : in out Digital_Disto; S : Sample) return Sample is
+   begin
+      return (if S > Self.Clip_Level then Self.Clip_Level
+              elsif S < -Self.Clip_Level then -Self.Clip_Level
+              else S);
+   end Process;
+
+   -----------------
+   -- Create_Dist --
+   -----------------
+
+   function Create_Dist
+     (Clip_Level : Float; Coeff : Float := 10.0) return access Disto
+   is
+   begin
+      return new Disto'(Clip_Level => Sample (Clip_Level),
+                        Coeff      => Sample (Coeff));
+   end Create_Dist;
+
+   -------------
+   -- Process --
+   -------------
+
+   overriding function Process
+     (Self : in out Disto; S : Sample) return Sample is
+   begin
+      return (if S > Self.Clip_Level
+              then Self.Clip_Level + ((S - Self.Clip_Level) / Self.Coeff)
+              elsif S < -Self.Clip_Level
+              then -Self.Clip_Level - ((S + Self.Clip_Level) / Self.Coeff)
+              else S);
    end Process;
 
 end Effects;

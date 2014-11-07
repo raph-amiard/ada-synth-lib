@@ -18,6 +18,7 @@ package Sound_Gen_Interfaces is
      (Self : in out Generator) return Sample is abstract;
 
    function Next_Sample (Self : in out Generator) return Sample;
+   pragma Inline (Next_Sample);
 
    ----------------------
    -- Signal_Processor --

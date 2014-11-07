@@ -1,5 +1,4 @@
 with Ada.Numerics; use Ada.Numerics;
-with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
 with Effects; use Effects;
 
 package body Waves is
@@ -136,7 +135,6 @@ package body Waves is
    procedure Add_Processor
      (Self : in out Chain; P : Signal_Processor_Access) is
    begin
---        Put_Line (Standard_Error, Self.Nb_Processors'Img);
       Self.Processors (Self.Nb_Processors) := P;
       Self.Nb_Processors := Self.Nb_Processors + 1;
    end Add_Processor;
@@ -224,6 +222,7 @@ package body Waves is
             else
                Ret := Sample (Self.Sustain);
             end if;
+            Self.Memo_Sample := Ret;
          when Release =>
             if Self.Current_P in 0 .. Self.Release then
                Ret :=
@@ -251,10 +250,12 @@ package body Waves is
       case Note_Sig.Kind is
          when On =>
             Self.Current_Note := Note_Sig.Note;
+            Self.Current_Freq :=
+              Note_To_Freq (Self.Current_Note, Self.Relative_Pitch);
          when others => null;
       end case;
 
-      Ret := Sample (Note_To_Freq (Self.Current_Note, Self.Relative_Pitch));
+      Ret := Sample (Self.Current_Freq);
 
       if Self.Proc /= null then
          Ret := Ret + Self.Proc.Next_Sample;

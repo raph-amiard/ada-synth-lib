@@ -49,7 +49,8 @@ package body Command is
         new Simple_Sequencer'
           (BPM => BPM,
            Nb_Steps => Nb_Steps * Measures,
-           Interval => Period ((BPM * Natural (SAMPLE_RATE)) / 60 / Nb_Steps),
+           Interval => Period
+             ((BPM * Natural (SAMPLE_RATE)) / 60 / Nb_Steps),
            others => <>);
    begin
       return Ret;
@@ -59,28 +60,23 @@ package body Command is
    -- Next_Message_Impl --
    -----------------------
 
-   overriding function Next_Message_Impl
+   overriding function Next_Message
      (Self : in out Simple_Sequencer) return Note_Signal
    is
-      Cur_Note : constant Sequencer_Note := Self.Notes (Self.Current_Note + 1);
+      Cur_Note : constant Sequencer_Note :=
+        Self.Notes ((Natural (Sample_Nb / Self.Interval)
+                    mod Self.Nb_Steps) + 1);
+      Current_P : constant Period := Sample_Nb mod Self.Interval;
    begin
-      Self.Current_P := Self.Current_P + 1;
-
-      if Self.Current_P = 1 and then Cur_Note /= No_Seq_Note then
-         return Note_Signal'(Kind => On,
-                             Note => Cur_Note.Note);
+      if Current_P = 1 and then Cur_Note /= No_Seq_Note then
+         return Note_Signal'(Kind => On, Note => Cur_Note.Note);
       elsif Cur_Note /= No_Seq_Note
-        and then Self.Current_P = Cur_Note.Duration + 1
+        and then Current_P = Cur_Note.Duration + 1
       then
          return Note_Signal'(Kind => Off, Note => <>);
-      else
-         if Self.Current_P >= Self.Interval then
-            Self.Current_P := 0;
-            Self.Current_Note := (Self.Current_Note + 1) mod Self.Nb_Steps;
-         end if;
-         return Note_Signal'(Kind => No_Signal, Note => <>);
       end if;
 
-   end Next_Message_Impl;
+      return Note_Signal'(Kind => No_Signal, Note => <>);
+   end Next_Message;
 
 end Command;

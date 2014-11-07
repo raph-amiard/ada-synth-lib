@@ -70,6 +70,7 @@ package Waves is
 
    type Pitch_Gen is new Generator with record
       Current_Note : Note_T := (C, 4);
+      Current_Freq : Frequency;
       Relative_Pitch : Integer;
       Source : Note_Generator_Access;
       Proc : Generator_Access := null;
@@ -81,7 +82,9 @@ package Waves is
       return access Pitch_Gen
    is
      (new Pitch_Gen'(Relative_Pitch => Rel_Pitch, Source => Source,
-                     Proc => Proc, others => <>));
+                     Proc => Proc,
+                     Current_Freq => Note_To_Freq ((A, 4), Rel_Pitch),
+                     others => <>));
 
    overriding function Next_Sample_Impl
      (Self : in out Pitch_Gen) return Sample;
