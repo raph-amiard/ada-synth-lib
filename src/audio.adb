@@ -73,8 +73,8 @@ procedure Audio is
      Create_Chain
        (Create_Mixer
           ((
-           1 => (Create_Square (Create_Pitch_Gen (-24, Synth_Source)), 0.8),
-           2 => (Create_Square (Create_Pitch_Gen (7, Synth_Source)), 0.5)
+           1 => (Create_Square (Create_Pitch_Gen (-24, Synth_Source)), 1.0),
+           2 => (Create_Square (Create_Pitch_Gen (7, Synth_Source)), 0.4)
 --             3 => (Create_Chain
 --                   (Create_Square (Create_Pitch_Gen (3, Synth_Source)),
 --                      (1 => Synth_VCA, 2 => Synth_LFO)), 0.5),
@@ -82,20 +82,20 @@ procedure Audio is
 --                   (Create_Square (Create_Pitch_Gen (19, Synth_Source)),
 --                      (1 => Synth_VCA, 2 => Synth_LFO)), 0.5)
           ), Env => Create_ADSR (0, 100, 200, 0.1, Synth_Source)),
-        (1 => Create_LP
-           (Fixed (200.0,
+        (2 => Create_LP
+           (Fixed (50.0,
             Proc =>
               Create_Chain
-                (Create_ADSR (0, 150, 100, 0.005, Synth_Source),
-                 (0 => new Attenuator'(Level => 6000.0)))), 0.7),
-         2 => Create_Dist (0.2, 2.0)));
+                (Create_ADSR (200, 150, 1000, 0.005, Synth_Source),
+                 (0 => new Attenuator'(Level => 1000.0)))), 0.3),
+         1 => Create_Dist (0.2, 2.0)));
 
    Main_Mixer : constant access Mixer :=
      Create_Mixer ((
                    (Kick, 0.5),
                    (Snare, 0.7),
                    (Hat, 0.6),
-                   (Synth, 0.6)
+                   (Synth, 0.8)
                   ));
 
    o : constant Sequencer_Note := No_Seq_Note;
