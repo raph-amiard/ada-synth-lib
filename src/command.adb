@@ -68,15 +68,20 @@ package body Command is
                     mod Self.Nb_Steps) + 1);
       Current_P : constant Period := Sample_Nb mod Self.Interval;
    begin
-      if Current_P = 1 and then Cur_Note /= No_Seq_Note then
-         return Note_Signal'(Kind => On, Note => Cur_Note.Note);
-      elsif Cur_Note /= No_Seq_Note
-        and then Current_P = Cur_Note.Duration + 1
-      then
-         return Note_Signal'(Kind => Off, Note => <>);
-      end if;
+      return Res : Note_Signal do
+         Res.Kind := No_Signal;
 
-      return Note_Signal'(Kind => No_Signal, Note => <>);
+         if Cur_Note.Note /= No_Note then
+            if Current_P = Cur_Note.Duration then
+               Res.Kind := Off;
+            elsif Current_P = 1 then
+               Res.Kind := On;
+               Res.Note := Cur_Note.Note;
+            end if;
+         end if;
+
+      end return;
+
    end Next_Message;
 
 end Command;
