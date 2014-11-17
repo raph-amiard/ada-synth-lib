@@ -53,7 +53,7 @@ package body Effects is
    -- Next_Sample_Impl --
    ----------------------
 
-   overriding function Next_Sample_Impl (Self : in out Mixer) return Sample
+   overriding function Next_Sample (Self : in out Mixer) return Sample
    is
       Ret, Tmp : Sample := 0.0;
       Env_Level : Sample;
@@ -76,7 +76,7 @@ package body Effects is
       end if;
 
       return Saturate (Ret);
-   end Next_Sample_Impl;
+   end Next_Sample;
 
    ------------------
    -- Create_Mixer --
@@ -101,11 +101,13 @@ package body Effects is
    -- Create --
    ------------
 
-   function Create_LP (Cut_Freq_Provider : Generator_Access;
-                    Res : Float) return access Low_Pass_Filter
+   function Create_LP (Source : Generator_Access;
+                       Cut_Freq_Provider : Generator_Access;
+                       Res : Float) return access Low_Pass_Filter
    is
    begin
-      return new Low_Pass_Filter'(Cut_Freq_Provider => Cut_Freq_Provider,
+      return new Low_Pass_Filter'(Source => Source,
+                                  Cut_Freq_Provider => Cut_Freq_Provider,
                                   Res => Res,
                                   others => <>);
    end Create_LP;
@@ -142,8 +144,8 @@ package body Effects is
    -- Process --
    -------------
 
-   overriding function Process
-     (Self : in out Low_Pass_Filter; S : Sample) return Sample
+   overriding function Next_Sample
+     (Self : in out Low_Pass_Filter) return Sample
    is
       X, Y : Float;
       Cut_Freq : Float;
@@ -154,7 +156,7 @@ package body Effects is
          Filter_Init (Self);
       end if;
 
-      X := 0.7 * Float (S);
+      X := 0.7 * Float (Self.Source.Next_Sample);
       Y := Self.A0 * X + Self.D1;
       Self.D1 := Self.D2 + Self.A1 * X + Self.B1 * Y;
       Self.D2 := Self.A2 * X + Self.B2 * Y;
@@ -165,7 +167,7 @@ package body Effects is
       Self.D4 := Self.A2 * X + Self.B2 * Y;
 
       return Sample (Y);
-   end Process;
+   end Next_Sample;
 
    ----------------------
    -- Create_Digi_Dist --

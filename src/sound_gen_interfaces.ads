@@ -2,23 +2,25 @@ with Utils; use Utils;
 
 package Sound_Gen_Interfaces is
 
-   Sample_Nb : Period := 1;
+   Sample_Nb : Sample_Period := 1;
 
    ---------------
    -- Generator --
    ---------------
 
+   Generator_Buffer_Length : constant := 256;
+   type Generator_Buffer is
+     array (Natural range 0 .. Generator_Buffer_Length - 1) of Sample;
+
    type Generator is abstract tagged record
-      Current_Sample_Nb : Period := 0;
+      Current_Sample_Nb : Sample_Period := 0;
       Memo_Sample : Sample := 0.0;
+      Buffer : Generator_Buffer;
    end record;
    type Generator_Access is access all Generator'Class;
 
-   function Next_Sample_Impl
-     (Self : in out Generator) return Sample is abstract;
-
-   function Next_Sample (Self : in out Generator) return Sample;
-   pragma Inline (Next_Sample);
+   procedure Next_Samples (Self : in out Generator) is abstract;
+   pragma Inline (Next_Samples);
 
    ----------------------
    -- Signal_Processor --
@@ -41,13 +43,21 @@ package Sound_Gen_Interfaces is
    end record;
 
    type Note_Generator is abstract tagged record
-      Current_Sample_Nb : Period := 0;
+      Current_Sample_Nb : Sample_Period := 0;
       Memo_Signal : Note_Signal;
    end record;
    type Note_Generator_Access is access all Note_Generator'Class;
 
-   function Next_Message_Impl
-     (Self : in out Note_Generator) return Note_Signal is abstract;
-   function Next_Message (Self : in out Note_Generator) return Note_Signal;
+   procedure Next_Message (Self : in out Note_Generator) is abstract;
+
+   type Note_Generator_Array is
+     array (Natural range <>) of Note_Generator_Access;
+
+   Note_Generators : Note_Generator_Array (0 .. 1024);
+   Note_Generators_Nb : Natural := 0;
+
+   procedure Register_Note_Generator (N : Note_Generator_Access);
+
+   procedure Next_Step;
 
 end Sound_Gen_Interfaces;

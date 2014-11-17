@@ -3,8 +3,6 @@ with Effects; use Effects;
 
 package body Waves is
 
-   procedure Update_Period (Self : in out Wave_Generator'Class);
-
    -------------------
    -- Update_Period --
    -------------------
@@ -32,7 +30,7 @@ package body Waves is
    -- Next_Sample --
    -----------------
 
-   overriding function Next_Sample_Impl
+   overriding function Next_Sample
      (Self : in out Saw_Generator) return Sample is
    begin
       Update_Period (Self);
@@ -42,7 +40,7 @@ package body Waves is
          Self.Current := Self.Current - 2.0;
       end if;
       return Self.Current;
-   end Next_Sample_Impl;
+   end Next_Sample;
 
    ------------
    -- Create --
@@ -61,17 +59,22 @@ package body Waves is
    -- Next_Sample --
    -----------------
 
-   overriding function Next_Sample_Impl
-     (Self : in out Square_Generator) return Sample is
+   overriding function Next_Sample
+     (Self : in out Square_Generator) return Sample
+   is
    begin
       Update_Period (Self);
       Self.Current_Sample := Self.Current_Sample + 1;
-      if Self.Current_Sample >= Self.P then
-         Self.Current_Sample := 0;
-         Self.Is_High := not Self.Is_High;
-      end if;
-      return (if Self.Is_High then 1.0 else -1.0);
-   end Next_Sample_Impl;
+      declare
+         A : constant Period := Period (Self.Current_Sample) / Self.P;
+      begin
+         if A >= 1.0 then
+            Self.Current_Sample := 0;
+            return 1.0;
+         end if;
+         return (if A >= 0.5 then 1.0 else -1.0);
+      end;
+   end Next_Sample;
 
    ------------
    -- Create --
@@ -83,7 +86,7 @@ package body Waves is
       Ret : constant access Sine_Generator :=
         new Sine_Generator'(Frequency_Provider => Freq_Provider,
                             Current_Sample => 0,
-                            Current_P => 0,
+                            Current_P => 0.0,
                             others => <>);
    begin
       Update_Period (Ret.all);
@@ -95,20 +98,20 @@ package body Waves is
    -- Next_Sample --
    -----------------
 
-   overriding function Next_Sample_Impl
+   overriding function Next_Sample
      (Self : in out Sine_Generator) return Sample is
    begin
       Update_Period (Self);
-      Self.P := Self.P * 2;
+      Self.P := Self.P * 2.0;
       Self.Current_Sample := Self.Current_Sample + 1;
-      if Self.Current_Sample = Self.Current_P then
+      if Period (Self.Current_Sample) >= Self.Current_P then
          Self.Current_P := Self.P;
          Self.Current_Sample := 0;
       end if;
       return Sample
         (Sin
           (Float (Self.Current_Sample) / Float (Self.Current_P) * Pi * 2.0));
-   end Next_Sample_Impl;
+   end Next_Sample;
 
    ------------
    -- Create --
@@ -143,7 +146,7 @@ package body Waves is
    -- Next_Sample --
    -----------------
 
-   overriding function Next_Sample_Impl
+   overriding function Next_Sample
      (Self : in out Chain) return Sample
    is
       S : Sample := Self.Gen.Next_Sample;
@@ -152,7 +155,7 @@ package body Waves is
          S := Self.Processors (I).Process (S);
       end loop;
       return S;
-   end Next_Sample_Impl;
+   end Next_Sample;
 
    ---------
    -- LFO --
@@ -161,11 +164,10 @@ package body Waves is
    function LFO (Freq : Frequency; Amplitude : Float) return Generator_Access
    is
       Sin : constant Generator_Access := Create_Sine (Fixed (Freq));
-      LFO_Chain : constant access Chain := Create_Chain (Sin);
    begin
-      LFO_Chain.Add_Processor (new Attenuator'(Level => Amplitude));
-      LFO_Chain.Add_Processor (new Transposer'(others => <>));
-      return Generator_Access (LFO_Chain);
+      return new Attenuator'
+        (Level => Amplitude,
+         Source => new Transposer'(Source => Sin, others => <>), others => <>);
    end LFO;
 
    ------------
@@ -190,11 +192,11 @@ package body Waves is
    -- Next_Sample --
    -----------------
 
-   overriding function Next_Sample_Impl (Self : in out ADSR) return Sample
+   overriding function Next_Sample (Self : in out ADSR) return Sample
    is
       Ret : Sample;
    begin
-      case Self.Source.Next_Message.Kind is
+      case Self.Source.Memo_Signal.Kind is
          when On =>
             Self.Current_P := 0;
             Self.State := Running;
@@ -235,21 +237,20 @@ package body Waves is
          when Off  => Ret := 0.0;
       end case;
       return Ret;
-   end Next_Sample_Impl;
+   end Next_Sample;
 
    ----------------------
-   -- Next_Sample_Impl --
+   -- Next_Sample --
    ----------------------
 
-   overriding function Next_Sample_Impl
+   overriding function Next_Sample
      (Self : in out Pitch_Gen) return Sample
    is
-      Note_Sig : constant Note_Signal := Self.Source.Next_Message;
       Ret : Sample;
    begin
-      case Note_Sig.Kind is
+      case Self.Source.Memo_Signal.Kind is
          when On =>
-            Self.Current_Note := Note_Sig.Note;
+            Self.Current_Note := Self.Source.Memo_Signal.Note;
             Self.Current_Freq :=
               Note_To_Freq (Self.Current_Note, Self.Relative_Pitch);
          when others => null;
@@ -262,7 +263,7 @@ package body Waves is
       end if;
 
       return Ret;
-   end Next_Sample_Impl;
+   end Next_Sample;
 
    ------------------
    -- Create_Noise --
@@ -278,14 +279,14 @@ package body Waves is
    end Create_Noise;
 
    ----------------------
-   -- Next_Sample_Impl --
+   -- Next_Sample --
    ----------------------
 
-   overriding function Next_Sample_Impl
+   overriding function Next_Sample
      (Self : in out Noise_Generator) return Sample
    is
    begin
       return Sample (Float'(GNAT.Random_Numbers.Random (Self.Gen.all)));
-   end Next_Sample_Impl;
+   end Next_Sample;
 
 end Waves;

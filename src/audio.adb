@@ -103,7 +103,7 @@ procedure Audio is
    Z : constant Sequencer_Note := ((G, 3), 5000);
    B : constant Sequencer_Note := ((G, 3), 8000);
 
-   SNL : constant Period := 4000;
+   SNL : constant Sample_Period := 4000;
 
    S1 : constant Sequencer_Note := ((C, 4), SNL);
    S2 : constant Sequencer_Note := ((F, 4), SNL);
@@ -132,6 +132,7 @@ begin
    Put_Line (Standard_Error, Note_To_Freq ((A, 5))'Img);
 
    loop
+      Next_Step;
       Int_Smp := Sample_To_Uint16 (Main_Mixer.Next_Sample);
       Sample_Nb := Sample_Nb + 1;
       Ignore := GNAT.OS_Lib.Write

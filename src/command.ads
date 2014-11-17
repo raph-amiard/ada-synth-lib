@@ -3,20 +3,20 @@ with Utils; use Utils;
 
 package Command is
    type Simple_Command is new Note_Generator with record
-      On_Period, Off_Period, Current_P : Period;
+      On_Period, Off_Period, Current_P : Sample_Period;
       Note : Note_T;
    end record;
 
    function Create_Simple_Command
-     (On_Period, Off_Period : Period;
+     (On_Period, Off_Period : Sample_Period;
       Note : Note_T) return Note_Generator_Access;
 
-   overriding function Next_Message_Impl
-     (Self : in out Simple_Command) return Note_Signal;
+   overriding procedure Next_Message
+     (Self : in out Simple_Command);
 
    type Sequencer_Note is record
       Note : Note_T;
-      Duration : Period;
+      Duration : Sample_Period;
    end record;
 
    No_Seq_Note : Sequencer_Note := (Note => No_Note, Duration => 0);
@@ -25,7 +25,7 @@ package Command is
    type Simple_Sequencer (Nb_Steps : Natural) is new Note_Generator with record
       BPM : Natural := 120;
       Notes : Notes_Array (1 .. Nb_Steps) := (others => No_Seq_Note);
-      Interval : Period := 0;
+      Interval : Sample_Period := 0;
       Current_Note : Natural := 0;
    end record;
 
@@ -33,11 +33,7 @@ package Command is
      (Nb_Steps, BPM : Natural;
       Measures : Natural := 1) return access Simple_Sequencer;
 
-   overriding function Next_Message
-     (Self : in out Simple_Sequencer) return Note_Signal;
-
-   overriding function Next_Message_Impl
-     (Self : in out Simple_Sequencer) return Note_Signal is
-     ((No_Note, No_Signal));
+   overriding procedure Next_Message
+     (Self : in out Simple_Sequencer);
 
 end Command;

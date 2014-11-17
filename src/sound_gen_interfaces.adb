@@ -1,45 +1,24 @@
 package body Sound_Gen_Interfaces is
 
-   -----------------
-   -- Next_Sample --
-   -----------------
+   -----------------------------
+   -- Register_Note_Generator --
+   -----------------------------
 
-   function Next_Sample
-     (Self : in out Generator) return Sample is
+   procedure Register_Note_Generator (N : Note_Generator_Access) is
    begin
-      return Generator'Class (Self).Next_Sample_Impl;
---        case Sample_Nb - Self.Current_Sample_Nb is
---           when 0 => null;
---           when 1 =>
---              Self.Current_Sample_Nb := Sample_Nb;
---              Self.Memo_Sample := Generator'Class (Self).Next_Sample_Impl;
---           when others =>
---              raise Constraint_Error
---                with "Cannot ask for a sample further in the future";
---        end case;
---
---        return Self.Memo_Sample;
-   end Next_Sample;
+      Note_Generators (Note_Generators_Nb) := N;
+      Note_Generators_Nb := Note_Generators_Nb + 1;
+   end Register_Note_Generator;
 
-   ------------------
-   -- Next_Message --
-   ------------------
+   ---------------
+   -- Next_Step --
+   ---------------
 
-   function Next_Message
-     (Self : in out Note_Generator) return Note_Signal
-   is
+   procedure Next_Step is
    begin
-      case Sample_Nb - Self.Current_Sample_Nb is
-         when 0 => null;
-         when 1 =>
-            Self.Current_Sample_Nb := Sample_Nb;
-            Self.Memo_Signal := Note_Generator'Class (Self).Next_Message_Impl;
-         when others =>
-            raise Constraint_Error
-              with "Cannot ask for a sample further in the future";
-      end case;
-
-      return Self.Memo_Signal;
-   end Next_Message;
+      for I in 0 .. Note_Generators_Nb - 1 loop
+         Note_Generators (I).Next_Message;
+      end loop;
+   end Next_Step;
 
 end Sound_Gen_Interfaces;

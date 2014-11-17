@@ -1,14 +1,23 @@
 project Ada_Audio is
    for Source_Dirs use ("src");
    for Object_Dir use "obj";
-   for Main use ("audio.adb");
+   for Main use ("audio_2.adb");
+
+   type Build_Type is ("Debug", "Release");
+   Build : Build_Type := External ("Build", "Release");
 
    package Builder is
       for Global_Configuration_Pragmas use "./gnat.adc";
    end Builder;
 
    package Compiler is
-      for Default_Switches ("Ada") use
-        ("-O3", "-g", "-gnatwaCJ", "-gnatygO", "-gnatp");
+      case Build is
+         when "Debug" =>
+            for Default_Switches ("Ada") use
+              ("-O0", "-g", "-gnatwaCJ", "-gnatygO"); --  , "-gnatp");
+         when "Release" =>
+            for Default_Switches ("Ada") use
+              ("-O3", "-g", "-gnatwaCJ", "-gnatygO", "-gnatp");
+      end case;
    end Compiler;
 end Ada_Audio;

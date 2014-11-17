@@ -9,6 +9,8 @@ package Waves is
       P : Period;
    end record;
 
+   procedure Update_Period (Self : in out Wave_Generator'Class);
+
    -------------------
    -- Saw_Generator --
    -------------------
@@ -20,8 +22,8 @@ package Waves is
 
    function Create_Saw
      (Freq_Provider : Generator_Access) return access Saw_Generator;
-   overriding function Next_Sample_Impl
-     (Self : in out Saw_Generator) return Sample;
+   overriding procedure Next_Samples
+     (Self : in out Saw_Generator);
 
    ----------------------
    -- Square_Generator --
@@ -29,27 +31,27 @@ package Waves is
 
    type Square_Generator is new Wave_Generator with record
       Is_High : Boolean;
-      Current_Sample : Period;
+      Current_Sample : Sample_Period;
    end record;
 
    function Create_Square
      (Freq_Provider : Generator_Access) return access Square_Generator;
-   overriding function Next_Sample_Impl
-     (Self : in out Square_Generator) return Sample;
+   overriding procedure Next_Samples
+     (Self : in out Square_Generator);
 
    --------------------
    -- Sine_Generator --
    --------------------
 
    type Sine_Generator is new Wave_Generator with record
-      Current_Sample : Period;
+      Current_Sample : Sample_Period;
       Current_P : Period;
    end record;
 
    function Create_Sine
      (Freq_Provider : Generator_Access) return access Sine_Generator;
-   overriding function Next_Sample_Impl
-     (Self : in out Sine_Generator) return Sample;
+   overriding procedure Next_Samples
+     (Self : in out Sine_Generator);
 
    ---------------------
    -- Noise Generator --
@@ -61,8 +63,8 @@ package Waves is
 
    function Create_Noise return access Noise_Generator;
 
-   overriding function Next_Sample_Impl
-     (Self : in out Noise_Generator) return Sample;
+   overriding procedure Next_Samples
+     (Self : in out Noise_Generator);
 
    ---------------
    -- Pitch Gen --
@@ -86,8 +88,8 @@ package Waves is
                      Current_Freq => Note_To_Freq ((A, 4), Rel_Pitch),
                      others => <>));
 
-   overriding function Next_Sample_Impl
-     (Self : in out Pitch_Gen) return Sample;
+   overriding procedure Next_Samples
+     (Self : in out Pitch_Gen);
 
    ---------------
    -- Fixed_Gen --
@@ -103,12 +105,8 @@ package Waves is
    is
      (new Fixed_Gen'(Val => Sample (F), Proc => Proc, others => <>));
 
-   overriding function Next_Sample_Impl
-     (Self : in out Fixed_Gen) return Sample
-   is
-     (if Self.Proc /= null
-      then Self.Val + Self.Proc.Next_Sample
-      else Self.Val);
+   overriding procedure Next_Samples
+     (Self : in out Fixed_Gen);
 
    -----------
    -- Chain --
@@ -135,8 +133,8 @@ package Waves is
    procedure Add_Processor
      (Self : in out Chain; P : Signal_Processor_Access);
 
-   overriding function Next_Sample_Impl
-     (Self : in out Chain) return Sample;
+   overriding procedure Next_Samples
+     (Self : in out Chain);
 
    ---------
    -- LFO --
@@ -151,10 +149,10 @@ package Waves is
    type ADSR_State is (Running, Release, Off);
    type ADSR is new Generator with record
       Source : Note_Generator_Access;
-      Attack, Decay, Release : Period;
+      Attack, Decay, Release : Sample_Period;
       Sustain : Scale;
       Cur_Sustain : Scale;
-      Current_P : Period;
+      Current_P : Sample_Period;
       State : ADSR_State;
    end record;
 
@@ -163,5 +161,5 @@ package Waves is
       Sustain : Scale;
       Source : Note_Generator_Access := null) return access ADSR;
 
-   overriding function Next_Sample_Impl (Self : in out ADSR) return Sample;
+   overriding procedure Next_Samples (Self : in out ADSR);
 end Waves;

@@ -8,13 +8,14 @@ package Effects is
    -- Attenuator --
    ----------------
 
-   type Attenuator is new Signal_Processor with record
+   type Attenuator is new Generator with record
       Level : Float;
+      Source : Generator_Access;
    end record;
 
-   overriding function Process
-     (Self : in out Attenuator; S : Sample) return Sample is
-     (S * Sample (Self.Level));
+   overriding function Next_Sample
+     (Self : in out Attenuator) return Sample is
+     (Self.Source.Next_Sample * Sample (Self.Level));
 
    --------------------
    -- Dyn_Attenuator --
@@ -36,12 +37,14 @@ package Effects is
    -- Transposer --
    ----------------
 
-   type Transposer is new Signal_Processor with null record;
+   type Transposer is new Generator with record
+      Source : Generator_Access;
+   end record;
 
-   overriding function Process
-     (Self : in out Transposer; S : Sample) return Sample
+   overriding function Next_Sample
+     (Self : in out Transposer) return Sample
    is
-     ((S + 1.0) / 2.0);
+     ((Self.Source.Next_Sample + 1.0) / 2.0);
 
    -------------------
    -- Digital_Disto --
@@ -76,19 +79,21 @@ package Effects is
    -- LP_Filter --
    ---------------
 
-   type Low_Pass_Filter is new Signal_Processor with record
+   type Low_Pass_Filter is new Generator with record
       Cut_Freq : Float;
       Cut_Freq_Provider : Generator_Access;
       Res : Float;
       A0, A1, A2, B1, B2 : Float;
       D1, D2, D3, D4 : Float := 0.0;
+      Source : Generator_Access;
    end record;
 
-   function Create_LP (Cut_Freq_Provider : Generator_Access;
-                    Res : Float) return access Low_Pass_Filter;
+   function Create_LP (Source : Generator_Access;
+                       Cut_Freq_Provider : Generator_Access;
+                       Res : Float) return access Low_Pass_Filter;
 
-   overriding function Process
-     (Self : in out Low_Pass_Filter; S : Sample) return Sample;
+   overriding function Next_Sample
+     (Self : in out Low_Pass_Filter) return Sample;
 
    -----------
    -- Mixer --
@@ -121,6 +126,6 @@ package Effects is
    procedure Add_Generator
      (Self : in out Mixer; G : access Generator'Class; Level : Float);
 
-   overriding function Next_Sample_Impl (Self : in out Mixer) return Sample;
+   overriding function Next_Sample (Self : in out Mixer) return Sample;
 
 end Effects;

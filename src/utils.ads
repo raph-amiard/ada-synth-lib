@@ -2,7 +2,8 @@ with Config; use Config;
 
 package Utils is
    type Frequency is new Float;
-   type Period is new Natural;
+   type Sample_Period is new Natural;
+   type Period is new Float;
    type Sample is new Float;
 
    subtype Millisecond is Natural;
@@ -36,8 +37,8 @@ package Utils is
       type Int_T is range <>;
    function Sample_To_Int (S : Sample) return Int_T;
 
-   function Msec_To_Period (Ms : Millisecond) return Period is
-     (Period (Float (Ms) / 1000.0 * Float (SAMPLE_RATE)));
+   function Msec_To_Period (Ms : Millisecond) return Sample_Period is
+     (Sample_Period (Float (Ms) / 1000.0 * Float (SAMPLE_RATE)));
 
    function Sin (N : Float) return Float;
 
