@@ -1,13 +1,10 @@
-with Ada.Text_IO; use Ada.Text_IO;
 with GNAT.OS_Lib;
 with Utils; use Utils;
 with Waves; use Waves;
 with Effects; use Effects;
 with Sound_Gen_Interfaces; use Sound_Gen_Interfaces;
 with Command; use Command;
-pragma Warnings (Off);
 with BLIT; use BLIT;
-pragma Warnings (On);
 
 procedure Audio_2 is
 
@@ -24,26 +21,30 @@ procedure Audio_2 is
      Note_Generator_Access (Synth_Seq);
 --     Synth : constant access Sine_Generator := Create_Sine
 --       (Create_Pitch_Gen (0, Synth_Source));
-   Synth : constant access Low_Pass_Filter :=
-     Create_LP
-       (Create_Mixer
-          ((
-           3 => (BLIT.Create_Saw
-                 (Create_Pitch_Gen
-                    (-24, Synth_Source, LFO (8.0, 10.0))), 0.5),
-           2 => (BLIT.Create_Saw
-                 (Create_Pitch_Gen
-                    (-12, Synth_Source, LFO (8.0, 10.0))), 0.5),
-           1 => (BLIT.Create_Saw
-                 (Create_Pitch_Gen
-                    (-17, Synth_Source, LFO (8.0, 10.0))), 0.5)
+   Synth : constant access Disto :=
+     Create_Dist
+       (Create_LP
+          (Create_Mixer
+             ((
+              4 => (Create_Sine
+                    (Create_Pitch_Gen
+                         (-30, Synth_Source)), 0.6),
+              3 => (BLIT.Create_Saw
+                    (Create_Pitch_Gen
+                         (-24, Synth_Source)), 0.3),
+              2 => (BLIT.Create_Saw
+                    (Create_Pitch_Gen
+                         (-12, Synth_Source)), 0.3),
+              1 => (BLIT.Create_Saw
+                    (Create_Pitch_Gen
+                         (-17, Synth_Source)), 0.3)
           )),
         Fixed (200.0,
           Proc => new Attenuator'
-            (Level => 15500.0,
+            (Level => 500.0,
              Source => Create_ADSR (200, 150, 1000, 0.005, Synth_Source),
              others => <>)),
-        0.6);
+        0.8), 0.01, 5.0);
 
    Main_Mixer : constant access Mixer :=
      Create_Mixer ((
@@ -66,8 +67,6 @@ begin
       S3, S3, S3, S3, S3, S4, S4, S4,
       S1, S1, S1, S1, S1, S2, S2, S2,
       S5, S5, S5, S5, S5, S6, S6, S6);
-
-   Put_Line (Standard_Error, Note_To_Freq ((A, 5))'Img);
 
    loop
       Next_Steps;

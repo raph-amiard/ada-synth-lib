@@ -215,26 +215,57 @@ package body Effects is
    -----------------
 
    function Create_Dist
-     (Clip_Level : Float; Coeff : Float := 10.0) return access Disto
+     (Source : Generator_Access;
+      Clip_Level : Float; Coeff : Float := 10.0) return access Disto
    is
    begin
       return new Disto'(Clip_Level => Sample (Clip_Level),
-                        Coeff      => Sample (Coeff));
+                        Coeff      => Sample (Coeff),
+                        Source     => Source,
+                        others => <>);
    end Create_Dist;
 
    -------------
    -- Process --
    -------------
 
-   overriding function Process
-     (Self : in out Disto; S : Sample) return Sample is
+   overriding procedure Next_Samples
+     (Self : in out Disto)
+   is
+      S : Sample;
+      Invert : Boolean;
    begin
-      return (if S > Self.Clip_Level
-              then Self.Clip_Level + ((S - Self.Clip_Level) / Self.Coeff)
-              elsif S < -Self.Clip_Level
-              then -Self.Clip_Level - ((S + Self.Clip_Level) / Self.Coeff)
-              else S);
-   end Process;
+      Self.Source.Next_Samples;
+
+      for I in B_Range_T'Range loop
+         Invert := False;
+         S := Self.Source.Buffer (I);
+         if S < 0.0 then
+            S := -S;
+            Invert := True;
+         end if;
+
+         if S > 1.0 then
+            S := (Self.Clip_Level + 1.0) / 2.0;
+         elsif S > Self.Clip_Level then
+            S :=
+              Self.Clip_Level +
+                ((S - Self.Clip_Level) /
+                 (1.0 + ((S - Self.Clip_Level) /
+                    (1.0 - Self.Clip_Level)) ** 2));
+         end if;
+
+         if Invert then
+            S := -S;
+         end if;
+         Self.Buffer (I) := S;
+--             (if S > Self.Clip_Level
+--              then Self.Clip_Level + ((S - Self.Clip_Level) / Self.Coeff)
+--              elsif S < -Self.Clip_Level
+--              then -Self.Clip_Level - ((S + Self.Clip_Level) / Self.Coeff)
+--              else S);
+      end loop;
+   end Next_Samples;
 
    ------------------
    -- Next_Samples --

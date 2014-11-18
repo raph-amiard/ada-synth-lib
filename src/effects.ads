@@ -62,16 +62,18 @@ package Effects is
    -- Digital_Disto --
    -------------------
 
-   type Disto is new Signal_Processor with record
+   type Disto is new Generator with record
       Clip_Level : Sample;
       Coeff : Sample := 10.0;
+      Source : Generator_Access;
    end record;
 
    function Create_Dist
-     (Clip_Level : Float; Coeff : Float := 10.0) return access Disto;
+     (Source : Generator_Access;
+      Clip_Level : Float; Coeff : Float := 10.0) return access Disto;
 
-   overriding function Process
-     (Self : in out Disto; S : Sample) return Sample;
+   overriding procedure Next_Samples
+     (Self : in out Disto);
 
    ---------------
    -- LP_Filter --

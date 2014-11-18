@@ -180,7 +180,8 @@ package body BLIT is
             Impulse_Time := Self.Next_Impulse_Time;
             Self.Next_Impulse_Time := Impulse_Time + (Self.P_Buffer (I));
 
-            for I in Natural (Impulse_Time) .. Natural (Self.Next_Impulse_Time)
+            for I in Natural (Impulse_Time) + Step_Width
+              .. Natural (Self.Next_Impulse_Time)
             loop
                Self.Ring_Buffer (I mod Ring_Buf_HB) := 0.0;
             end loop;
