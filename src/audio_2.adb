@@ -41,10 +41,10 @@ procedure Audio_2 is
           )),
         Fixed (200.0,
           Proc => new Attenuator'
-            (Level => 500.0,
-             Source => Create_ADSR (200, 150, 1000, 0.005, Synth_Source),
+            (Level => 11500.0,
+             Source => Create_ADSR (10, 150, 200, 0.005, Synth_Source),
              others => <>)),
-        0.8), 0.01, 5.0);
+        0.18), 1.00001, 1.5);
 
    Main_Mixer : constant access Mixer :=
      Create_Mixer ((
