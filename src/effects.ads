@@ -13,25 +13,25 @@ package Effects is
       Source : Generator_Access;
    end record;
 
-   overriding function Next_Sample
-     (Self : in out Attenuator) return Sample is
-     (Self.Source.Next_Sample * Sample (Self.Level));
+   overriding procedure Next_Samples
+     (Self : in out Attenuator);
 
    --------------------
    -- Dyn_Attenuator --
    --------------------
 
-   type Dyn_Attenuator is new Signal_Processor with record
+   type Dyn_Attenuator is new Generator with record
       Level_Provider : Generator_Access;
+      Source : Generator_Access;
    end record;
 
-   function VCA (G : Generator_Access) return access Dyn_Attenuator
-   is (new Dyn_Attenuator'(Level_Provider => G));
+   function VCA (Source : Generator_Access;
+                 G : Generator_Access) return access Dyn_Attenuator
+   is (new Dyn_Attenuator'(Source => Source,
+                           Level_Provider => G, others => <>));
 
-   overriding function Process
-     (Self : in out Dyn_Attenuator; S : Sample) return Sample
-   is
-     (S * Self.Level_Provider.Next_Sample);
+   overriding procedure Next_Samples
+     (Self : in out Dyn_Attenuator);
 
    ----------------
    -- Transposer --
@@ -41,10 +41,8 @@ package Effects is
       Source : Generator_Access;
    end record;
 
-   overriding function Next_Sample
-     (Self : in out Transposer) return Sample
-   is
-     ((Self.Source.Next_Sample + 1.0) / 2.0);
+   overriding procedure Next_Samples
+     (Self : in out Transposer);
 
    -------------------
    -- Digital_Disto --
@@ -92,8 +90,8 @@ package Effects is
                        Cut_Freq_Provider : Generator_Access;
                        Res : Float) return access Low_Pass_Filter;
 
-   overriding function Next_Sample
-     (Self : in out Low_Pass_Filter) return Sample;
+   overriding procedure Next_Samples
+     (Self : in out Low_Pass_Filter);
 
    -----------
    -- Mixer --
@@ -126,6 +124,6 @@ package Effects is
    procedure Add_Generator
      (Self : in out Mixer; G : access Generator'Class; Level : Float);
 
-   overriding function Next_Sample (Self : in out Mixer) return Sample;
+   overriding procedure Next_Samples (Self : in out Mixer);
 
 end Effects;

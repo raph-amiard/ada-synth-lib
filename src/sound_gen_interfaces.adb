@@ -14,11 +14,11 @@ package body Sound_Gen_Interfaces is
    -- Next_Step --
    ---------------
 
-   procedure Next_Step is
+   procedure Next_Steps is
    begin
       for I in 0 .. Note_Generators_Nb - 1 loop
-         Note_Generators (I).Next_Message;
+         Note_Generators (I).Next_Messages;
       end loop;
-   end Next_Step;
+   end Next_Steps;
 
 end Sound_Gen_Interfaces;

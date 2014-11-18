@@ -11,7 +11,7 @@ package Command is
      (On_Period, Off_Period : Sample_Period;
       Note : Note_T) return Note_Generator_Access;
 
-   overriding procedure Next_Message
+   overriding procedure Next_Messages
      (Self : in out Simple_Command);
 
    type Sequencer_Note is record
@@ -33,7 +33,7 @@ package Command is
      (Nb_Steps, BPM : Natural;
       Measures : Natural := 1) return access Simple_Sequencer;
 
-   overriding procedure Next_Message
+   overriding procedure Next_Messages
      (Self : in out Simple_Sequencer);
 
 end Command;

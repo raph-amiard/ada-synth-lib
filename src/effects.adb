@@ -53,30 +53,44 @@ package body Effects is
    -- Next_Sample_Impl --
    ----------------------
 
-   overriding function Next_Sample (Self : in out Mixer) return Sample
+   overriding procedure Next_Samples (Self : in out Mixer)
    is
       Ret, Tmp : Sample := 0.0;
       Env_Level : Sample;
    begin
       if Self.Env /= null then
-         Env_Level := Self.Env.Next_Sample;
-         if Env_Level = 0.0 then
-            return 0.0;
-         end if;
+         Self.Env.Next_Samples;
       end if;
 
       for I in 0 .. Self.Length - 1 loop
-         Tmp := Self.Generators (I).Gen.Next_Sample;
-         Tmp := Tmp * Sample (Self.Generators (I).Level);
-         Ret := Ret + Tmp;
+         Self.Generators (I).Gen.Next_Samples;
       end loop;
 
-      if Self.Env /= null then
-         Ret := Ret * Env_Level;
-      end if;
+      for I in B_Range_T'Range loop
+         Ret := 0.0;
+         if Self.Env /= null then
+            Env_Level := Self.Env.Buffer (I);
+            if Env_Level = 0.0 then
+               Self.Buffer (I) := 0.0;
+               goto Continue_Label;
+            end if;
+         end if;
 
-      return Saturate (Ret);
-   end Next_Sample;
+         for J in 0 .. Self.Length - 1 loop
+            Tmp := Self.Generators (J).Gen.Buffer (I);
+            Tmp := Tmp * Sample (Self.Generators (J).Level);
+            Ret := Ret + Tmp;
+         end loop;
+
+         if Self.Env /= null then
+            Ret := Ret * Env_Level;
+         end if;
+
+         Self.Buffer (I) := Saturate (Ret);
+
+         <<Continue_Label>>
+      end loop;
+   end Next_Samples;
 
    ------------------
    -- Create_Mixer --
@@ -144,30 +158,35 @@ package body Effects is
    -- Process --
    -------------
 
-   overriding function Next_Sample
-     (Self : in out Low_Pass_Filter) return Sample
+   overriding procedure Next_Samples
+     (Self : in out Low_Pass_Filter)
    is
       X, Y : Float;
       Cut_Freq : Float;
    begin
-      Cut_Freq := Float (Self.Cut_Freq_Provider.Next_Sample);
-      if Cut_Freq /= Self.Cut_Freq then
-         Self.Cut_Freq := Cut_Freq;
-         Filter_Init (Self);
-      end if;
+      Self.Cut_Freq_Provider.Next_Samples;
+      Self.Source.Next_Samples;
 
-      X := 0.7 * Float (Self.Source.Next_Sample);
-      Y := Self.A0 * X + Self.D1;
-      Self.D1 := Self.D2 + Self.A1 * X + Self.B1 * Y;
-      Self.D2 := Self.A2 * X + Self.B2 * Y;
-      X := Y;
-      --  and the second
-      Y := Self.A0 * X + Self.D3;
-      Self.D3 := Self.D4 + Self.A1 * X + Self.B1 * Y;
-      Self.D4 := Self.A2 * X + Self.B2 * Y;
+      for I in B_Range_T'Range loop
+         Cut_Freq := Float (Self.Cut_Freq_Provider.Buffer (I));
+         if Cut_Freq /= Self.Cut_Freq then
+            Self.Cut_Freq := Cut_Freq;
+            Filter_Init (Self);
+         end if;
 
-      return Sample (Y);
-   end Next_Sample;
+         X := 0.7 * Float (Self.Source.Buffer (I));
+         Y := Self.A0 * X + Self.D1;
+         Self.D1 := Self.D2 + Self.A1 * X + Self.B1 * Y;
+         Self.D2 := Self.A2 * X + Self.B2 * Y;
+         X := Y;
+         --  and the second
+         Y := Self.A0 * X + Self.D3;
+         Self.D3 := Self.D4 + Self.A1 * X + Self.B1 * Y;
+         Self.D4 := Self.A2 * X + Self.B2 * Y;
+
+         Self.Buffer (I) := Sample (Y);
+      end loop;
+   end Next_Samples;
 
    ----------------------
    -- Create_Digi_Dist --
@@ -216,5 +235,49 @@ package body Effects is
               then -Self.Clip_Level - ((S + Self.Clip_Level) / Self.Coeff)
               else S);
    end Process;
+
+   ------------------
+   -- Next_Samples --
+   ------------------
+
+   overriding procedure Next_Samples
+     (Self : in out Attenuator)
+   is
+   begin
+      Self.Source.Next_Samples;
+      for I in B_Range_T'Range loop
+         Self.Buffer (I) := (Self.Source.Buffer (I) * Sample (Self.Level));
+      end loop;
+   end Next_Samples;
+
+   ------------------
+   -- Next_Samples --
+   ------------------
+
+   overriding procedure Next_Samples
+     (Self : in out Dyn_Attenuator)
+   is
+   begin
+      Self.Source.Next_Samples;
+      Self.Level_Provider.Next_Samples;
+      for I in B_Range_T'Range loop
+         Self.Buffer (I) :=
+           Self.Source.Buffer (I) * Self.Level_Provider.Buffer (I);
+      end loop;
+   end Next_Samples;
+
+   ------------------
+   -- Next_Samples --
+   ------------------
+
+   overriding procedure Next_Samples
+     (Self : in out Transposer)
+   is
+   begin
+      Self.Source.Next_Samples;
+      for I in B_Range_T'Range loop
+         Self.Buffer (I) := (Self.Source.Buffer (I) + 1.0) / 2.0;
+      end loop;
+   end Next_Samples;
 
 end Effects;

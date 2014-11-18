@@ -4,9 +4,11 @@ with GNAT.Random_Numbers;
 
 package Waves is
 
+   type Period_Buffer is array (B_Range_T) of Period;
+
    type Wave_Generator is abstract new Generator with record
       Frequency_Provider : Generator_Access := null;
-      P : Period;
+      P_Buffer : Period_Buffer;
    end record;
 
    procedure Update_Period (Self : in out Wave_Generator'Class);

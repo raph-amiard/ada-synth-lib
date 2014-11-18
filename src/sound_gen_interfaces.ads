@@ -9,8 +9,10 @@ package Sound_Gen_Interfaces is
    ---------------
 
    Generator_Buffer_Length : constant := 256;
+   type B_Range_T is range 0 .. Generator_Buffer_Length - 1;
+
    type Generator_Buffer is
-     array (Natural range 0 .. Generator_Buffer_Length - 1) of Sample;
+     array (B_Range_T) of Sample;
 
    type Generator is abstract tagged record
       Current_Sample_Nb : Sample_Period := 0;
@@ -42,13 +44,14 @@ package Sound_Gen_Interfaces is
       Kind : Note_Signal_T := No_Signal;
    end record;
 
+   type Note_Signal_Buffer is array (B_Range_T) of Note_Signal;
    type Note_Generator is abstract tagged record
       Current_Sample_Nb : Sample_Period := 0;
-      Memo_Signal : Note_Signal;
+      Buffer : Note_Signal_Buffer;
    end record;
    type Note_Generator_Access is access all Note_Generator'Class;
 
-   procedure Next_Message (Self : in out Note_Generator) is abstract;
+   procedure Next_Messages (Self : in out Note_Generator) is abstract;
 
    type Note_Generator_Array is
      array (Natural range <>) of Note_Generator_Access;
@@ -58,6 +61,6 @@ package Sound_Gen_Interfaces is
 
    procedure Register_Note_Generator (N : Note_Generator_Access);
 
-   procedure Next_Step;
+   procedure Next_Steps;
 
 end Sound_Gen_Interfaces;
