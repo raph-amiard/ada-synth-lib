@@ -1,7 +1,9 @@
-with Ada.Numerics; use Ada.Numerics;
 with Effects; use Effects;
+with Interfaces; use Interfaces;
 
 package body Waves is
+
+   function Mod_To_Int (A : Unsigned_32) return Integer_32;
 
    -------------------
    -- Update_Period --
@@ -302,17 +304,39 @@ package body Waves is
       return N;
    end Create_Noise;
 
-   ----------------------
-   -- Next_Sample --
-   ----------------------
+   F_Level : constant Sample := 2.0 / Sample (16#FFFFFFFF#);
+   G_X1 : Unsigned_32 := 16#67452301#;
+   G_X2 : Unsigned_32 := 16#EFCDAB89#;
+   Z : constant := 2 ** 31;
+
+   ----------------
+   -- Mod_To_Int --
+   ----------------
+
+   function Mod_To_Int (A : Unsigned_32) return Integer_32 is
+      Res : Integer_32;
+   begin
+      if A < Z then
+         return Integer_32 (A);
+      else
+         Res := Integer_32 (A - Z);
+         Res := Res - (Z - 1) - 1;
+         return Res;
+      end if;
+   end Mod_To_Int;
+
+   ------------------
+   -- Next_Samples --
+   ------------------
 
    overriding procedure Next_Samples
      (Self : in out Noise_Generator)
    is
    begin
       for I in B_Range_T'Range loop
-         Self.Buffer (I) :=
-           Sample (Float'(GNAT.Random_Numbers.Random (Self.Gen.all)));
+         G_X1 := G_X1 xor G_X2;
+         Self.Buffer (I) := Sample (Mod_To_Int (G_X2)) * F_Level;
+         G_X2 := G_X2 + G_X1;
       end loop;
    end Next_Samples;
 

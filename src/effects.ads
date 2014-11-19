@@ -104,7 +104,7 @@ package Effects is
       Level : Float;
    end record;
 
-   type Generator_Vector is array (Natural range 0 .. 1024) of Mixer_Generator;
+   type Generator_Vector is array (Natural range 0 .. 32) of Mixer_Generator;
 
    type Mixer is new Generator with record
       Generators : Generator_Vector;

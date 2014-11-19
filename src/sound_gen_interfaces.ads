@@ -8,7 +8,7 @@ package Sound_Gen_Interfaces is
    -- Generator --
    ---------------
 
-   Generator_Buffer_Length : constant := 1024;
+   Generator_Buffer_Length : constant := 32;
    type B_Range_T is range 0 .. Generator_Buffer_Length - 1;
 
    type Generator_Buffer is
@@ -56,7 +56,7 @@ package Sound_Gen_Interfaces is
    type Note_Generator_Array is
      array (Natural range <>) of Note_Generator_Access;
 
-   Note_Generators : Note_Generator_Array (0 .. 1024);
+   Note_Generators : Note_Generator_Array (0 .. 64);
    Note_Generators_Nb : Natural := 0;
 
    procedure Register_Note_Generator (N : Note_Generator_Access);

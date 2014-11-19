@@ -44,7 +44,7 @@ procedure Audio_2 is
             (Level => 1500.0,
              Source => Create_ADSR (10, 150, 200, 0.005, Synth_Source),
              others => <>)),
-        0.6), 1.00001, 1.5);
+        0.2), 1.00001, 1.5);
 
    Main_Mixer : constant access Mixer :=
      Create_Mixer ((

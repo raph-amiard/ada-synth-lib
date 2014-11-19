@@ -5,6 +5,7 @@ with Waves; use Waves;
 with Effects; use Effects;
 with Sound_Gen_Interfaces; use Sound_Gen_Interfaces;
 with Command; use Command;
+pragma Warnings (Off);
 with BLIT; use BLIT;
 
 procedure Audio is
@@ -93,17 +94,17 @@ procedure Audio is
              )),
            Fixed (200.0,
              Proc => new Attenuator'
-               (Level => 1500.0,
+               (Level => 500.0,
                 Source => Create_ADSR (10, 150, 200, 0.005, Synth_Source),
                 others => <>)),
-           0.18), 1.00001, 1.5);
+           0.1), 0.00001, 1.5);
 
    Main_Mixer : constant access Mixer :=
      Create_Mixer ((
                    (Kick, 0.5),
                    (Snare, 0.7),
                    (Hat, 0.6),
-                   (Synth, 0.55)
+                   (Synth, 0.45)
                   ));
 
    o : constant Sequencer_Note := No_Seq_Note;

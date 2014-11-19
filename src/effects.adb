@@ -1,6 +1,5 @@
 with Config; use Config;
-with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
-with Ada.Numerics; use Ada.Numerics;
+with Ada.Numerics.Elementary_Functions;
 
 package body Effects is
 
@@ -144,7 +143,7 @@ package body Effects is
          R := 0.001;
       end if;
 
-      K := Tan (W * Pi);
+      K := Ada.Numerics.Elementary_Functions.Tan (W * Pi);
       K2 := K * K;
       BH := 1.0 + R * K + K2;
       Self.A0 := K2 / BH;
