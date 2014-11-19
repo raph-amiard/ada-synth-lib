@@ -37,14 +37,14 @@ procedure Audio_2 is
                          (-12, Synth_Source)), 0.3),
               1 => (BLIT.Create_Saw
                     (Create_Pitch_Gen
-                         (-17, Synth_Source)), 0.3)
+                         (-17, Synth_Source)), 0.5)
           )),
         Fixed (200.0,
           Proc => new Attenuator'
-            (Level => 11500.0,
+            (Level => 1500.0,
              Source => Create_ADSR (10, 150, 200, 0.005, Synth_Source),
              others => <>)),
-        0.18), 1.00001, 1.5);
+        0.6), 1.00001, 1.5);
 
    Main_Mixer : constant access Mixer :=
      Create_Mixer ((

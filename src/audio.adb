@@ -5,6 +5,7 @@ with Waves; use Waves;
 with Effects; use Effects;
 with Sound_Gen_Interfaces; use Sound_Gen_Interfaces;
 with Command; use Command;
+with BLIT; use BLIT;
 
 procedure Audio is
 
@@ -29,11 +30,11 @@ procedure Audio is
               0.1),
 
         2 => (Create_Sine (Create_Pitch_Gen
-                 (-24, Kick_Source,
-                    Proc =>
-                      Create_Chain
-                        (Create_ADSR (0, 50, 10000, 0.1, Kick_Source),
-                         (0 => new Attenuator'(Level => 300.0))))),
+              (-24, Kick_Source,
+                 Proc => new Attenuator'
+                   (Level => 300.0,
+                    Source => Create_ADSR (0, 50, 10000, 0.1, Kick_Source),
+                    others => <>))),
 
               0.7)
        ), Env => Create_ADSR (10, 1000, 200, 0.2, Kick_Source));
@@ -50,9 +51,11 @@ procedure Audio is
                  (Create_Pitch_Gen
                     (12, Snare_Source,
                        Proc =>
-                         Create_Chain
-                           (Create_ADSR (0, 200, 10000, 0.5, Snare_Source),
-                            (0 => new Attenuator'(Level => 300.0))))),
+                          new Attenuator'
+                         (Level => 300.0,
+                          Source =>
+                            Create_ADSR (0, 200, 10000, 0.5, Snare_Source),
+                          others => <>))),
                  0.1)
           ), Env => Create_ADSR (0, 100, 100, 0.2, Snare_Source));
 
@@ -69,33 +72,38 @@ procedure Audio is
      Create_Sequencer (8, BPM, 4);
    Synth_Source : constant Note_Generator_Access :=
      Note_Generator_Access (Synth_Seq);
-   Synth : constant access Chain :=
-     Create_Chain
-       (Create_Mixer
-          ((
-           1 => (Create_Square (Create_Pitch_Gen (-24, Synth_Source)), 1.0),
-           2 => (Create_Square (Create_Pitch_Gen (7, Synth_Source)), 0.4)
---             3 => (Create_Chain
---                   (Create_Square (Create_Pitch_Gen (3, Synth_Source)),
---                      (1 => Synth_VCA, 2 => Synth_LFO)), 0.5),
---             3 => (Create_Chain
---                   (Create_Square (Create_Pitch_Gen (19, Synth_Source)),
---                      (1 => Synth_VCA, 2 => Synth_LFO)), 0.5)
-          ), Env => Create_ADSR (0, 100, 200, 0.1, Synth_Source)),
-        (2 => Create_LP
-           (Fixed (50.0,
-            Proc =>
-              Create_Chain
-                (Create_ADSR (200, 150, 1000, 0.005, Synth_Source),
-                 (0 => new Attenuator'(Level => 1000.0)))), 0.3),
-         1 => Create_Dist (0.2, 2.0)));
+
+   Synth : constant access Disto :=
+     Create_Dist
+       (Create_LP
+          (Create_Mixer
+             ((
+              4 => (Create_Sine
+                    (Create_Pitch_Gen
+                         (-30, Synth_Source)), 0.6),
+              3 => (BLIT.Create_Saw
+                    (Create_Pitch_Gen
+                         (-24, Synth_Source)), 0.3),
+              2 => (BLIT.Create_Saw
+                    (Create_Pitch_Gen
+                         (-12, Synth_Source)), 0.3),
+              1 => (BLIT.Create_Saw
+                    (Create_Pitch_Gen
+                         (-17, Synth_Source)), 0.5)
+             )),
+           Fixed (200.0,
+             Proc => new Attenuator'
+               (Level => 1500.0,
+                Source => Create_ADSR (10, 150, 200, 0.005, Synth_Source),
+                others => <>)),
+           0.18), 1.00001, 1.5);
 
    Main_Mixer : constant access Mixer :=
      Create_Mixer ((
                    (Kick, 0.5),
                    (Snare, 0.7),
                    (Hat, 0.6),
-                   (Synth, 0.8)
+                   (Synth, 0.55)
                   ));
 
    o : constant Sequencer_Note := No_Seq_Note;
@@ -132,11 +140,15 @@ begin
    Put_Line (Standard_Error, Note_To_Freq ((A, 5))'Img);
 
    loop
-      Next_Step;
-      Int_Smp := Sample_To_Uint16 (Main_Mixer.Next_Sample);
-      Sample_Nb := Sample_Nb + 1;
-      Ignore := GNAT.OS_Lib.Write
-        (GNAT.OS_Lib.Standout, Int_Smp'Address, Int_Smp'Size / 8);
+      Next_Steps;
+      Main_Mixer.Next_Samples;
+      for I in B_Range_T'Range loop
+         Int_Smp := Sample_To_Uint16 (Main_Mixer.Buffer (I));
+         Ignore := GNAT.OS_Lib.Write
+           (GNAT.OS_Lib.Standout, Int_Smp'Address, Int_Smp'Size / 8);
+      end loop;
+      exit when Sample_Nb > 10_000_000;
+      Sample_Nb := Sample_Nb + Generator_Buffer_Length;
    end loop;
 
 end Audio;
