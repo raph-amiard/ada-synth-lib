@@ -17,6 +17,18 @@ package body Utils is
            (Int_T'Last - 1));
    end Sample_To_Int;
 
+   --------------------
+   -- Sample_To_UInt --
+   --------------------
+
+   function Sample_To_UInt (S : Sample) return UInt_T is
+   begin
+      return UInt_T
+        (((Saturate (S) + 1.0) / 2.0)
+         * Sample
+           (UInt_T'Last - 1));
+   end Sample_To_UInt;
+
    ----------------------
    -- Distance_From_A4 --
    ----------------------
@@ -44,13 +56,15 @@ package body Utils is
    -- Sin --
    ---------
 
+   type Mm is mod 2 ** 32;
+
    TABLE_SIZE      : constant := 1024;
    TAN_TABLE_SIZE  : constant := 1024;
    PI2             : constant := 6.283185307;
    ALPHA           : constant := Float (TABLE_SIZE) / PI2;
 
    pragma Style_Checks (Off);
-   SINE_TABLE : constant array (0 .. TABLE_SIZE - 1) of Float :=
+   SINE_TABLE : constant array (Mm range 0 .. TABLE_SIZE - 1) of Float :=
      (
       0.0,  0.00613588,  0.0122715,  0.0184067,  0.0245412,  0.0306748,  0.0368072,  0.0429383
       ,  0.0490677,  0.0551952,  0.0613207,  0.0674439,  0.0735646,  0.0796824,  0.0857973,  0.091909
@@ -445,7 +459,7 @@ package body Utils is
 
    function Sin (N : Float) return Float is
    begin
-      return SINE_TABLE (Integer (ALPHA * N) mod TABLE_SIZE);
+      return SINE_TABLE (Mm (ALPHA * N) and (TABLE_SIZE - 1));
    end Sin;
 
    function Tan (N : Float) return Float is

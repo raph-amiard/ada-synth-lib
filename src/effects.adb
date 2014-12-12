@@ -1,5 +1,11 @@
+pragma Warnings (Off);
+
 with Config; use Config;
 with Ada.Numerics.Elementary_Functions;
+with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Float_Text_IO; use Ada.Float_Text_IO;
+
+pragma Warnings (On);
 
 package body Effects is
 
@@ -143,7 +149,16 @@ package body Effects is
          R := 0.001;
       end if;
 
-      K := Ada.Numerics.Elementary_Functions.Tan (W * Pi);
+      K := Utils.Tan (W * Pi);
+
+      Put (Standard_Error, "INPUT OF TAN : ");
+      Put (Standard_Error, W * Pi, 2, 5, 0);
+      New_Line (Standard_Error);
+
+      Put (Standard_Error, "ERROR OF TAN : ");
+      Put (Standard_Error, (K - Utils.Tan (W * Pi)), 2, 5, 0);
+      New_Line (Standard_Error);
+
       K2 := K * K;
       BH := 1.0 + R * K + K2;
       Self.A0 := K2 / BH;

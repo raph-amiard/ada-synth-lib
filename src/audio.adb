@@ -7,6 +7,7 @@ with Sound_Gen_Interfaces; use Sound_Gen_Interfaces;
 with Command; use Command;
 pragma Warnings (Off);
 with BLIT; use BLIT;
+with Interfaces.C; use Interfaces.C;
 
 procedure Audio is
 

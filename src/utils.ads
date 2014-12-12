@@ -37,6 +37,10 @@ package Utils is
       type Int_T is range <>;
    function Sample_To_Int (S : Sample) return Int_T;
 
+   generic
+      type UInt_T is mod <>;
+   function Sample_To_UInt (S : Sample) return UInt_T;
+
    function Msec_To_Period (Ms : Millisecond) return Sample_Period is
      (Sample_Period (Float (Ms) / 1000.0 * Float (SAMPLE_RATE)));
 
