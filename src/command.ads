@@ -21,6 +21,7 @@ package Command is
 
    No_Seq_Note : Sequencer_Note := (Note => No_Note, Duration => 0);
    type Notes_Array is array (Natural range <>) of Sequencer_Note;
+   No_Notes : Notes_Array (1 .. 0) := (others => <>);
 
    type Simple_Sequencer (Nb_Steps : Natural) is new Note_Generator with record
       BPM : Natural := 120;
@@ -31,7 +32,8 @@ package Command is
 
    function Create_Sequencer
      (Nb_Steps, BPM : Natural;
-      Measures : Natural := 1) return access Simple_Sequencer;
+      Measures : Natural := 1;
+      Notes : Notes_Array := No_Notes) return access Simple_Sequencer;
 
    overriding procedure Next_Messages
      (Self : in out Simple_Sequencer);

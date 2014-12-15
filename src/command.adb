@@ -48,7 +48,8 @@ package body Command is
 
    function Create_Sequencer
      (Nb_Steps, BPM : Natural;
-      Measures : Natural := 1) return access Simple_Sequencer
+      Measures : Natural := 1;
+      Notes : Notes_Array := No_Notes) return access Simple_Sequencer
    is
       Ret : constant access Simple_Sequencer :=
         new Simple_Sequencer'
@@ -59,6 +60,7 @@ package body Command is
            others => <>);
    begin
       Register_Note_Generator (Note_Generator_Access (Ret));
+      Ret.Notes := Notes;
       return Ret;
    end Create_Sequencer;
 

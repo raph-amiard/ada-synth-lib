@@ -91,10 +91,11 @@ package body Waves is
    ------------
 
    function Create_Sine
-     (Freq_Provider : Generator_Access) return access Sine_Generator
+     (Freq_Provider : access Generator'Class) return access Sine_Generator
    is
       Ret : constant access Sine_Generator :=
-        new Sine_Generator'(Frequency_Provider => Freq_Provider,
+        new Sine_Generator'(Frequency_Provider =>
+                              Generator_Access (Freq_Provider),
                             Current_Sample => 0,
                             Current_P => 0.0,
                             others => <>);
@@ -299,8 +300,6 @@ package body Waves is
    is
       N : constant access Noise_Generator := new Noise_Generator;
    begin
-      N.Gen := new GNAT.Random_Numbers.Generator;
-      GNAT.Random_Numbers.Reset (N.Gen.all);
       return N;
    end Create_Noise;
 

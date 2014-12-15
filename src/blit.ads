@@ -24,10 +24,10 @@ package BLIT is
    end record;
 
    function Create_Square
-     (Freq_Provider : Generator_Access) return access BLIT_Square;
+     (Freq_Provider : access Generator'Class) return access BLIT_Square;
 
    function Create_Saw
-     (Freq_Provider : Generator_Access) return access BLIT_Saw;
+     (Freq_Provider : access Generator'Class) return access BLIT_Saw;
 
    overriding procedure Next_Samples
      (Self : in out BLIT_Square);

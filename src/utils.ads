@@ -46,7 +46,7 @@ package Utils is
 
    function Sin (N : Float) return Float;
 
-   function Tan (N : Float) return Float;
+   function Filter_Tan (Freq : Natural) return Float;
 
    Pi : constant :=
      3.14159_26535_89793_23846_26433_83279_50288_41971_69399_37511;

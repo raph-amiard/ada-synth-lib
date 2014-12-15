@@ -1,6 +1,3 @@
-with Ada.Numerics.Long_Elementary_Functions;
-use Ada.Numerics.Long_Elementary_Functions;
-
 package body BLIT is
    Low_Pass : constant := 0.999;
    --  lower values filter more high frequency
@@ -30,7 +27,7 @@ package body BLIT is
       Master_Size : constant := Step_Width * Phase_Count;
       Master : array (Natural range 0 .. Master_Size - 1) of Float :=
         (others => 0.5);
-      Gain : Long_Float := 0.5 / 0.777;
+      Gain : Float := 0.5 / 0.777;
       --  adjust normal square wave's amplitude of ~0.777 to 0.5
 
       Sine_Size : constant Integer := 256 * Phase_Count + 2;
@@ -40,15 +37,15 @@ package body BLIT is
       loop
          exit when H > Max_Harmonic;
          declare
-            Amplitude : constant Long_Float := Gain / Long_Float (H);
-            To_Angle : constant Long_Float :=
-              3.14159265358979323846 * 2.0 / Long_Float (Sine_Size) *
-              Long_Float (H);
+            Amplitude : constant Float := Gain / Float (H);
+            To_Angle : constant Float :=
+              3.14159265358979323846 * 2.0 / Float (Sine_Size) *
+              Float (H);
          begin
             for I in 0 .. Master_Size - 1 loop
                Master (I) := Master (I) +
-                 Float  (Sin (Long_Float (I - Master_Size / 2) * To_Angle)
-                         * Amplitude);
+                 Sin (Float (I - Master_Size / 2) * To_Angle)
+                         * Amplitude;
             end loop;
             Gain := Gain * Low_Pass;
          end;
@@ -57,14 +54,14 @@ package body BLIT is
 
       for Phase in 0 .. Phase_Count - 1 loop
          declare
-            Error : Long_Float := 1.0;
-            Prev : Long_Float := 0.0;
+            Error : Float := 1.0;
+            Prev : Float := 0.0;
          begin
             for I in 0 .. Step_Width - 1 loop
                declare
-                  Cur : constant Long_Float := Long_Float
-                    (Master (I * Phase_Count + (Phase_Count - 1 - Phase)));
-                  Delt : constant Long_Float := Cur - Prev;
+                  Cur : constant Float :=
+                    Master (I * Phase_Count + (Phase_Count - 1 - Phase));
+                  Delt : constant Float := Cur - Prev;
                begin
                   Error := Error - Delt;
                   Prev := Cur;
@@ -84,9 +81,10 @@ package body BLIT is
    -------------------
 
    function Create_Square
-     (Freq_Provider : Generator_Access) return access BLIT_Square is
+     (Freq_Provider : access Generator'Class) return access BLIT_Square is
    begin
-      return new BLIT_Square'(Frequency_Provider => Freq_Provider,
+      return new BLIT_Square'(Frequency_Provider =>
+                                Generator_Access (Freq_Provider),
                               Current_Sample => 0,
                               others => <>);
    end Create_Square;
@@ -96,9 +94,10 @@ package body BLIT is
    ----------------
 
    function Create_Saw
-     (Freq_Provider : Generator_Access) return access BLIT_Saw is
+     (Freq_Provider : access Generator'Class) return access BLIT_Saw is
    begin
-      return new BLIT_Saw'(Frequency_Provider => Freq_Provider,
+      return new BLIT_Saw'(Frequency_Provider =>
+                             Generator_Access (Freq_Provider),
                               Current_Sample => 0,
                               others => <>);
    end Create_Saw;

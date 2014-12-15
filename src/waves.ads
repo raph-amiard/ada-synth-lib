@@ -1,6 +1,5 @@
 with Utils; use Utils;
 with Sound_Gen_Interfaces; use Sound_Gen_Interfaces;
-with GNAT.Random_Numbers;
 
 package Waves is
 
@@ -51,7 +50,7 @@ package Waves is
    end record;
 
    function Create_Sine
-     (Freq_Provider : Generator_Access) return access Sine_Generator;
+     (Freq_Provider : access Generator'Class) return access Sine_Generator;
    overriding procedure Next_Samples
      (Self : in out Sine_Generator);
 
@@ -59,9 +58,7 @@ package Waves is
    -- Noise Generator --
    ---------------------
 
-   type Noise_Generator is new Wave_Generator with record
-      Gen : access GNAT.Random_Numbers.Generator;
-   end record;
+   type Noise_Generator is new Wave_Generator with null record;
 
    function Create_Noise return access Noise_Generator;
 

@@ -10,7 +10,7 @@ package Effects is
 
    type Attenuator is new Generator with record
       Level : Float;
-      Source : Generator_Access;
+      Source : access Generator'Class;
    end record;
 
    overriding procedure Next_Samples
@@ -88,8 +88,8 @@ package Effects is
       Source : Generator_Access;
    end record;
 
-   function Create_LP (Source : Generator_Access;
-                       Cut_Freq_Provider : Generator_Access;
+   function Create_LP (Source : access Generator'Class;
+                       Cut_Freq_Provider : access Generator'Class;
                        Res : Float) return access Low_Pass_Filter;
 
    overriding procedure Next_Samples
