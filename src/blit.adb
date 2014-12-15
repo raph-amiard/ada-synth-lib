@@ -39,7 +39,7 @@ package body BLIT is
          declare
             Amplitude : constant Float := Gain / Float (H);
             To_Angle : constant Float :=
-              3.14159265358979323846 * 2.0 / Float (Sine_Size) *
+              Pi * 2.0 / Float (Sine_Size) *
               Float (H);
          begin
             for I in 0 .. Master_Size - 1 loop
@@ -74,6 +74,9 @@ package body BLIT is
               Steps (Phase, Step_Width / 2 + 1) + Sample (Error * 0.5);
          end;
       end loop;
+   exception
+      when Constraint_Error =>
+         null;
    end Init_Steps;
 
    -------------------
@@ -87,6 +90,9 @@ package body BLIT is
                                 Generator_Access (Freq_Provider),
                               Current_Sample => 0,
                               others => <>);
+
+   exception when Program_Error => return null;
+         when Constraint_Error => return null;
    end Create_Square;
 
    ----------------
@@ -99,7 +105,10 @@ package body BLIT is
       return new BLIT_Saw'(Frequency_Provider =>
                              Generator_Access (Freq_Provider),
                               Current_Sample => 0,
-                              others => <>);
+                           others => <>);
+
+   exception when Program_Error => return null;
+      when Constraint_Error => return null;
    end Create_Saw;
 
    --------------
@@ -109,15 +118,19 @@ package body BLIT is
    procedure Add_Step (Self : in out BLIT_Generator;
                        Time : Period; Delt : Sample)
    is
-      Whole : constant Natural := Natural (Period'Floor (Time));
-      Phase : constant Natural :=
+      Whole, Phase : Natural;
+   begin
+      Whole := Natural (Period'Floor (Time));
+      Phase :=
         Natural (Period'Floor ((Time - Period (Whole))
                  * Period (Phase_Count)));
-   begin
+
       for I in 0 .. Step_Width - 1 loop
          Self.Ring_Buffer ((Whole + I) mod Ring_Buf_HB) :=
            Steps (Phase, I) * Delt;
       end loop;
+
+   exception when Constraint_Error => null;
    end Add_Step;
 
    -----------------
@@ -159,6 +172,8 @@ package body BLIT is
 
          Self.Buffer (I) :=  Self.Last_Sum - 0.5;
       end loop;
+
+   exception when Constraint_Error => null;
    end Next_Samples;
 
    -----------------
@@ -198,6 +213,8 @@ package body BLIT is
 
          Self.Buffer (I) := Self.Last_Sum - 0.5;
       end loop;
+
+   exception when Constraint_Error => null;
    end Next_Samples;
 
 begin

@@ -1,1 +1,3 @@
 pragma Profile (Ravenscar);
+pragma Warnings 
+ (Off, "pragma Restrictions (No_Exception_Propagation) in effect");
