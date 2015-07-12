@@ -100,9 +100,11 @@ package body Effects is
       Discard : Natural;
       pragma Unreferenced (Discard);
    begin
+
       for Source of Sources loop
          Discard := Add_Generator (Ret.all, Source);
       end loop;
+
       Ret.Env := Env;
       return Ret;
    end Create_Mixer;

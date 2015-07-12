@@ -36,7 +36,7 @@ package Waves is
    end record;
 
    function Create_Square
-     (Freq_Provider : Generator_Access) return access Square_Generator;
+     (Freq_Provider : access Generator'Class) return access Square_Generator;
    overriding procedure Next_Samples
      (Self : in out Square_Generator);
 

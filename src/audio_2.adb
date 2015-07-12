@@ -21,6 +21,7 @@ procedure Audio_2 is
      Note_Generator_Access (Synth_Seq);
 --     Synth : constant access Sine_Generator := Create_Sine
 --       (Create_Pitch_Gen (0, Synth_Source));
+
    Synth : constant access Disto :=
      Create_Dist
        (Create_LP

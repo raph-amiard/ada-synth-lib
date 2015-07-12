@@ -6,12 +6,14 @@ project Ada_Audio is
    Build_Type : Build_Type_Kind := External ("build_type", "native");
 
    for Source_Dirs use ("src");
+   for Main use ("audio.adb", "audio_2.adb");
+   for Object_Dir use "obj";
 
    case Build_Type is
-      when "native" => 
+      when "native" =>
          for Main use ("audio.adb");
          for Object_Dir use "obj";
-      when "bareboard" => 
+      when "bareboard" =>
          for Main use ("bb_audio.adb");
          for Object_Dir use "bb_obj";
          for Runtime ("Ada") use "ravenscar-sfp-stm32f4";
@@ -32,4 +34,5 @@ project Ada_Audio is
               ("-O3", "-g", "-gnatwaCJ", "-gnatygO", "-gnatp", "-gnatn");
       end case;
    end Compiler;
+
 end Ada_Audio;

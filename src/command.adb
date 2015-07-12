@@ -56,7 +56,8 @@ package body Command is
           (BPM => BPM,
            Nb_Steps => Nb_Steps * Measures,
            Interval => Sample_Period
-             ((BPM * Natural (SAMPLE_RATE)) / 60 / Nb_Steps),
+             (((60.0 / Float (BPM) * 4.0)
+              / Float (Nb_Steps)) * Float (SAMPLE_RATE)),
            others => <>);
    begin
       Register_Note_Generator (Note_Generator_Access (Ret));

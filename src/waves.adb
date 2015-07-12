@@ -54,9 +54,10 @@ package body Waves is
    ------------
 
    function Create_Square
-     (Freq_Provider : Generator_Access) return access Square_Generator is
+     (Freq_Provider : access Generator'Class) return access Square_Generator is
    begin
-      return new Square_Generator'(Frequency_Provider => Freq_Provider,
+      return new Square_Generator'(Frequency_Provider =>
+                                     Generator_Access (Freq_Provider),
                                    Is_High => True,
                                    Current_Sample => 0,
                                    others => <>);

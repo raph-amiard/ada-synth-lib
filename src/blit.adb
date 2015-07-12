@@ -1,3 +1,6 @@
+with Ada.Numerics.Long_Elementary_Functions;
+use Ada.Numerics.Long_Elementary_Functions;
+
 package body BLIT is
    Low_Pass : constant := 0.999;
    --  lower values filter more high frequency
@@ -27,7 +30,7 @@ package body BLIT is
       Master_Size : constant := Step_Width * Phase_Count;
       Master : array (Natural range 0 .. Master_Size - 1) of Float :=
         (others => 0.5);
-      Gain : Float := 0.5 / 0.777;
+      Gain : Long_Float := 0.5 / 0.777;
       --  adjust normal square wave's amplitude of ~0.777 to 0.5
 
       Sine_Size : constant Integer := 256 * Phase_Count + 2;
@@ -37,15 +40,15 @@ package body BLIT is
       loop
          exit when H > Max_Harmonic;
          declare
-            Amplitude : constant Float := Gain / Float (H);
-            To_Angle : constant Float :=
-              Pi * 2.0 / Float (Sine_Size) *
-              Float (H);
+            Amplitude : constant Long_Float := Gain / Long_Float (H);
+            To_Angle : constant Long_Float :=
+              3.14159265358979323846 * 2.0 / Long_Float (Sine_Size) *
+              Long_Float (H);
          begin
             for I in 0 .. Master_Size - 1 loop
                Master (I) := Master (I) +
-                 Sin (Float (I - Master_Size / 2) * To_Angle)
-                         * Amplitude;
+                 Float  (Sin (Long_Float (I - Master_Size / 2) * To_Angle)
+                         * Amplitude);
             end loop;
             Gain := Gain * Low_Pass;
          end;
@@ -54,14 +57,14 @@ package body BLIT is
 
       for Phase in 0 .. Phase_Count - 1 loop
          declare
-            Error : Float := 1.0;
-            Prev : Float := 0.0;
+            Error : Long_Float := 1.0;
+            Prev : Long_Float := 0.0;
          begin
             for I in 0 .. Step_Width - 1 loop
                declare
-                  Cur : constant Float :=
-                    Master (I * Phase_Count + (Phase_Count - 1 - Phase));
-                  Delt : constant Float := Cur - Prev;
+                  Cur : constant Long_Float := Long_Float
+                    (Master (I * Phase_Count + (Phase_Count - 1 - Phase)));
+                  Delt : constant Long_Float := Cur - Prev;
                begin
                   Error := Error - Delt;
                   Prev := Cur;
@@ -74,9 +77,6 @@ package body BLIT is
               Steps (Phase, Step_Width / 2 + 1) + Sample (Error * 0.5);
          end;
       end loop;
-   exception
-      when Constraint_Error =>
-         null;
    end Init_Steps;
 
    -------------------
@@ -90,9 +90,6 @@ package body BLIT is
                                 Generator_Access (Freq_Provider),
                               Current_Sample => 0,
                               others => <>);
-
-   exception when Program_Error => return null;
-         when Constraint_Error => return null;
    end Create_Square;
 
    ----------------
@@ -105,10 +102,7 @@ package body BLIT is
       return new BLIT_Saw'(Frequency_Provider =>
                              Generator_Access (Freq_Provider),
                               Current_Sample => 0,
-                           others => <>);
-
-   exception when Program_Error => return null;
-      when Constraint_Error => return null;
+                              others => <>);
    end Create_Saw;
 
    --------------
@@ -118,19 +112,15 @@ package body BLIT is
    procedure Add_Step (Self : in out BLIT_Generator;
                        Time : Period; Delt : Sample)
    is
-      Whole, Phase : Natural;
-   begin
-      Whole := Natural (Period'Floor (Time));
-      Phase :=
+      Whole : constant Natural := Natural (Period'Floor (Time));
+      Phase : constant Natural :=
         Natural (Period'Floor ((Time - Period (Whole))
                  * Period (Phase_Count)));
-
+   begin
       for I in 0 .. Step_Width - 1 loop
          Self.Ring_Buffer ((Whole + I) mod Ring_Buf_HB) :=
            Steps (Phase, I) * Delt;
       end loop;
-
-   exception when Constraint_Error => null;
    end Add_Step;
 
    -----------------
@@ -172,8 +162,6 @@ package body BLIT is
 
          Self.Buffer (I) :=  Self.Last_Sum - 0.5;
       end loop;
-
-   exception when Constraint_Error => null;
    end Next_Samples;
 
    -----------------
@@ -213,8 +201,6 @@ package body BLIT is
 
          Self.Buffer (I) := Self.Last_Sum - 0.5;
       end loop;
-
-   exception when Constraint_Error => null;
    end Next_Samples;
 
 begin
