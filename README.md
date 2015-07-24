@@ -1,5 +1,5 @@
-Ada audio
-=========
+Ada synth lib
+=============
 
 Simple synthetizer library
 
@@ -12,4 +12,4 @@ $ gprbuild -p
 
 For bareboard/sfp:
 
-$ gprbuild -p -f --target=arm-eabi --RTS=ravenscar-sfp-stm32f4 -Xtarget=bareboard
+$ gprbuild -p -f -Xtarget=bareboard

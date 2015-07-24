@@ -1,4 +1,4 @@
-project Ada_Audio is
+project Ada_Synth_Lib is
    type Build_Type is ("Debug", "Release");
    Build : Build_Type := External ("Build", "Release");
 
@@ -35,4 +35,4 @@ project Ada_Audio is
       end case;
    end Compiler;
 
-end Ada_Audio;
+end Ada_Synth_Lib;
