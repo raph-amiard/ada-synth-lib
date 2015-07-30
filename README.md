@@ -6,9 +6,7 @@ purpose. The design goal is to make a library from which you can make synthesis
 musical instruments that can run on bareboard devices such as the STM32F4 board
 or the Rpi.
 
-Here is a small demo of the library:
-
-<iframe width="420" height="315" src="https://www.youtube.com/embed/2eiWnN1xWcs" frameborder="0" allowfullscreen></iframe>
+Here is a [small demo of the library (youtube video)](https://www.youtube.com/watch?v=2eiWnN1xWcs)
 
 Build
 =====
