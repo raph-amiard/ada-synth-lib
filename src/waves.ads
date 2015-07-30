@@ -100,9 +100,10 @@ package Waves is
    end record;
 
    function Fixed
-     (F : Frequency; Proc : Generator_Access := null) return access Fixed_Gen
+     (Freq : Frequency;
+      Modulator : Generator_Access := null) return access Fixed_Gen
    is
-     (new Fixed_Gen'(Val => Sample (F), Proc => Proc, others => <>));
+     (new Fixed_Gen'(Val => Sample (Freq), Proc => Modulator, others => <>));
 
    overriding procedure Next_Samples
      (Self : in out Fixed_Gen);
