@@ -1,3 +1,5 @@
+with Config; use Config;
+
 package body Effects is
 
    function Add_Generator
@@ -82,7 +84,11 @@ package body Effects is
             Ret := Ret * Env_Level;
          end if;
 
-         Self.Buffer (I) := Saturate (Ret);
+         if Self.Saturate then
+            Self.Buffer (I) := Saturate (Ret);
+         else
+            Self.Buffer (I) := Ret;
+         end if;
 
          <<Continue_Label>>
       end loop;
@@ -94,11 +100,11 @@ package body Effects is
 
    function Create_Mixer
      (Sources : Generators_Arg_Array;
-      Env : access ADSR := null) return access Mixer
+      Env : access ADSR := null;
+      Saturate : Boolean := True) return access Mixer
    is
       Ret : constant access Mixer := new Mixer;
       Discard : Natural;
-      pragma Unreferenced (Discard);
    begin
 
       for Source of Sources loop
@@ -106,6 +112,7 @@ package body Effects is
       end loop;
 
       Ret.Env := Env;
+      Ret.Saturate := Saturate;
       return Ret;
    end Create_Mixer;
 
@@ -115,13 +122,13 @@ package body Effects is
 
    function Create_LP (Source : access Generator'Class;
                        Cut_Freq_Provider : access Generator'Class;
-                       Res : Float) return access Low_Pass_Filter
+                       Q : Float) return access Low_Pass_Filter
    is
    begin
       return new Low_Pass_Filter'(Source => Generator_Access (Source),
                                   Cut_Freq_Provider =>
                                     Generator_Access (Cut_Freq_Provider),
-                                  Res => Res,
+                                  Res => Q,
                                   others => <>);
    end Create_LP;
 
@@ -214,13 +221,13 @@ package body Effects is
    -----------------
 
    function Create_Dist
-     (Source : Generator_Access;
+     (Source : access Generator'Class;
       Clip_Level : Float; Coeff : Float := 10.0) return access Disto
    is
    begin
       return new Disto'(Clip_Level => Sample (Clip_Level),
                         Coeff      => Sample (Coeff),
-                        Source     => Source,
+                        Source     => Generator_Access (Source),
                         others => <>);
    end Create_Dist;
 
@@ -309,6 +316,50 @@ package body Effects is
       for I in B_Range_T'Range loop
          Self.Buffer (I) := (Self.Source.Buffer (I) + 1.0) / 2.0;
       end loop;
+   end Next_Samples;
+
+   -----------------------
+   -- Create_Delay_Line --
+   -----------------------
+
+   function Create_Delay_Line (Source : access Generator'Class;
+                               Dlay : Millisecond;
+                               Decay : Sample) return access Delay_Line
+   is
+   begin
+      return new Delay_Line'
+        (Source           => Source,
+         Delay_In_Samples =>
+           B_Range_T (Float (Dlay) * SAMPLE_RATE / 1000.0),
+         Decay            => Decay,
+         others           => <>);
+   end Create_Delay_Line;
+
+   ------------------
+   -- Next_Samples --
+   ------------------
+
+   overriding procedure Next_Samples (Self : in out Delay_Line) is
+   begin
+      Self.Source.Next_Samples;
+
+      Self.Buffer := Self.Source.Buffer;
+
+      for I in 0 .. Self.Delay_In_Samples loop
+         Self.Buffer (I) :=
+           Self.Buffer (I) +
+           (Self.Last_Buffer
+              (B_Range_T'Last - Self.Delay_In_Samples + I) * Self.Decay);
+      end loop;
+
+      for I in
+        B_Range_T'First .. B_Range_T'Last - Self.Delay_In_Samples
+      loop
+         Self.Buffer (I + Self.Delay_In_Samples) :=
+           Self.Buffer (I + Self.Delay_In_Samples) +
+             (Self.Buffer (I) * Self.Decay);
+      end loop;
+      Self.Last_Buffer := Self.Buffer;
    end Next_Samples;
 
 end Effects;

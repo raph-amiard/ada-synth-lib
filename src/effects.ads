@@ -69,7 +69,7 @@ package Effects is
    end record;
 
    function Create_Dist
-     (Source : Generator_Access;
+     (Source : access Generator'Class;
       Clip_Level : Float; Coeff : Float := 10.0) return access Disto;
 
    overriding procedure Next_Samples
@@ -90,7 +90,7 @@ package Effects is
 
    function Create_LP (Source : access Generator'Class;
                        Cut_Freq_Provider : access Generator'Class;
-                       Res : Float) return access Low_Pass_Filter;
+                       Q : Float) return access Low_Pass_Filter;
 
    overriding procedure Next_Samples
      (Self : in out Low_Pass_Filter);
@@ -110,6 +110,7 @@ package Effects is
       Generators : Generator_Vector;
       Length     : Natural := 0;
       Env        : access ADSR;
+      Saturate   : Boolean := False;
    end record;
 
    type Generators_Arg_Array is array (Natural range <>) of Mixer_Generator;
@@ -117,7 +118,8 @@ package Effects is
 
    function Create_Mixer
      (Sources : Generators_Arg_Array;
-      Env : access ADSR := null) return access Mixer;
+      Env : access ADSR := null;
+      Saturate : Boolean := True) return access Mixer;
 
    function Add_Generator
      (Self : in out Mixer; G : access Generator'Class;
@@ -127,5 +129,18 @@ package Effects is
      (Self : in out Mixer; G : access Generator'Class; Level : Float);
 
    overriding procedure Next_Samples (Self : in out Mixer);
+
+   type Delay_Line is new Generator with record
+      Source           : access Generator'Class;
+      Delay_In_Samples : B_Range_T;
+      Decay            : Sample;
+      Last_Buffer      : Generator_Buffer := (others => 0.0);
+   end record;
+
+   function Create_Delay_Line (Source : access Generator'Class;
+                               Dlay : Millisecond;
+                               Decay : Sample) return access Delay_Line;
+
+   overriding procedure Next_Samples (Self : in out Delay_Line);
 
 end Effects;
