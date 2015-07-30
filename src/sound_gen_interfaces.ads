@@ -8,7 +8,7 @@ package Sound_Gen_Interfaces is
    -- Generator --
    ---------------
 
-   Generator_Buffer_Length : constant := 32;
+   Generator_Buffer_Length : constant := 100_000;
    type B_Range_T is range 0 .. Generator_Buffer_Length - 1;
 
    type Generator_Buffer is

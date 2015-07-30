@@ -7,30 +7,19 @@ with BLIT; use BLIT;
 
 package Simple_Demo is
 
-   BPM : constant := 130;
+   BPM : constant := 120;
 
    o : constant Sequencer_Note := No_Seq_Note;
-   K : constant Sequencer_Note := ((G, 3), 3000);
-   Z : constant Sequencer_Note := ((G, 3), 5000);
-   B : constant Sequencer_Note := ((G, 3), 8000);
-
-   SNL : constant Sample_Period := 4000;
-
-   S1 : constant Sequencer_Note := ((C, 4), SNL);
-   S2 : constant Sequencer_Note := ((F, 4), SNL);
-   S3 : constant Sequencer_Note := ((D_Sh, 4), SNL);
-   S4 : constant Sequencer_Note := ((A_Sh, 4), SNL);
-   S5 : constant Sequencer_Note := ((G, 4), SNL);
-   S6 : constant Sequencer_Note := ((D_Sh, 4), SNL);
-
-   Kick_Seq : constant access Simple_Sequencer :=
-     Create_Sequencer
-       (16, BPM, 2,
-        (K, o, o, K, o, o, K, o, o, o, B, o, o, o, o, o,
-         K, o, o, K, o, o, K, o, o, o, K, o, o, o, o, K));
+   K : constant Sequencer_Note := (Note => (G, 3), Duration => 3000);
+   Z : constant Sequencer_Note := (Note => (G, 3), Duration => 5000);
+   B : constant Sequencer_Note := (Note => (G, 3), Duration => 8000);
 
    Kick_Source : constant Note_Generator_Access :=
-     Note_Generator_Access (Kick_Seq);
+       Note_Generator_Access
+         (Create_Sequencer
+            (16, BPM, 2,
+             (K, o, o, K, o, o, K, o, o, o, B, o, o, o, o, o,
+              K, o, o, K, o, o, K, o, o, o, K, o, o, o, o, K)));
 
    Kick : constant access Mixer :=
      Create_Mixer
@@ -52,11 +41,12 @@ package Simple_Demo is
 
    Snare_Seq : constant access Simple_Sequencer :=
      Create_Sequencer
-       (16, BPM, 4,
-        (o, o, o, o, Z, o, o, o, o, o, o, o, K, o, o, o,
-         o, o, o, o, K, o, o, o, o, o, o, o, B, o, K, K,
-         o, o, o, o, Z, o, o, o, o, o, o, o, K, o, o, o,
-         o, o, o, o, K, o, o, K, o, o, Z, o, B, o, Z, o));
+       (Nb_Steps => 16, BPM => BPM, Measures => 4,
+        Notes =>
+          (o, o, o, o, Z, o, o, o, o, o, o, o, K, o, o, o,
+           o, o, o, o, K, o, o, o, o, o, o, o, B, o, K, K,
+           o, o, o, o, Z, o, o, o, o, o, o, o, K, o, o, o,
+           o, o, o, o, K, o, o, K, o, o, Z, o, B, o, Z, o));
 
    Snare_Source : constant Note_Generator_Access :=
      Note_Generator_Access (Snare_Seq);
@@ -88,6 +78,14 @@ package Simple_Demo is
         1 => (Create_Noise, 0.5)
        ), Env => Create_ADSR (0, 20, 0, 0.0, Hat_Source));
 
+   SNL : constant Sample_Period := 4000;
+   S1 : constant Sequencer_Note := ((C, 4), SNL);
+   S2 : constant Sequencer_Note := ((F, 4), SNL);
+   S3 : constant Sequencer_Note := ((D_Sh, 4), SNL);
+   S4 : constant Sequencer_Note := ((A_Sh, 4), SNL);
+   S5 : constant Sequencer_Note := ((G, 4), SNL);
+   S6 : constant Sequencer_Note := ((D_Sh, 4), SNL);
+
    Synth_Seq : constant access Simple_Sequencer :=
      Create_Sequencer
        (8, BPM, 4,
@@ -101,29 +99,28 @@ package Simple_Demo is
 
    Synth : constant access Disto :=
      Create_Dist
-       (Generator_Access
-          (Create_LP
-             (Create_Mixer
-                  ((
-                   4 => (BLIT.Create_Square
-                         (Create_Pitch_Gen
-                              (-17, Synth_Source)), 0.5),
-                   3 => (BLIT.Create_Saw
-                         (Create_Pitch_Gen
-                              (-24, Synth_Source)), 0.3),
-                   2 => (BLIT.Create_Saw
-                         (Create_Pitch_Gen
-                              (0, Synth_Source)), 0.3),
-                   1 => (BLIT.Create_Saw
-                         (Create_Pitch_Gen
-                              (-36, Synth_Source)), 0.6)
-                  )),
-              Fixed (200.0,
-                Proc => new Attenuator'
-                  (Level => 1500.0,
-                   Source => Create_ADSR (160, 20, 20, 0.005, Synth_Source),
-                   others => <>)),
-              0.2)), 1.00001, 1.5);
+       (Create_LP
+          (Create_Mixer
+             ((
+              4 => (Create_Sine
+                    (Create_Pitch_Gen
+                         (-30, Synth_Source)), 0.6),
+              3 => (BLIT.Create_Saw
+                    (Create_Pitch_Gen
+                         (-24, Synth_Source)), 0.3),
+              2 => (BLIT.Create_Saw
+                    (Create_Pitch_Gen
+                         (-12, Synth_Source)), 0.3),
+              1 => (BLIT.Create_Saw
+                    (Create_Pitch_Gen
+                         (-17, Synth_Source)), 0.5)
+          )),
+        Fixed (200.0,
+          Modulator => new Attenuator'
+            (Level => 1500.0,
+             Source => Create_ADSR (10, 150, 200, 0.005, Synth_Source),
+             others => <>)),
+        0.2), 1.00001, 1.5);
 
    Main_Mixer : constant access Mixer :=
      Create_Mixer ((
