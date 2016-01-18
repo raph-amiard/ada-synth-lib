@@ -12,15 +12,20 @@ Build
 =====
 
 You'll need AdaCore's latest GPL release, that you can get through
-[Adacore libre site](http://libre.adacore.com/)
-
-Although the lib is probably building with the FSF versions of the tools, I did
-not test it myself.
+[Adacore libre site](http://libre.adacore.com/), or you can use the FSF
+compiler available on most Linux distributions. It has been tested to work with
+Debian Stable and Ubuntu 15.04.
 
 For native:
 
 ~~~shell
-$ gprbuild -p
+$ gprbuild -p ada_synth_lib.gpr
+~~~
+
+For native with libsoundio support:
+
+~~~shell
+$ gprbuild -p ada_synth_lib_soundio.gpr
 ~~~
 
 For bareboard/sfp:

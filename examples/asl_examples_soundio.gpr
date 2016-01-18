@@ -1,0 +1,9 @@
+with "../ada_synth_lib_soundio";
+with "../ada-soundio/soundio.gpr";
+
+project ASL_Examples_Soundio is
+   for Object_Dir use "obj";
+   for Source_Dirs use (".");
+   for Main use ("soundio_example.adb");
+   package Linker renames Soundio.Linker;
+end ASL_Examples_Soundio;
