@@ -7,9 +7,6 @@ project Ada_Synth_Lib_Soundio is
    type Build_Type_Kind is ("native", "bareboard");
    Build_Type : Build_Type_Kind := External ("build_type", "native");
 
-   for Library_Name use "adasynth";
-   for Library_Dir use "lib";
-
    for Source_Dirs use ("src", "soundio-src");
    for Object_Dir use "obj";
 
