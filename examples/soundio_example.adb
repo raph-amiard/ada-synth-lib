@@ -2,7 +2,7 @@ with Soundio; use Soundio;
 with Interfaces.C; use Interfaces.C;
 with Ada.Text_IO; use Ada.Text_IO;
 with Soundio_Output; use Soundio_Output;
-with Simple_Demo_3;
+with Simple_Demo;
 
 procedure Soundio_Example is
 
@@ -19,7 +19,7 @@ begin
    Out_Stream := Outstream_Create (Device);
    Out_Stream.Format := Format_Float32NE;
    Out_Stream.Write_Callback := Soundio_Output.Write_Callback'Access;
-   Set_Generator (Out_Stream => Out_Stream, G => Simple_Demo_3.Main);
+   Set_Generator (Out_Stream => Out_Stream, G => Simple_Demo.Main_Mixer);
    Err := Outstream_Open (Out_Stream);
    Err := Outstream_Start (Out_Stream);
 
