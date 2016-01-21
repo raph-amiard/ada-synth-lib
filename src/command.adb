@@ -75,6 +75,9 @@ package body Command is
       Cur_Note : Sequencer_Note;
       Current_P : Sample_Period;
    begin
+      Self.Current_Note := (Natural (Sample_Nb / Self.Interval)
+                            mod Self.Nb_Steps) + 1;
+
       for I in B_Range_T'Range loop
          Cur_Note :=
            Self.Notes ((Natural
