@@ -34,4 +34,6 @@ project Ada_Synth_Lib_Soundio is
       end case;
    end Compiler;
 
+   for Main use ("ring_buffer_test.adb");
+
 end Ada_Synth_Lib_Soundio;
