@@ -8,13 +8,34 @@ or the Rpi.
 
 Here is a [small demo of the library (youtube video)](https://www.youtube.com/watch?v=2eiWnN1xWcs)
 
-Build
+Setup
 =====
 
 You'll need AdaCore's latest GPL release, that you can get through
 [Adacore libre site](http://libre.adacore.com/), or you can use the FSF
 compiler available on most Linux distributions. It has been tested to work with
-Debian Stable and Ubuntu 15.04.
+Debian Stable and Ubuntu 15.04, with the `ada_synth_lib_soundio.gpr` project.
+The regular project file uses Runtime attribute, which is not yet supported by
+the gprbuild FSF version.
+
+### Preparing for the soundio build
+
+You need to checkout the [ada-soundio repo](https://github.com/raph-amiard/ada-soundio)
+at the root of ada-synth-lib:
+
+~~~shell
+git clone https://github.com/raph-amiard/ada-soundio/
+~~~
+
+This repo contains a script that will build libsoundio and ada-soundio at the
+same time, that you can use if you have bash.
+
+~~~shell
+cd ada-soundio && ./build.script && cd -
+~~~
+
+Build
+=====
 
 For native:
 
