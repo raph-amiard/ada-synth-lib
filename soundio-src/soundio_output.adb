@@ -33,7 +33,7 @@ package body Soundio_Output is
            (Mode => Buffer,
             G => G,
             Ring_Buf => Ring_Buf,
-            Current_Sample => <>));
+            Current_Sample => <>, S => Stop));
    end Set_Ring_Buffer;
 
    -------------------
@@ -46,8 +46,12 @@ package body Soundio_Output is
    begin
       Out_Stream.User_Data := Access_To_Address
         (new Soundio_User_Data'
-           (Mode => Callback, G => G, Current_Sample => <>));
+           (Mode => Callback, G => G, Current_Sample => <>, S => Stop));
    end Set_Generator;
+
+   -------------------
+   -- Get_User_Data --
+   -------------------
 
    function Get_User_Data
      (Out_Stream : access SoundIo_Out_Stream) return User_Data_Access
@@ -196,15 +200,58 @@ package body Soundio_Output is
    is
       U : constant User_Data_Access := Get_User_Data (Out_Stream);
       Available_Frames : Natural := FRB.Available_Write_Frames (U.Ring_Buf);
-      Written_Samples : Natural := 0;
+      Written_Samples  : Natural := 0;
    begin
-      for Dummy in 0 .. Max_Nb_Samples - 1 loop
-         exit when Available_Frames = 0;
-         FRB.Write (U.Ring_Buf, Get_Next_Sample (U));
-         Available_Frames := Available_Frames - 1;
-         Written_Samples := Written_Samples + 1;
-      end loop;
+      if U.S = Stop then
+         for Dummy in 0 .. Max_Nb_Samples - 1 loop
+            exit when Available_Frames = 0;
+            FRB.Write (U.Ring_Buf, 0.0);
+            Available_Frames := Available_Frames - 1;
+            Written_Samples := Written_Samples + 1;
+         end loop;
+      else
+         for Dummy in 0 .. Max_Nb_Samples - 1 loop
+            exit when Available_Frames = 0;
+            FRB.Write (U.Ring_Buf, Get_Next_Sample (U));
+            Available_Frames := Available_Frames - 1;
+            Written_Samples := Written_Samples + 1;
+         end loop;
+      end if;
    end Write_Samples;
+
+   ----------
+   -- Play --
+   ----------
+
+   procedure Play
+     (Out_Stream : access SoundIo_Out_Stream)
+   is
+      U : constant User_Data_Access := Get_User_Data (Out_Stream);
+   begin
+      if U.S = Play then
+         return;
+      end if;
+      U.S := Play;
+   end Play;
+
+   ----------
+   -- Stop --
+   ----------
+
+   procedure Stop
+     (Out_Stream : access SoundIo_Out_Stream)
+   is
+      U : constant User_Data_Access := Get_User_Data (Out_Stream);
+   begin
+
+      if U.S = Stop then
+         return;
+      end if;
+
+      U.S := Stop;
+      Sample_Nb := 0;
+      U.G.Reset;
+   end Stop;
 
    -----------------
    -- Drift_Level --

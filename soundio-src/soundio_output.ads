@@ -5,12 +5,15 @@ with Ring_Buffer;
 
 package Soundio_Output is
 
+   type State is (Play, Stop);
+
    type Soundio_Mode is (Callback, Buffer);
 
    package FRB
    is new Ring_Buffer (Float, Checks => True, Default_Value => 0.0);
 
    type Soundio_User_Data (Mode : Soundio_Mode) is record
+      S              : State;
       G              : access Generator'Class;
       Current_Sample : B_Range_T := B_Range_T'Last;
 
@@ -22,6 +25,12 @@ package Soundio_Output is
       end case;
    end record;
    type User_Data_Access is access all Soundio_User_Data;
+
+   procedure Play
+     (Out_Stream : access SoundIo_Out_Stream);
+
+   procedure Stop
+     (Out_Stream : access SoundIo_Out_Stream);
 
    procedure Set_Generator
      (Out_Stream : access SoundIo_Out_Stream;
