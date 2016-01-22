@@ -362,4 +362,87 @@ package body Effects is
       Self.Last_Buffer := Self.Buffer;
    end Next_Samples;
 
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out Delay_Line)
+   is
+   begin
+      Base_Reset (Self);
+      Reset_Not_Null (Self.Source);
+      Self.Last_Buffer := (others => 0.0);
+   end Reset;
+
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out Attenuator)
+   is
+   begin
+      Base_Reset (Self);
+      Reset_Not_Null (Self.Source);
+   end Reset;
+
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out Dyn_Attenuator)
+   is
+   begin
+      Base_Reset (Self);
+      Reset_Not_Null (Self.Level_Provider);
+      Reset_Not_Null (Self.Source);
+   end Reset;
+
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out Transposer)
+   is
+   begin
+      Base_Reset (Self);
+      Reset_Not_Null (Self.Source);
+   end Reset;
+
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out Disto)
+   is
+   begin
+      Base_Reset (Self);
+      Reset_Not_Null (Self.Source);
+   end Reset;
+
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out Low_Pass_Filter)
+   is
+   begin
+      Base_Reset (Self);
+      Reset_Not_Null (Self.Source);
+      Reset_Not_Null (Self.Cut_Freq_Provider);
+   end Reset;
+
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out Mixer)
+   is
+   begin
+      Base_Reset (Self);
+      Reset_Not_Null (Self.Env);
+      for IG in 0 .. Self.Length loop
+         Reset_Not_Null (Self.Generators (IG).Gen);
+      end loop;
+   end Reset;
+
 end Effects;

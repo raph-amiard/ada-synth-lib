@@ -203,6 +203,39 @@ package body BLIT is
       end loop;
    end Next_Samples;
 
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out BLIT_Square) is
+   begin
+      Base_Reset (Self);
+      Self.Ring_Buffer := (others => 0.0);
+      Self.Next_Impulse_Time := 0.0;
+      Self.Last_Sum := 0.0;
+      Self.Current_Sample := 0;
+      Self.State := Down;
+      Reset_Not_Null (Self.Freq_Provider);
+      Reset_Not_Null (Self.Frequency_Provider);
+      Self.P_Buffer := (others => 0.0);
+   end Reset;
+
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out BLIT_Saw) is
+   begin
+      Base_Reset (Self);
+      Self.Ring_Buffer := (others => 0.0);
+      Self.Next_Impulse_Time := 0.0;
+      Self.Last_Sum := 0.0;
+      Self.Current_Sample := 0;
+      Reset_Not_Null (Self.Freq_Provider);
+      Reset_Not_Null (Self.Frequency_Provider);
+      Self.P_Buffer := (others => 0.0);
+   end Reset;
+
 begin
    Init_Steps;
 end BLIT;

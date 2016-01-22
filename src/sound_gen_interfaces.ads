@@ -15,14 +15,17 @@ package Sound_Gen_Interfaces is
      array (B_Range_T) of Sample;
 
    type Generator is abstract tagged record
-      Current_Sample_Nb : Sample_Period := 0;
-      Memo_Sample : Sample := 0.0;
       Buffer : Generator_Buffer;
    end record;
    type Generator_Access is access all Generator'Class;
 
    procedure Next_Samples (Self : in out Generator) is abstract;
    pragma Inline (Next_Samples);
+
+   procedure Base_Reset (Self : in out Generator);
+   procedure Reset_Not_Null (Self : Generator_Access);
+
+   procedure Reset (Self : in out Generator) is abstract;
 
    ----------------------
    -- Signal_Processor --
@@ -47,16 +50,18 @@ package Sound_Gen_Interfaces is
    type Note_Signal_Buffer is array (B_Range_T) of Note_Signal;
    type Note_Generator is abstract tagged record
       Current_Sample_Nb : Sample_Period := 0;
-      Buffer : Note_Signal_Buffer;
+      Buffer            : Note_Signal_Buffer;
    end record;
    type Note_Generator_Access is access all Note_Generator'Class;
 
    procedure Next_Messages (Self : in out Note_Generator) is abstract;
+   procedure Reset (Self : in out Note_Generator) is abstract;
+   procedure Reset_Not_Null (Self : Note_Generator_Access);
 
    type Note_Generator_Array is
      array (Natural range <>) of Note_Generator_Access;
 
-   Note_Generators : Note_Generator_Array (0 .. 64);
+   Note_Generators    : Note_Generator_Array (0 .. 64);
    Note_Generators_Nb : Natural := 0;
 
    procedure Register_Note_Generator (N : Note_Generator_Access);

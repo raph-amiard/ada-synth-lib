@@ -7,7 +7,7 @@ package Waves is
 
    type Wave_Generator is abstract new Generator with record
       Frequency_Provider : Generator_Access := null;
-      P_Buffer : Period_Buffer;
+      P_Buffer           : Period_Buffer;
    end record;
 
    procedure Update_Period (Self : in out Wave_Generator'Class);
@@ -17,28 +17,30 @@ package Waves is
    -------------------
 
    type Saw_Generator is new Wave_Generator with record
-      Current : Sample;
-      Step : Float;
+      Current : Sample := -1.0;
+      Step    : Float := 0.0;
    end record;
 
    function Create_Saw
      (Freq_Provider : Generator_Access) return access Saw_Generator;
    overriding procedure Next_Samples
      (Self : in out Saw_Generator);
+   overriding procedure Reset (Self : in out Saw_Generator);
 
    ----------------------
    -- Square_Generator --
    ----------------------
 
    type Square_Generator is new Wave_Generator with record
-      Is_High : Boolean;
-      Current_Sample : Sample_Period;
+      Is_High        : Boolean;
+      Current_Sample : Sample_Period := 0;
    end record;
 
    function Create_Square
      (Freq_Provider : access Generator'Class) return access Square_Generator;
    overriding procedure Next_Samples
      (Self : in out Square_Generator);
+   overriding procedure Reset (Self : in out Square_Generator);
 
    --------------------
    -- Sine_Generator --
@@ -46,13 +48,14 @@ package Waves is
 
    type Sine_Generator is new Wave_Generator with record
       Current_Sample : Sample_Period;
-      Current_P : Period;
+      Current_P      : Period;
    end record;
 
    function Create_Sine
      (Freq_Provider : access Generator'Class) return access Sine_Generator;
    overriding procedure Next_Samples
      (Self : in out Sine_Generator);
+   overriding procedure Reset (Self : in out Sine_Generator);
 
    ---------------------
    -- Noise Generator --
@@ -64,17 +67,18 @@ package Waves is
 
    overriding procedure Next_Samples
      (Self : in out Noise_Generator);
+   overriding procedure Reset (Self : in out Noise_Generator);
 
    ---------------
    -- Pitch Gen --
    ---------------
 
    type Pitch_Gen is new Generator with record
-      Current_Note : Note_T := (C, 4);
-      Current_Freq : Frequency;
+      Current_Note   : Note_T := (C, 4);
+      Current_Freq   : Frequency;
       Relative_Pitch : Integer;
-      Source : Note_Generator_Access;
-      Proc : Generator_Access := null;
+      Source         : Note_Generator_Access;
+      Proc           : Generator_Access := null;
    end record;
 
    function Create_Pitch_Gen
@@ -89,6 +93,7 @@ package Waves is
 
    overriding procedure Next_Samples
      (Self : in out Pitch_Gen);
+   overriding procedure Reset (Self : in out Pitch_Gen);
 
    ---------------
    -- Fixed_Gen --
@@ -107,6 +112,7 @@ package Waves is
 
    overriding procedure Next_Samples
      (Self : in out Fixed_Gen);
+   overriding procedure Reset (Self : in out Fixed_Gen);
 
    -----------
    -- Chain --
@@ -120,8 +126,8 @@ package Waves is
      array (Natural range 0 .. 1024) of Signal_Processor_Access;
 
    type Chain is new Generator with record
-      Gen : Generator_Access;
-      Processors : Signal_Processor_Vector;
+      Gen           : Generator_Access;
+      Processors    : Signal_Processor_Vector;
       Nb_Processors : Natural := 0;
    end record;
 
@@ -135,6 +141,7 @@ package Waves is
 
    overriding procedure Next_Samples
      (Self : in out Chain);
+   overriding procedure Reset (Self : in out Chain);
 
    ---------
    -- LFO --
@@ -148,12 +155,13 @@ package Waves is
 
    type ADSR_State is (Running, Release, Off);
    type ADSR is new Generator with record
-      Source : Note_Generator_Access;
+      Source                 : Note_Generator_Access;
       Attack, Decay, Release : Sample_Period;
-      Sustain : Scale;
-      Cur_Sustain : Scale;
-      Current_P : Sample_Period;
-      State : ADSR_State;
+      Sustain                : Scale;
+      Cur_Sustain            : Scale;
+      Current_P              : Sample_Period;
+      State                  : ADSR_State;
+      Memo_Sample            : Sample := 0.0;
    end record;
 
    function Create_ADSR
@@ -162,4 +170,5 @@ package Waves is
       Source : Note_Generator_Access := null) return access ADSR;
 
    overriding procedure Next_Samples (Self : in out ADSR);
+   overriding procedure Reset (Self : in out ADSR);
 end Waves;

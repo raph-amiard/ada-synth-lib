@@ -21,4 +21,35 @@ package body Sound_Gen_Interfaces is
       end loop;
    end Next_Steps;
 
+   ----------------
+   -- Base_Reset --
+   ----------------
+
+   procedure Base_Reset (Self : in out Generator) is
+   begin
+      Self.Buffer := (others => 0.0);
+   end Base_Reset;
+
+   --------------------
+   -- Reset_Not_Null --
+   --------------------
+
+   procedure Reset_Not_Null (Self : Generator_Access) is
+   begin
+      if Self /= null then
+         Self.Reset;
+      end if;
+   end Reset_Not_Null;
+
+   --------------------
+   -- Reset_Not_Null --
+   --------------------
+
+   procedure Reset_Not_Null (Self : Note_Generator_Access) is
+   begin
+      if Self /= null then
+         Self.Reset;
+      end if;
+   end Reset_Not_Null;
+
 end Sound_Gen_Interfaces;

@@ -198,13 +198,14 @@ package body Waves is
       Source : Note_Generator_Access := null) return access ADSR
    is
    begin
-      return new ADSR'(State     => Off,
-                       Source    => Source,
-                       Attack    => Msec_To_Period (Attack),
-                       Decay     => Msec_To_Period (Decay),
-                       Release   => Msec_To_Period (Release),
-                       Sustain   => Sustain,
-                       Current_P => 0, others => <>);
+      return new ADSR'
+        (State     => Off,
+         Source    => Source,
+         Attack    => Msec_To_Period (Attack),
+         Decay     => Msec_To_Period (Decay),
+         Release   => Msec_To_Period (Release),
+         Sustain   => Sustain,
+         Current_P => 0, others => <>);
    end Create_ADSR;
 
    -----------------
@@ -358,5 +359,95 @@ package body Waves is
          end if;
       end loop;
    end Next_Samples;
+
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out ADSR) is
+   begin
+      Base_Reset (Self);
+      Reset_Not_Null (Self.Source);
+      Self.Memo_Sample := 0.0;
+   end Reset;
+
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out Saw_Generator) is
+   begin
+      Base_Reset (Self);
+      Reset_Not_Null (Self.Frequency_Provider);
+      Self.P_Buffer := (others => 0.0);
+      Self.Current := -1.0;
+   end Reset;
+
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out Square_Generator) is
+   begin
+      Base_Reset (Self);
+      Reset_Not_Null (Self.Frequency_Provider);
+      Self.P_Buffer := (others => 0.0);
+      Self.Current_Sample := 0;
+      Self.Is_High := True;
+   end Reset;
+
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out Sine_Generator) is
+   begin
+      Base_Reset (Self);
+      Reset_Not_Null (Self.Frequency_Provider);
+      Self.P_Buffer := (others => 0.0);
+      Self.Current_Sample := 0;
+   end Reset;
+
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out Noise_Generator) is
+   begin
+      Base_Reset (Self);
+      Reset_Not_Null (Self.Frequency_Provider);
+      Self.P_Buffer := (others => 0.0);
+   end Reset;
+
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out Pitch_Gen) is
+   begin
+      Base_Reset (Self);
+      Reset_Not_Null (Self.Source);
+      Reset_Not_Null (Self.Proc);
+   end Reset;
+
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out Fixed_Gen) is
+   begin
+      Base_Reset (Self);
+      Reset_Not_Null (Self.Proc);
+   end Reset;
+
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out Chain) is
+   begin
+      Base_Reset (Self);
+      Reset_Not_Null (Self.Gen);
+   end Reset;
 
 end Waves;

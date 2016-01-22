@@ -8,11 +8,11 @@ package BLIT is
    type BLIT_State is (Up, Down);
 
    type BLIT_Generator is abstract new Wave_Generator with record
-      Freq_Provider : Generator_Access;
-      Current_Sample : Natural;
-      Ring_Buffer : Ring_Buffer_T;
+      Freq_Provider     : Generator_Access;
+      Current_Sample    : Natural;
+      Ring_Buffer       : Ring_Buffer_T;
       Next_Impulse_Time : Period := 0.0;
-      Last_Sum : Sample := 0.0;
+      Last_Sum          : Sample := 0.0;
    end record;
 
    type BLIT_Square is new BLIT_Generator with record
@@ -22,6 +22,9 @@ package BLIT is
    type BLIT_Saw is new BLIT_Generator with record
       null;
    end record;
+
+   overriding procedure Reset (Self : in out BLIT_Square);
+   overriding procedure Reset (Self : in out BLIT_Saw);
 
    function Create_Square
      (Freq_Provider : access Generator'Class) return access BLIT_Square;

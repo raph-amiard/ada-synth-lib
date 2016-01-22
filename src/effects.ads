@@ -16,13 +16,15 @@ package Effects is
    overriding procedure Next_Samples
      (Self : in out Attenuator);
 
+   overriding procedure Reset (Self : in out Attenuator);
+
    --------------------
    -- Dyn_Attenuator --
    --------------------
 
    type Dyn_Attenuator is new Generator with record
       Level_Provider : Generator_Access;
-      Source : Generator_Access;
+      Source         : Generator_Access;
    end record;
 
    function VCA (Source : Generator_Access;
@@ -32,6 +34,8 @@ package Effects is
 
    overriding procedure Next_Samples
      (Self : in out Dyn_Attenuator);
+
+   overriding procedure Reset (Self : in out Dyn_Attenuator);
 
    ----------------
    -- Transposer --
@@ -43,6 +47,8 @@ package Effects is
 
    overriding procedure Next_Samples
      (Self : in out Transposer);
+
+   overriding procedure Reset (Self : in out Transposer);
 
    -------------------
    -- Digital_Disto --
@@ -75,17 +81,19 @@ package Effects is
    overriding procedure Next_Samples
      (Self : in out Disto);
 
+   overriding procedure Reset (Self : in out Disto);
+
    ---------------
    -- LP_Filter --
    ---------------
 
    type Low_Pass_Filter is new Generator with record
-      Cut_Freq : Float;
-      Cut_Freq_Provider : Generator_Access;
-      Res : Float;
+      Cut_Freq_Provider  : Generator_Access;
+      Source             : Generator_Access;
+      Cut_Freq           : Float;
+      Res                : Float;
       A0, A1, A2, B1, B2 : Float;
-      D1, D2, D3, D4 : Float := 0.0;
-      Source : Generator_Access;
+      D1, D2, D3, D4     : Float := 0.0;
    end record;
 
    function Create_LP (Source : access Generator'Class;
@@ -94,6 +102,8 @@ package Effects is
 
    overriding procedure Next_Samples
      (Self : in out Low_Pass_Filter);
+
+   overriding procedure Reset (Self : in out Low_Pass_Filter);
 
    -----------
    -- Mixer --
@@ -130,6 +140,8 @@ package Effects is
 
    overriding procedure Next_Samples (Self : in out Mixer);
 
+   overriding procedure Reset (Self : in out Mixer);
+
    type Delay_Line is new Generator with record
       Source           : access Generator'Class;
       Delay_In_Samples : B_Range_T;
@@ -142,5 +154,7 @@ package Effects is
                                Decay : Sample) return access Delay_Line;
 
    overriding procedure Next_Samples (Self : in out Delay_Line);
+
+   overriding procedure Reset (Self : in out Delay_Line);
 
 end Effects;

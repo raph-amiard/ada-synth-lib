@@ -96,4 +96,22 @@ package body Command is
       end loop;
    end Next_Messages;
 
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out Simple_Command) is
+   begin
+      Self.Current_P := 0;
+   end Reset;
+
+   -----------
+   -- Reset --
+   -----------
+
+   overriding procedure Reset (Self : in out Simple_Sequencer) is
+   begin
+      Self.Current_Note := 0;
+   end Reset;
+
 end Command;
