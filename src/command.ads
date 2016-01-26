@@ -42,4 +42,6 @@ package Command is
    overriding procedure Next_Messages
      (Self : in out Simple_Sequencer);
 
+   function Note_For_Sample (Self : Simple_Sequencer; Sample_Nb : Sample_Period) return Natural;
+
 end Command;

@@ -1,4 +1,5 @@
 with Config; use Config;
+with Ada.Text_IO; use Ada.Text_IO;
 
 package body Command is
 
@@ -75,9 +76,6 @@ package body Command is
       Cur_Note : Sequencer_Note;
       Current_P : Sample_Period;
    begin
-      Self.Current_Note := (Natural (Sample_Nb / Self.Interval)
-                            mod Self.Nb_Steps) + 1;
-
       for I in B_Range_T'Range loop
          Cur_Note :=
            Self.Notes ((Natural
@@ -113,5 +111,11 @@ package body Command is
    begin
       Self.Current_Note := 0;
    end Reset;
+
+   function Note_For_Sample (Self : Simple_Sequencer; Sample_Nb : Sample_Period) return Natural
+   is
+   begin
+     return (Natural (Sample_Nb / Self.Interval) mod Self.Nb_Steps) + 1;
+   end Note_For_Sample;
 
 end Command;
