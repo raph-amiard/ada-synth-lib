@@ -1,5 +1,5 @@
-with Soundio; use Soundio;
-with Interfaces.C; use Interfaces.C;
+with Soundio;              use Soundio;
+with Interfaces.C;         use Interfaces.C;
 with Sound_Gen_Interfaces; use Sound_Gen_Interfaces;
 with Ring_Buffer;
 

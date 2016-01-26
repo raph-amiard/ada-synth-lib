@@ -2,7 +2,7 @@ with Ada.Unchecked_Conversion;
 with System;
 with Utils;       use Utils;
 with Ada.Text_IO; use Ada.Text_IO;
-with Config; use Config;
+with Config;      use Config;
 
 package body Soundio_Output is
 
@@ -135,13 +135,23 @@ package body Soundio_Output is
                  Outstream_Begin_Write (Out_Stream, Areas, Frame_Count);
                exit when Frame_Count = 0;
 
-               for Frame in 0 .. Frame_Count - 1 loop
-                  Sample := Get_Next_Sample (Get_Generator (Out_Stream));
-                  for Channel in 0 .. Layout.Channel_Count - 1 loop
-                     Write_Float_Sample
-                       (Get_Area (Areas, Channel), Frame, Sample);
+               if User_Data.S = Play then
+                  for Frame in 0 .. Frame_Count - 1 loop
+                     Sample := Get_Next_Sample (Get_Generator (Out_Stream));
+                     for Channel in 0 .. Layout.Channel_Count - 1 loop
+                        Write_Float_Sample
+                          (Get_Area (Areas, Channel), Frame, Sample);
+                     end loop;
                   end loop;
-               end loop;
+               else
+                  for Frame in 0 .. Frame_Count - 1 loop
+                     for Channel in 0 .. Layout.Channel_Count - 1 loop
+                        Write_Float_Sample
+                          (Get_Area (Areas, Channel), Frame, 0.0);
+                     end loop;
+                  end loop;
+               end if;
+
 
                Dummy_Err := Outstream_End_Write (Out_Stream);
                Frames_Left := Frames_Left - Frame_Count;
