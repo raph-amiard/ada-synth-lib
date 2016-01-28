@@ -1,4 +1,5 @@
 with Utils; use Utils;
+with Array_Utils;
 
 package Sound_Gen_Interfaces is
 
@@ -10,14 +11,30 @@ package Sound_Gen_Interfaces is
 
    Generator_Buffer_Length : constant := 512;
    type B_Range_T is range 0 .. Generator_Buffer_Length - 1;
+   type Generator_Buffer is array (B_Range_T) of Sample;
 
-   type Generator_Buffer is
-     array (B_Range_T) of Sample;
+   type Generator;
+   type Generator_Access is access all Generator'Class;
+
+   package Generator_Arrays
+   is new Array_Utils (Generator_Access);
+   subtype Generator_Array is Generator_Arrays.Array_Type;
+   subtype Generator_Vector is Generator_Arrays.Vectors.Vector;
+   Empty_Generator_Array : Generator_Array := Generator_Arrays.Empty_Array;
+
+   type Params_Aggregator_Type is record
+      Generators : Generator_Arrays.Vector_Type;
+   end record;
+   type Params_Aggregator is access all Params_Aggregator_Type;
+
+   procedure Enter (F : Params_Aggregator);
+   procedure Leave (F : Params_Aggregator);
+   procedure Add_To_Current (G : Generator_Access);
 
    type Generator is abstract tagged record
-      Buffer : Generator_Buffer;
+      Buffer       : Generator_Buffer;
+      Params_Scope : Params_Aggregator;
    end record;
-   type Generator_Access is access all Generator'Class;
 
    procedure Next_Samples (Self : in out Generator) is abstract;
    pragma Inline (Next_Samples);
@@ -26,6 +43,34 @@ package Sound_Gen_Interfaces is
    procedure Reset_Not_Null (Self : Generator_Access);
 
    procedure Reset (Self : in out Generator) is abstract;
+
+   function Children
+     (Self : in out Generator) return Generator_Array is abstract;
+
+   function All_Children
+     (Self : in out Generator) return Generator_Array;
+
+   function Has_Params_Scope
+     (Self : in out Generator) return Boolean is (False);
+
+   function Is_Param
+     (Self : in out Generator) return Boolean is (False);
+   procedure Compute_Params (Self : in out Generator);
+
+   function Get_Params
+     (Self : in out Generator) return Generator_Arrays.Array_Type;
+
+   function Nb_Values (Self : in out Generator) return Natural is (0);
+   procedure Set_Value
+     (Self : in out Generator; I : Natural; Val : Float) is null;
+   function Get_Value
+     (Self : in out Generator; I : Natural) return Float is (0.0);
+   function Get_Name
+     (Self : in out Generator; I : Natural) return String is ("");
+   function Get_Min_Value
+     (Self : in out Generator; I : Natural) return Float is (0.0);
+   function Get_Max_Value
+     (Self : in out Generator; I : Natural) return Float is (0.0);
 
    ----------------------
    -- Signal_Processor --
@@ -65,7 +110,6 @@ package Sound_Gen_Interfaces is
    Note_Generators_Nb : Natural := 0;
 
    procedure Register_Note_Generator (N : Note_Generator_Access);
-
    procedure Next_Steps;
 
 end Sound_Gen_Interfaces;

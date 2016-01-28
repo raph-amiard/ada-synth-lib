@@ -152,7 +152,6 @@ package body Soundio_Output is
                   end loop;
                end if;
 
-
                Dummy_Err := Outstream_End_Write (Out_Stream);
                Frames_Left := Frames_Left - Frame_Count;
             end;

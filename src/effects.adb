@@ -121,15 +121,17 @@ package body Effects is
    ------------
 
    function Create_LP (Source : access Generator'Class;
-                       Cut_Freq_Provider : access Generator'Class;
+                       Cut_Freq : access Generator'Class;
                        Q : Float) return access Low_Pass_Filter
    is
    begin
-      return new Low_Pass_Filter'(Source => Generator_Access (Source),
-                                  Cut_Freq_Provider =>
-                                    Generator_Access (Cut_Freq_Provider),
-                                  Res => Q,
-                                  others => <>);
+      return LPF : access Low_Pass_Filter do
+         LPF := new Low_Pass_Filter'(Source => Generator_Access (Source),
+                                     Cut_Freq_Provider =>
+                                       Generator_Access (Cut_Freq),
+                                     Res               => Q,
+                                     others            => <>);
+      end return;
    end Create_LP;
 
    -----------------
@@ -444,5 +446,32 @@ package body Effects is
          Reset_Not_Null (Self.Generators (IG).Gen);
       end loop;
    end Reset;
+
+   --------------
+   -- Children --
+   --------------
+
+   overriding function Children
+     (Self : in out Mixer) return Generator_Array is
+   begin
+      return A : Generator_Array (0 .. Self.Length) do
+         for J in 0 .. Self.Length - 1 loop
+            A (J) := Self.Generators (J).Gen;
+         end loop;
+         A (Self.Length) := Self.Env;
+      end return;
+   end Children;
+
+   ---------------
+   -- Set_Value --
+   ---------------
+
+   overriding procedure Set_Value
+     (Self : in out Low_Pass_Filter; I : Natural; Val : Float)
+   is
+      pragma Unreferenced (I);
+   begin
+      Self.Res := Val;
+   end Set_Value;
 
 end Effects;

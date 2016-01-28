@@ -215,7 +215,6 @@ package body BLIT is
       Self.Last_Sum := 0.0;
       Self.Current_Sample := 0;
       Self.State := Down;
-      Reset_Not_Null (Self.Freq_Provider);
       Reset_Not_Null (Self.Frequency_Provider);
       Self.P_Buffer := (others => 0.0);
    end Reset;
@@ -231,7 +230,6 @@ package body BLIT is
       Self.Next_Impulse_Time := 0.0;
       Self.Last_Sum := 0.0;
       Self.Current_Sample := 0;
-      Reset_Not_Null (Self.Freq_Provider);
       Reset_Not_Null (Self.Frequency_Provider);
       Self.P_Buffer := (others => 0.0);
    end Reset;

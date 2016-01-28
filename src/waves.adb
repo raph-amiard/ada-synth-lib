@@ -348,16 +348,17 @@ package body Waves is
    overriding procedure Next_Samples
      (Self : in out Fixed_Gen) is
    begin
+
       if Self.Proc /= null then
          Self.Proc.Next_Samples;
-      end if;
-
-      for I in B_Range_T'Range loop
-         Self.Buffer (I) := Self.Val;
-         if Self.Proc /= null then
+         for I in B_Range_T'Range loop
             Self.Buffer (I) := Self.Val + Self.Proc.Buffer (I);
-         end if;
-      end loop;
+         end loop;
+      else
+         for I in B_Range_T'Range loop
+            Self.Buffer (I) := Self.Val;
+         end loop;
+      end if;
    end Next_Samples;
 
    -----------
@@ -449,5 +450,52 @@ package body Waves is
       Base_Reset (Self);
       Reset_Not_Null (Self.Gen);
    end Reset;
+
+   -----------
+   -- Fixed --
+   -----------
+
+   function Fixed
+     (Freq      : Frequency;
+      Modulator : Generator_Access := null;
+      Name      : String := "") return access Fixed_Gen
+   is
+   begin
+      return new
+        Fixed_Gen'
+          (Val    => Sample (Freq),
+           Proc   => Modulator,
+           Name   => To_Unbounded_String (Name),
+           others => <>);
+   end Fixed;
+
+   ---------------
+   -- Set_Value --
+   ---------------
+
+   overriding procedure Set_Value
+     (Self : in out Fixed_Gen; I : Natural; Val : Float)
+   is
+      pragma Unreferenced (I);
+   begin
+      Self.Val := Sample (Val);
+   end Set_Value;
+
+   ---------------
+   -- Set_Value --
+   ---------------
+
+   overriding procedure Set_Value
+     (Self : in out ADSR; I : Natural; Val : Float)
+   is
+   begin
+      case I is
+         when 0 => Self.Attack := Sample_Period (Val);
+         when 1 => Self.Decay := Sample_Period (Val);
+         when 2 => Self.Sustain := Scale (Val);
+         when 3 => Self.Release := Sample_Period (Val);
+         when others => raise Constraint_Error;
+      end case;
+   end Set_Value;
 
 end Waves;

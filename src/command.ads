@@ -1,5 +1,6 @@
 with Sound_Gen_Interfaces; use Sound_Gen_Interfaces;
 with Utils; use Utils;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 package Command is
    type Simple_Command is new Note_Generator with record
@@ -30,6 +31,7 @@ package Command is
       Notes        : Notes_Array (1 .. Nb_Steps) := (others => No_Seq_Note);
       Interval     : Sample_Period := 0;
       Current_Note : Natural := 0;
+      Track_Name   : Unbounded_String;
    end record;
 
    overriding procedure Reset (Self : in out Simple_Sequencer);
@@ -37,11 +39,13 @@ package Command is
    function Create_Sequencer
      (Nb_Steps, BPM : Natural;
       Measures      : Natural := 1;
-      Notes         : Notes_Array := No_Notes) return access Simple_Sequencer;
+      Notes         : Notes_Array := No_Notes;
+      Track_Name    : String) return access Simple_Sequencer;
 
    overriding procedure Next_Messages
      (Self : in out Simple_Sequencer);
 
-   function Note_For_Sample (Self : Simple_Sequencer; Sample_Nb : Sample_Period) return Natural;
+   function Note_For_Sample
+     (Self : Simple_Sequencer; Sample_Nb : Sample_Period) return Natural;
 
 end Command;

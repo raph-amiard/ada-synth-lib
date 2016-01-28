@@ -18,6 +18,9 @@ package Effects is
 
    overriding procedure Reset (Self : in out Attenuator);
 
+   overriding function Children
+     (Self : in out Attenuator) return Generator_Array is ((0 => Self.Source));
+
    --------------------
    -- Dyn_Attenuator --
    --------------------
@@ -37,6 +40,10 @@ package Effects is
 
    overriding procedure Reset (Self : in out Dyn_Attenuator);
 
+   overriding function Children
+     (Self : in out Dyn_Attenuator) return Generator_Array
+   is ((Self.Level_Provider, Self.Source));
+
    ----------------
    -- Transposer --
    ----------------
@@ -49,6 +56,10 @@ package Effects is
      (Self : in out Transposer);
 
    overriding procedure Reset (Self : in out Transposer);
+
+   overriding function Children
+     (Self : in out Transposer) return Generator_Array
+   is ((0 => Self.Source));
 
    -------------------
    -- Digital_Disto --
@@ -83,6 +94,10 @@ package Effects is
 
    overriding procedure Reset (Self : in out Disto);
 
+   overriding function Children
+     (Self : in out Disto) return Generator_Array
+   is ((0 => Self.Source));
+
    ---------------
    -- LP_Filter --
    ---------------
@@ -90,20 +105,52 @@ package Effects is
    type Low_Pass_Filter is new Generator with record
       Cut_Freq_Provider  : Generator_Access;
       Source             : Generator_Access;
-      Cut_Freq           : Float;
       Res                : Float;
+      Cut_Freq           : Float;
       A0, A1, A2, B1, B2 : Float;
       D1, D2, D3, D4     : Float := 0.0;
    end record;
 
-   function Create_LP (Source : access Generator'Class;
-                       Cut_Freq_Provider : access Generator'Class;
-                       Q : Float) return access Low_Pass_Filter;
+--     overriding function Has_Params_Scope
+--       (Self : in out Low_Pass_Filter) return Boolean is (True);
+
+   function Create_LP
+     (Source   : access Generator'Class;
+      Cut_Freq : access Generator'Class;
+      Q        : Float) return access Low_Pass_Filter;
+
+   overriding function Is_Param (Self : in out Low_Pass_Filter) return Boolean
+   is (True);
 
    overriding procedure Next_Samples
      (Self : in out Low_Pass_Filter);
 
    overriding procedure Reset (Self : in out Low_Pass_Filter);
+
+   overriding function Children
+     (Self : in out Low_Pass_Filter) return Generator_Array
+   is ((Self.Cut_Freq_Provider, Self.Source));
+
+   overriding function Nb_Values
+     (Self : in out Low_Pass_Filter) return Natural is (1);
+
+   overriding procedure Set_Value
+     (Self : in out Low_Pass_Filter; I : Natural; Val : Float);
+
+   overriding function Get_Value
+     (Self : in out Low_Pass_Filter; I : Natural) return Float
+   is (Self.Res);
+
+   overriding function Get_Name
+     (Self : in out Low_Pass_Filter; I : Natural) return String
+   is
+     ("Q");
+
+   overriding function Get_Min_Value
+     (Self : in out Low_Pass_Filter; I : Natural) return Float is (0.0);
+
+   overriding function Get_Max_Value
+     (Self : in out Low_Pass_Filter; I : Natural) return Float is (1.0);
 
    -----------
    -- Mixer --
@@ -142,6 +189,9 @@ package Effects is
 
    overriding procedure Reset (Self : in out Mixer);
 
+   overriding function Children
+     (Self : in out Mixer) return Generator_Array;
+
    type Delay_Line is new Generator with record
       Source           : access Generator'Class;
       Delay_In_Samples : B_Range_T;
@@ -156,5 +206,10 @@ package Effects is
    overriding procedure Next_Samples (Self : in out Delay_Line);
 
    overriding procedure Reset (Self : in out Delay_Line);
+
+   overriding function Children
+     (Self : in out Delay_Line) return Generator_Array
+   is
+     (0 => Self.Source);
 
 end Effects;

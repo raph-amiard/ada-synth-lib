@@ -1,5 +1,4 @@
 with Config; use Config;
-with Ada.Text_IO; use Ada.Text_IO;
 
 package body Command is
 
@@ -49,8 +48,9 @@ package body Command is
 
    function Create_Sequencer
      (Nb_Steps, BPM : Natural;
-      Measures : Natural := 1;
-      Notes : Notes_Array := No_Notes) return access Simple_Sequencer
+      Measures      : Natural := 1;
+      Notes         : Notes_Array := No_Notes;
+      Track_Name    : String) return access Simple_Sequencer
    is
       Ret : constant access Simple_Sequencer :=
         new Simple_Sequencer'
@@ -63,6 +63,7 @@ package body Command is
    begin
       Register_Note_Generator (Note_Generator_Access (Ret));
       Ret.Notes := Notes;
+      Ret.Track_Name := To_Unbounded_String (Track_Name);
       return Ret;
    end Create_Sequencer;
 
@@ -112,10 +113,11 @@ package body Command is
       Self.Current_Note := 0;
    end Reset;
 
-   function Note_For_Sample (Self : Simple_Sequencer; Sample_Nb : Sample_Period) return Natural
+   function Note_For_Sample
+     (Self : Simple_Sequencer; Sample_Nb : Sample_Period) return Natural
    is
    begin
-     return (Natural (Sample_Nb / Self.Interval) mod Self.Nb_Steps) + 1;
+      return (Natural (Sample_Nb / Self.Interval) mod Self.Nb_Steps) + 1;
    end Note_For_Sample;
 
 end Command;

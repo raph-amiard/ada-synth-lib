@@ -1,5 +1,6 @@
 with Utils; use Utils;
 with Sound_Gen_Interfaces; use Sound_Gen_Interfaces;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 package Waves is
 
@@ -11,6 +12,10 @@ package Waves is
    end record;
 
    procedure Update_Period (Self : in out Wave_Generator'Class);
+
+   overriding function Children
+     (Self : in out Wave_Generator) return Generator_Array
+   is (0 => Self.Frequency_Provider);
 
    -------------------
    -- Saw_Generator --
@@ -95,24 +100,57 @@ package Waves is
      (Self : in out Pitch_Gen);
    overriding procedure Reset (Self : in out Pitch_Gen);
 
+   overriding function Children
+     (Self : in out Pitch_Gen) return Generator_Array
+   is (0 => Self.Proc);
+
    ---------------
    -- Fixed_Gen --
    ---------------
 
    type Fixed_Gen is new Generator with record
-      Val : Sample;
+      Val  : Sample;
       Proc : Generator_Access := null;
+      Name : Unbounded_String;
    end record;
 
-   function Fixed
-     (Freq : Frequency;
-      Modulator : Generator_Access := null) return access Fixed_Gen
-   is
-     (new Fixed_Gen'(Val => Sample (Freq), Proc => Modulator, others => <>));
+   type Fixed_Generator is access all Fixed_Gen;
 
-   overriding procedure Next_Samples
-     (Self : in out Fixed_Gen);
+   function Fixed
+     (Freq      : Frequency;
+      Modulator : Generator_Access := null;
+      Name      : String := "")
+      return access Fixed_Gen;
+   overriding procedure Next_Samples (Self : in out Fixed_Gen);
    overriding procedure Reset (Self : in out Fixed_Gen);
+
+   overriding function Children
+     (Self : in out Fixed_Gen) return Generator_Array
+   is (0 => Self.Proc);
+
+   overriding function Is_Param (Self : in out Fixed_Gen) return Boolean
+   is (True);
+
+   overriding function Nb_Values
+     (Self : in out Fixed_Gen) return Natural is (1);
+
+   overriding procedure Set_Value
+     (Self : in out Fixed_Gen; I : Natural; Val : Float);
+
+   overriding function Get_Value
+     (Self : in out Fixed_Gen; I : Natural) return Float
+   is (Float (Self.Val));
+
+   overriding function Get_Name
+     (Self : in out Fixed_Gen; I : Natural) return String
+   is
+     (To_String (Self.Name));
+
+   overriding function Get_Min_Value
+     (Self : in out Fixed_Gen; I : Natural) return Float is (0.0);
+
+   overriding function Get_Max_Value
+     (Self : in out Fixed_Gen; I : Natural) return Float is (20_000.0);
 
    -----------
    -- Chain --
@@ -143,6 +181,10 @@ package Waves is
      (Self : in out Chain);
    overriding procedure Reset (Self : in out Chain);
 
+   overriding function Children
+     (Self : in out Chain) return Generator_Array
+   is (Empty_Generator_Array);
+
    ---------
    -- LFO --
    ---------
@@ -171,4 +213,56 @@ package Waves is
 
    overriding procedure Next_Samples (Self : in out ADSR);
    overriding procedure Reset (Self : in out ADSR);
+
+   overriding function Children
+     (Self : in out ADSR) return Generator_Array
+   is (Empty_Generator_Array);
+
+   overriding function Is_Param (Self : in out ADSR) return Boolean
+   is (True);
+
+   overriding function Nb_Values
+     (Self : in out ADSR) return Natural is (4);
+
+   overriding procedure Set_Value
+     (Self : in out ADSR; I : Natural; Val : Float);
+
+   overriding function Get_Value
+     (Self : in out ADSR; I : Natural) return Float
+   is
+     (case I is
+         when 0 => Float (Self.Attack),
+         when 1 => Float (Self.Decay),
+         when 2 => Float (Self.Sustain),
+         when 3 => Float (Self.Release),
+         when others => raise Constraint_Error);
+
+   overriding function Get_Name
+     (Self : in out ADSR; I : Natural) return String
+   is
+     (case I is
+         when 0      => "Attack",
+         when 1      => "Decay",
+         when 2      => "Sustain",
+         when 3      => "Release",
+         when others => raise Constraint_Error);
+
+   overriding function Get_Min_Value
+     (Self : in out ADSR; I : Natural) return Float is
+     (case I is
+         when 0      => 0.0,
+         when 1      => 0.0,
+         when 2      => 0.0,
+         when 3      => 0.0,
+         when others => raise Constraint_Error);
+
+   overriding function Get_Max_Value
+     (Self : in out ADSR; I : Natural) return Float is
+     (case I is
+         when 0      => 10000.0,
+         when 1      => 10000.0,
+         when 2      => 1.0,
+         when 3      => 10000.0,
+         when others => raise Constraint_Error);
+
 end Waves;
