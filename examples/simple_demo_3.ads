@@ -49,7 +49,7 @@ package Simple_Demo_3 is
         Coeff      => 1.5,
         Source     => Create_LP
           (
-           Cut_Freq_Provider =>
+           Cut_Freq =>
              Fixed
                (Freq      => 200.0,
                 Modulator =>
@@ -88,7 +88,7 @@ package Simple_Demo_3 is
 
    Synth_2 : constant access Low_Pass_Filter :=
      Create_LP
-       (Cut_Freq_Provider =>
+       (Cut_Freq =>
           Fixed
             (Freq      => 300.0,
              Modulator =>
@@ -169,13 +169,10 @@ package Simple_Demo_3 is
               0.7)
        ), Env => Create_ADSR (1, 100, 100, 0.2, Kick_Source));
 
-   Synth_Delay : constant access Generator'Class :=
-     Create_Delay_Line (Synth_2, 800, 0.7);
-
    Main : constant access Generator'Class :=
-     Create_Mixer ((1 => (Create_Delay_Line (Hat, 55, 0.1),  0.7),
+     Create_Mixer ((1 => (Hat,         0.7),
                     2 => (Kick,        0.7),
-                    3 => (Synth_Delay, 0.05),
+                    3 => (Synth_2, 0.05),
                     4 => (Synth,       0.7)));
 
 

@@ -28,8 +28,9 @@ package body Effects is
      (Self : in out Mixer; G : access Generator'Class;
       Level : Float) return Natural
    is
+      pragma Suppress (Accessibility_Check);
       MG : constant Mixer_Generator := Mixer_Generator'(Gen   => G,
-                                               Level => Level);
+                                                        Level => Level);
    begin
       return Add_Generator (Self, MG);
    end Add_Generator;
@@ -472,6 +473,17 @@ package body Effects is
       pragma Unreferenced (I);
    begin
       Self.Res := Val;
+   end Set_Value;
+
+   ---------------
+   -- Set_Value --
+   ---------------
+
+   overriding procedure Set_Value
+     (Self : in out Attenuator; I : Natural; Val : Float) is
+      pragma Unreferenced (I);
+   begin
+      Self.Level := Val;
    end Set_Value;
 
 end Effects;

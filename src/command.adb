@@ -50,7 +50,7 @@ package body Command is
      (Nb_Steps, BPM : Natural;
       Measures      : Natural := 1;
       Notes         : Notes_Array := No_Notes;
-      Track_Name    : String) return access Simple_Sequencer
+      Track_Name    : String := "") return access Simple_Sequencer
    is
       Ret : constant access Simple_Sequencer :=
         new Simple_Sequencer'
@@ -119,5 +119,21 @@ package body Command is
    begin
       return (Natural (Sample_Nb / Self.Interval) mod Self.Nb_Steps) + 1;
    end Note_For_Sample;
+
+   ------------------
+   -- To_Seq_Notes --
+   ------------------
+
+   function To_Seq_Notes
+     (A   : Utils.Scales_Arrays.Array_Type;
+      D   : Sample_Period;
+      Oct : Octave_T) return Notes_Array
+   is
+      function N (N : Scale_Degree_T) return Sequencer_Note is (((N, Oct), D));
+      function Map is new Utils.Scales_Arrays.Map_Gen
+        (Sequencer_Note, Notes_Array, N);
+   begin
+      return Map (A);
+   end To_Seq_Notes;
 
 end Command;

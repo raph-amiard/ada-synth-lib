@@ -82,13 +82,13 @@ package Waves is
       Current_Note   : Note_T := (C, 4);
       Current_Freq   : Frequency;
       Relative_Pitch : Integer;
-      Source         : Note_Generator_Access;
+      Source         : access Note_Generator'Class;
       Proc           : Generator_Access := null;
    end record;
 
    function Create_Pitch_Gen
      (Rel_Pitch : Integer;
-      Source : Note_Generator_Access; Proc : Generator_Access := null)
+      Source : access Note_Generator'Class; Proc : Generator_Access := null)
       return access Pitch_Gen
    is
      (new Pitch_Gen'(Relative_Pitch => Rel_Pitch, Source => Source,
@@ -150,7 +150,7 @@ package Waves is
      (Self : in out Fixed_Gen; I : Natural) return Float is (0.0);
 
    overriding function Get_Max_Value
-     (Self : in out Fixed_Gen; I : Natural) return Float is (20_000.0);
+     (Self : in out Fixed_Gen; I : Natural) return Float is (5_000.0);
 
    -----------
    -- Chain --
@@ -197,7 +197,7 @@ package Waves is
 
    type ADSR_State is (Running, Release, Off);
    type ADSR is new Generator with record
-      Source                 : Note_Generator_Access;
+      Source                 : access Note_Generator'Class;
       Attack, Decay, Release : Sample_Period;
       Sustain                : Scale;
       Cur_Sustain            : Scale;
@@ -209,7 +209,7 @@ package Waves is
    function Create_ADSR
      (Attack, Decay, Release : Millisecond;
       Sustain : Scale;
-      Source : Note_Generator_Access := null) return access ADSR;
+      Source : access Note_Generator'Class := null) return access ADSR;
 
    overriding procedure Next_Samples (Self : in out ADSR);
    overriding procedure Reset (Self : in out ADSR);

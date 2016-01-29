@@ -195,7 +195,7 @@ package body Waves is
 
    function Create_ADSR
      (Attack, Decay, Release : Millisecond; Sustain : Scale;
-      Source : Note_Generator_Access := null) return access ADSR
+      Source : access Note_Generator'Class := null) return access ADSR
    is
    begin
       return new ADSR'

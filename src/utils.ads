@@ -1,4 +1,5 @@
 with Config; use Config;
+with Array_Utils;
 
 package Utils is
    type Frequency is new Float;
@@ -16,6 +17,9 @@ package Utils is
       Scale_Degree : Scale_Degree_T;
       Octave : Octave_T;
    end record;
+
+   package Notes_Arrays is new Array_Utils (Note_T);
+   package Scales_Arrays is new Array_Utils (Scale_Degree_T);
 
    function Note_Img (N : Note_T) return String is
       (N.Scale_Degree'Img & " " & N.Octave'Img);

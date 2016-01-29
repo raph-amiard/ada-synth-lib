@@ -21,7 +21,7 @@ package body Utils is
    function Sample_To_UInt (S : Sample) return UInt_T is
    begin
       return UInt_T
-        (((Saturate (S) + 1.0) / 2.0)
+        (((Saturate (S / 4.0) + 1.0) / 2.0)
          * Sample
            (UInt_T'Last - 1));
    end Sample_To_UInt;

@@ -42,7 +42,7 @@ procedure Audio_2 is
            --  We use an ADSR enveloppe to modulate the Cut frequency of the
            --  filter. Using it as the modulator of a Fixed generator allows us
            --  to have a cut frequency that varies between 1700 hz and 200 hz.
-           Cut_Freq_Provider =>
+           Cut_Freq =>
              Fixed
                (Freq      => 200.0,
                 Modulator => new Attenuator'

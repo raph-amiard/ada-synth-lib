@@ -13,6 +13,30 @@ package Effects is
       Source : access Generator'Class;
    end record;
 
+   overriding function Is_Param (Self : in out Attenuator) return Boolean
+   is (True);
+
+   overriding function Nb_Values
+     (Self : in out Attenuator) return Natural is (1);
+
+   overriding procedure Set_Value
+     (Self : in out Attenuator; I : Natural; Val : Float);
+
+   overriding function Get_Value
+     (Self : in out Attenuator; I : Natural) return Float
+   is (Self.Level);
+
+   overriding function Get_Name
+     (Self : in out Attenuator; I : Natural) return String
+   is
+     ("Attenuator");
+
+   overriding function Get_Min_Value
+     (Self : in out Attenuator; I : Natural) return Float is (0.0);
+
+   overriding function Get_Max_Value
+     (Self : in out Attenuator; I : Natural) return Float is (5_000.0);
+
    overriding procedure Next_Samples
      (Self : in out Attenuator);
 
@@ -157,7 +181,7 @@ package Effects is
    -----------
 
    type Mixer_Generator is record
-      Gen : access Generator'Class;
+      Gen   : access Generator'Class;
       Level : Float;
    end record;
 
