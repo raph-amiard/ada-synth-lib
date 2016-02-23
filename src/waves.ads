@@ -243,10 +243,10 @@ package Waves is
      (Self : in out ADSR; I : Natural) return Float
    is
      (case I is
-         when 0 => Float (Self.Attack),
-         when 1 => Float (Self.Decay),
+         when 0 => Period_To_Sec (Self.Attack),
+         when 1 => Period_To_Sec (Self.Decay),
          when 2 => Float (Self.Sustain),
-         when 3 => Float (Self.Release),
+         when 3 => Period_To_Sec (Self.Release),
          when others => raise Constraint_Error);
 
    overriding function Get_Name
@@ -271,10 +271,10 @@ package Waves is
    overriding function Get_Max_Value
      (Self : in out ADSR; I : Natural) return Float is
      (case I is
-         when 0      => 10000.0,
-         when 1      => 10000.0,
+         when 0      => 1.0,
+         when 1      => 3.0,
          when 2      => 1.0,
-         when 3      => 10000.0,
+         when 3      => 10.0,
          when others => raise Constraint_Error);
 
    overriding function Get_Scale

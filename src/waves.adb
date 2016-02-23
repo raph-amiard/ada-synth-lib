@@ -233,15 +233,19 @@ package body Waves is
          case Self.State is
          when Running =>
             if Self.Current_P in 0 .. Self.Attack then
-               Ret := Sample (Self.Current_P) / Sample (Self.Attack);
+               Ret := Exp8_Transfer
+                 (Sample (Self.Current_P) / Sample (Self.Attack));
             elsif
               Self.Current_P in Self.Attack + 1 .. Self.Attack + Self.Decay
             then
                Ret :=
-                 (Sample ((Self.Decay - (Self.Current_P - Self.Attack)))
-                  / Sample (Self.Decay)
-                  * Sample (1.0 - Self.Sustain))
-                   + Sample (Self.Sustain);
+                 Exp8_Transfer
+                   (Float (Self.Decay + Self.Attack - Self.Current_P)
+                    / Float (Self.Decay));
+
+               Ret := Ret
+               * Sample (1.0 - Self.Sustain)
+                 + Sample (Self.Sustain);
             else
                Ret := Sample (Self.Sustain);
             end if;
@@ -249,7 +253,9 @@ package body Waves is
          when Release =>
             if Self.Current_P in 0 .. Self.Release then
                Ret :=
-                 Sample (Self.Release - Self.Current_P) / Sample (Self.Release)
+                 Exp8_Transfer
+                   (Sample (Self.Release - Self.Current_P)
+                    / Sample (Self.Release))
                  * Sample (Self.Cur_Sustain);
             else
                Self.State := Off;
@@ -497,10 +503,10 @@ package body Waves is
    is
    begin
       case I is
-         when 0 => Self.Attack := Sample_Period (Val);
-         when 1 => Self.Decay := Sample_Period (Val);
+         when 0 => Self.Attack := Sec_To_Period (Val);
+         when 1 => Self.Decay :=  Sec_To_Period (Val);
          when 2 => Self.Sustain := Scale (Val);
-         when 3 => Self.Release := Sample_Period (Val);
+         when 3 => Self.Release := Sec_To_Period (Val);
          when others => raise Constraint_Error;
       end case;
    end Set_Value;

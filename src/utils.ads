@@ -1,5 +1,6 @@
 with Config; use Config;
 with Array_Utils;
+with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
 
 package Utils is
    type Frequency is new Float;
@@ -49,6 +50,12 @@ package Utils is
 
    function Msec_To_Period (Ms : Millisecond) return Sample_Period is
      (Sample_Period (Float (Ms) / 1000.0 * Float (SAMPLE_RATE)));
+
+   function Period_To_Sec (P : Sample_Period) return Float is
+     (Float (P) / Float (SAMPLE_RATE));
+
+   function Sec_To_Period (S : Float) return Sample_Period is
+     (Sample_Period (S * Float (SAMPLE_RATE)));
 
    function Sin (N : Float) return Float;
 
