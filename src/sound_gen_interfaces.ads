@@ -92,24 +92,36 @@ package Sound_Gen_Interfaces is
       Kind : Note_Signal_T := No_Signal;
    end record;
 
+   type I_Simulation_Listener is interface;
+   procedure Next_Step (Self : in out I_Simulation_Listener) is abstract;
+   function Name
+     (Self : in out I_Simulation_Listener) return String is abstract;
+
    type Note_Signal_Buffer is array (B_Range_T) of Note_Signal;
+
    type Note_Generator is abstract tagged record
-      Current_Sample_Nb : Sample_Period := 0;
       Buffer            : Note_Signal_Buffer;
    end record;
    type Note_Generator_Access is access all Note_Generator'Class;
 
-   procedure Next_Messages (Self : in out Note_Generator) is abstract;
    procedure Reset (Self : in out Note_Generator) is abstract;
    procedure Reset_Not_Null (Self : Note_Generator_Access);
 
-   type Note_Generator_Array is
-     array (Natural range <>) of Note_Generator_Access;
+   type Sim_Listener_Array is
+     array (Natural range <>) of access I_Simulation_Listener'Class;
 
-   Note_Generators    : Note_Generator_Array (0 .. 64);
-   Note_Generators_Nb : Natural := 0;
+   Simulation_Listeners    : Sim_Listener_Array (0 .. 1024);
+   Simulation_Listeners_Nb : Natural := 0;
 
-   procedure Register_Note_Generator (N : Note_Generator_Access);
+   procedure Register_Simulation_Listener
+     (N : access I_Simulation_Listener'Class);
    procedure Next_Steps;
+
+   type Sequencer_Note is record
+      Note     : Note_T;
+      Duration : Sample_Period;
+   end record;
+
+   No_Seq_Note : Sequencer_Note := (Note => No_Note, Duration => 0);
 
 end Sound_Gen_Interfaces;

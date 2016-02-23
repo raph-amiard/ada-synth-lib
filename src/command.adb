@@ -8,25 +8,25 @@ package body Command is
 
    function Create_Simple_Command
      (On_Period, Off_Period : Sample_Period;
-      Note : Note_T) return Note_Generator_Access
+      Note : Note_T) return access Simple_Command'Class
    is
-      N : Note_Generator_Access;
    begin
-      N := new Simple_Command'(Note              => Note,
-                               Current_Sample_Nb => <>,
-                               Buffer            => <>,
-                               On_Period         => On_Period,
-                               Off_Period        => Off_Period,
-                               Current_P         => 0);
-      Register_Note_Generator (N);
-      return N;
+      return N : constant access Simple_Command'Class
+        := new Simple_Command'(Note       => Note,
+                               Buffer     => <>,
+                               On_Period  => On_Period,
+                               Off_Period => Off_Period,
+                               Current_P  => 0)
+      do
+         Register_Simulation_Listener (N);
+      end return;
    end Create_Simple_Command;
 
    -----------------------
    -- Next_Message_Impl --
    -----------------------
 
-   overriding procedure Next_Messages
+   overriding procedure Next_Step
      (Self : in out Simple_Command)
    is
    begin
@@ -40,7 +40,7 @@ package body Command is
             Self.Buffer (I) := Note_Signal'(Kind => No_Signal, Note => <>);
          end if;
       end loop;
-   end Next_Messages;
+   end Next_Step;
 
    ----------------------
    -- Create_Sequencer --
@@ -61,7 +61,8 @@ package body Command is
               / Float (Nb_Steps)) * Float (SAMPLE_RATE)),
            others => <>);
    begin
-      Register_Note_Generator (Note_Generator_Access (Ret));
+      Register_Simulation_Listener (Ret);
+
       Ret.Notes := Notes;
       Ret.Track_Name := To_Unbounded_String (Track_Name);
       return Ret;
@@ -71,10 +72,10 @@ package body Command is
    -- Next_Message_Impl --
    -----------------------
 
-   overriding procedure Next_Messages
+   overriding procedure Next_Step
      (Self : in out Simple_Sequencer)
    is
-      Cur_Note : Sequencer_Note;
+      Cur_Note  : Sequencer_Note;
       Current_P : Sample_Period;
    begin
       for I in B_Range_T'Range loop
@@ -93,7 +94,7 @@ package body Command is
             end if;
          end if;
       end loop;
-   end Next_Messages;
+   end Next_Step;
 
    -----------
    -- Reset --

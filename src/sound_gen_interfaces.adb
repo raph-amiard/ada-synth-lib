@@ -14,11 +14,12 @@ package body Sound_Gen_Interfaces is
    -- Register_Note_Generator --
    -----------------------------
 
-   procedure Register_Note_Generator (N : Note_Generator_Access) is
+   procedure Register_Simulation_Listener
+     (N : access I_Simulation_Listener'Class) is
    begin
-      Note_Generators (Note_Generators_Nb) := N;
-      Note_Generators_Nb := Note_Generators_Nb + 1;
-   end Register_Note_Generator;
+      Simulation_Listeners (Simulation_Listeners_Nb) := N;
+      Simulation_Listeners_Nb := Simulation_Listeners_Nb + 1;
+   end Register_Simulation_Listener;
 
    ---------------
    -- Next_Step --
@@ -26,8 +27,8 @@ package body Sound_Gen_Interfaces is
 
    procedure Next_Steps is
    begin
-      for I in 0 .. Note_Generators_Nb - 1 loop
-         Note_Generators (I).Next_Messages;
+      for I in 0 .. Simulation_Listeners_Nb - 1 loop
+         Simulation_Listeners (I).Next_Step;
       end loop;
    end Next_Steps;
 
