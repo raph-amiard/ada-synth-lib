@@ -18,11 +18,13 @@ package Utils is
       Octave : Octave_T;
    end record;
 
+   function Note_Img (N : Note_T) return String;
+
+   function "<" (L, R : Note_T) return Boolean is
+     (Note_Img (L) < Note_Img (R));
+
    package Notes_Arrays is new Array_Utils (Note_T);
    package Scales_Arrays is new Array_Utils (Scale_Degree_T);
-
-   function Note_Img (N : Note_T) return String is
-      (N.Scale_Degree'Img & " " & N.Octave'Img);
 
    No_Note : constant Note_T := (A, -1);
 
@@ -58,5 +60,7 @@ package Utils is
    function Exp8_Transfer (F : Float) return Float
    is
      (Exp ((F - 1.0) * 8.0));
+
+   function Img (F : Float) return String;
 
 end Utils;

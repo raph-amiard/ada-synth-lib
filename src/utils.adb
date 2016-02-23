@@ -1,4 +1,5 @@
 with Utils.Tan_Table; use Utils.Tan_Table;
+with Ada.Float_Text_IO;
 
 package body Utils is
 
@@ -267,5 +268,28 @@ package body Utils is
 --     end loop;
 --     Put (Standard_Error, ")");
 --     New_Line (Standard_Error);
+
+   --------------
+   -- Note_Img --
+   --------------
+
+   function Note_Img (N : Note_T) return String is
+      Octave_Img : constant String := N.Octave'Img;
+      Scale_Img  : constant String := N.Scale_Degree'Img;
+   begin
+      return Scale_Img & Octave_Img (2 .. Octave_Img'Last);
+   end Note_Img;
+
+   ---------
+   -- Img --
+   ---------
+
+   function Img (F : Float) return String
+   is
+      S : String (1 .. 10);
+   begin
+      Ada.Float_Text_IO.Put (S, F, 2, 0);
+      return S;
+   end Img;
 
 end Utils;
