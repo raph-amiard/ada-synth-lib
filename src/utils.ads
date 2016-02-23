@@ -6,7 +6,7 @@ package Utils is
    type Frequency is new Float;
    type Sample_Period is new Natural;
    type Period is new Float;
-   type Sample is new Float;
+   subtype Sample is Float;
 
    subtype Millisecond is Natural;
    type Scale is new Float range 0.0 .. 1.0;
