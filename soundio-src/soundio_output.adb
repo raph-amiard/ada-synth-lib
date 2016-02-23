@@ -114,7 +114,7 @@ package body Soundio_Output is
       Available_Frames  : Natural;
    begin
       if Initial_Drift_Level = 0 then
-         Initial_Drift_Level := Frame_Count_Max;
+         Initial_Drift_Level := Frame_Count_Max - (Frame_Count_Max / 10);
       else
          Current_Drift_Level := Frame_Count_Max;
       end if;
