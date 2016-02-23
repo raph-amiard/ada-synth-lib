@@ -456,17 +456,24 @@ package body Waves is
    -----------
 
    function Fixed
-     (Freq      : Frequency;
-      Modulator : Generator_Access := null;
-      Name      : String := "") return access Fixed_Gen
+     (Freq        : Frequency;
+      Modulator   : Generator_Access := null;
+      Name        : String := "";
+      Min         : Float := 0.0;
+      Max         : Float := 5_000.0;
+      Param_Scale : Param_Scale_T := Linear)
+      return access Fixed_Gen
    is
    begin
       return new
         Fixed_Gen'
-          (Val    => Sample (Freq),
-           Proc   => Modulator,
-           Name   => To_Unbounded_String (Name),
-           others => <>);
+          (Val         => Sample (Freq),
+           Proc        => Modulator,
+           Name        => To_Unbounded_String (Name),
+           Min         => Min,
+           Max         => Max,
+           Param_Scale => Param_Scale,
+           others      => <>);
    end Fixed;
 
    ---------------

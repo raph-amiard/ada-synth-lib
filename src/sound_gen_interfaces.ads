@@ -72,6 +72,16 @@ package Sound_Gen_Interfaces is
    function Get_Max_Value
      (Self : in out Generator; I : Natural) return Float is (0.0);
 
+   type Scaled_Value_T is new Float range 0.0 .. 1.0;
+
+   procedure Set_Scaled_Value
+     (Self : in out Generator'Class; I : Natural; Val : Scaled_Value_T);
+
+   type Param_Scale_T is (Linear, Exp);
+
+   function Get_Scale
+     (Self : in out Generator; I : Natural) return Param_Scale_T is (Linear);
+
    ----------------------
    -- Signal_Processor --
    ----------------------

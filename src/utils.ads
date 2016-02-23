@@ -55,4 +55,8 @@ package Utils is
    Pi : constant :=
      3.14159_26535_89793_23846_26433_83279_50288_41971_69399_37511;
 
+   function Exp8_Transfer (F : Float) return Float
+   is
+     (Exp ((F - 1.0) * 8.0));
+
 end Utils;

@@ -170,4 +170,21 @@ package body Sound_Gen_Interfaces is
         & Cat_Arrays (Self.All_Children);
    end Get_Params;
 
+   ----------------------
+   -- Set_Scaled_Value --
+   ----------------------
+
+   procedure Set_Scaled_Value
+     (Self : in out Generator'Class; I : Natural; Val : Scaled_Value_T)
+   is
+      V : Float :=
+        (if Self.Get_Scale (I) = Exp
+         then Exp8_Transfer (Float (Val)) else Float (Val));
+      Max : constant Float := Self.Get_Max_Value (I);
+      Min : constant Float := Self.Get_Min_Value (I);
+   begin
+      V := V * (Max - Min) + Min;
+      Self.Set_Value (I, V);
+   end Set_Scaled_Value;
+
 end Sound_Gen_Interfaces;

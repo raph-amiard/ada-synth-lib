@@ -109,18 +109,25 @@ package Waves is
    ---------------
 
    type Fixed_Gen is new Generator with record
-      Val  : Sample;
-      Proc : Generator_Access := null;
-      Name : Unbounded_String;
+      Val         : Sample;
+      Proc        : Generator_Access := null;
+      Name        : Unbounded_String;
+      Min         : Float := 0.0;
+      Max         : Float := 5_000.0;
+      Param_Scale : Param_Scale_T := Linear;
    end record;
 
    type Fixed_Generator is access all Fixed_Gen;
 
    function Fixed
-     (Freq      : Frequency;
-      Modulator : Generator_Access := null;
-      Name      : String := "")
+     (Freq        : Frequency;
+      Modulator   : Generator_Access := null;
+      Name        : String := "";
+      Min         : Float := 0.0;
+      Max         : Float := 5_000.0;
+      Param_Scale : Param_Scale_T := Linear)
       return access Fixed_Gen;
+
    overriding procedure Next_Samples (Self : in out Fixed_Gen);
    overriding procedure Reset (Self : in out Fixed_Gen);
 
@@ -147,10 +154,15 @@ package Waves is
      (To_String (Self.Name));
 
    overriding function Get_Min_Value
-     (Self : in out Fixed_Gen; I : Natural) return Float is (0.0);
+     (Self : in out Fixed_Gen; I : Natural) return Float is (Self.Min);
 
    overriding function Get_Max_Value
-     (Self : in out Fixed_Gen; I : Natural) return Float is (5_000.0);
+     (Self : in out Fixed_Gen; I : Natural) return Float is (Self.Max);
+
+   overriding function Get_Scale
+     (Self : in out Fixed_Gen; I : Natural) return Param_Scale_T
+   is
+      (Self.Param_Scale);
 
    -----------
    -- Chain --
@@ -264,5 +276,10 @@ package Waves is
          when 2      => 1.0,
          when 3      => 10000.0,
          when others => raise Constraint_Error);
+
+   overriding function Get_Scale
+     (Self : in out ADSR; I : Natural) return Param_Scale_T is
+     (case I is
+      when 0 | 1 | 3 => Exp, when others => Linear);
 
 end Waves;
