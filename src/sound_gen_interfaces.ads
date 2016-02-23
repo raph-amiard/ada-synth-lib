@@ -3,7 +3,7 @@ with Array_Utils;
 
 package Sound_Gen_Interfaces is
 
-   Sample_Nb : Sample_Period := 1;
+   Sample_Nb : Sample_Period := 0;
 
    ---------------
    -- Generator --
