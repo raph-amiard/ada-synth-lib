@@ -17,10 +17,10 @@ project Ada_Synth_Lib_Soundio is
       case Build is
          when "Debug" =>
             for Default_Switches ("Ada") use
-              ("-O0", "-g", "-gnatwaCJ", "-gnatygO"); --  , "-gnatp");
+              ("-O0", "-g", "-gnatwaCJ", "-gnatydISux"); --  , "-gnatp");
          when "Release" =>
             for Default_Switches ("Ada") use
-              ("-O3", "-g", "-gnatwaCJ", "-gnatygO", "-gnatp", "-gnatn");
+              ("-O3", "-g", "-gnatwaCJ", "-gnatydISux", "-gnatp", "-gnatn");
       end case;
    end Compiler;
 
