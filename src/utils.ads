@@ -12,6 +12,22 @@ package Utils is
    type Scale is new Float range 0.0 .. 1.0;
 
    type Scale_Degree_T is (A, A_Sh, B, C, C_Sh, D, D_Sh, E, F, F_Sh, G, G_Sh);
+   type Scale_Color_T is (Black, White);
+
+   Degrees_Colors : array (Scale_Degree_T) of Scale_Color_T :=
+     (A    => White,
+      A_Sh => Black,
+      B    => White,
+      C    => White,
+      C_Sh => Black,
+      D    => White,
+      D_Sh => Black,
+      E    => White,
+      F    => White,
+      F_Sh => Black,
+      G    => White,
+      G_Sh => Black);
+
    type Octave_T is range -1 .. 10;
 
    type Note_T is record
