@@ -1,5 +1,5 @@
-with Ada.Numerics.Long_Elementary_Functions;
-use Ada.Numerics.Long_Elementary_Functions;
+with Ada.Numerics.Elementary_Functions;
+use Ada.Numerics, Ada.Numerics.Elementary_Functions;
 
 package body BLIT is
    Low_Pass : constant := 0.999;
@@ -30,25 +30,25 @@ package body BLIT is
       Master_Size : constant := Step_Width * Phase_Count;
       Master : array (Natural range 0 .. Master_Size - 1) of Float :=
         (others => 0.5);
-      Gain : Long_Float := 0.5 / 0.777;
+      Gain : Float := 0.5 / 0.777;
       --  adjust normal square wave's amplitude of ~0.777 to 0.5
 
       Sine_Size : constant Integer := 256 * Phase_Count + 2;
       Max_Harmonic : constant Integer := Sine_Size / 2 / Phase_Count;
-      H : Natural := 1;
+      H           : Natural := 1;
    begin
       loop
          exit when H > Max_Harmonic;
          declare
-            Amplitude : constant Long_Float := Gain / Long_Float (H);
-            To_Angle : constant Long_Float :=
-              3.14159265358979323846 * 2.0 / Long_Float (Sine_Size) *
-              Long_Float (H);
+            Amplitude : constant Float := Gain / Float (H);
+            To_Angle : constant Float :=
+              Pi * 2.0 / Float (Sine_Size) *
+              Float (H);
          begin
             for I in 0 .. Master_Size - 1 loop
                Master (I) := Master (I) +
-                 Float  (Sin (Long_Float (I - Master_Size / 2) * To_Angle)
-                         * Amplitude);
+                 Elementary_Functions.Sin
+                   (Float (I - Master_Size / 2) * To_Angle) * Amplitude;
             end loop;
             Gain := Gain * Low_Pass;
          end;
