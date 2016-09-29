@@ -17,7 +17,8 @@ package body BLIT is
 
    procedure Init_Steps;
    procedure Add_Step
-     (Self : in out BLIT_Generator; Time : Period; Delt : Sample);
+     (Self : in out BLIT_Generator;
+      Time : Natural; Phase : Float; Delt : Sample);
 
    ----------------
    -- Init_Steps --
@@ -42,7 +43,7 @@ package body BLIT is
          declare
             Amplitude : constant Float := Gain / Float (H);
             To_Angle : constant Float :=
-              Pi * 2.0 / Float (Sine_Size) *
+              Ada.Numerics.Pi * 2.0 / Float (Sine_Size) *
               Float (H);
          begin
             for I in 0 .. Master_Size - 1 loop
@@ -110,16 +111,13 @@ package body BLIT is
    --------------
 
    procedure Add_Step (Self : in out BLIT_Generator;
-                       Time : Period; Delt : Sample)
+                       Time : Natural; Phase : Float; Delt : Sample)
    is
-      Whole : constant Natural := Natural (Period'Floor (Time));
-      Phase : constant Natural :=
-        Natural (Period'Floor ((Time - Period (Whole))
-                 * Period (Phase_Count)));
+      P : constant Natural :=
+            Natural (Float'Floor (Phase * Float (Phase_Count)));
    begin
       for I in 0 .. Step_Width - 1 loop
-         Self.Ring_Buffer ((Whole + I) mod Ring_Buf_HB) :=
-           Steps (Phase, I) * Delt;
+         Self.Ring_Buffer ((Time + I) mod Ring_Buf_HB) := Steps (P, I) * Delt;
       end loop;
    end Add_Step;
 
@@ -130,28 +128,37 @@ package body BLIT is
    overriding procedure Next_Samples
      (Self : in out BLIT_Square)
    is
-      Impulse_Time : Period;
-      CSample_Nb : Natural;
+      Impulse_Time  : Natural;
+      Impulse_Phase : Float;
+      Delta_Time    : Float;
+      CSample_Nb    : Natural;
+
    begin
       Update_Period (Self);
 
       for I in B_Range_T'Range loop
          CSample_Nb := Natural (Sample_Nb) + Natural (I);
-         if Period (CSample_Nb) > Self.Next_Impulse_Time - 1.0
-         then
+         if Self.Next_Impulse_Time <= CSample_Nb then
             Impulse_Time := Self.Next_Impulse_Time;
-            Self.Next_Impulse_Time := Impulse_Time + (Self.P_Buffer (I) / 2.0);
+            Impulse_Phase := Self.Next_Impulse_Phase;
 
-            for I in Natural (Impulse_Time) .. Natural (Self.Next_Impulse_Time)
-            loop
+            Delta_Time := Float (Self.P_Buffer (I)) / 2.0 + Self.Next_Impulse_Phase;
+
+            Self.Next_Impulse_Time := Self.Next_Impulse_Time +
+              Natural (Float'Floor (Delta_Time));
+            Self.Next_Impulse_Phase := Delta_Time - Float'Floor (Delta_Time);
+
+            for I in Impulse_Time .. Self.Next_Impulse_Time loop
                Self.Ring_Buffer (I mod Ring_Buf_HB) := 0.0;
             end loop;
 
             if Self.State = Up then
-               Add_Step (BLIT_Generator (Self), Impulse_Time, -1.0);
+               Add_Step
+                 (BLIT_Generator (Self), Impulse_Time, Impulse_Phase, -1.0);
                Self.State := Down;
             else
-               Add_Step (BLIT_Generator (Self), Impulse_Time, 1.0);
+               Add_Step
+                 (BLIT_Generator (Self), Impulse_Time, Impulse_Phase, 1.0);
                Self.State := Up;
             end if;
          end if;
@@ -171,24 +178,31 @@ package body BLIT is
    overriding procedure Next_Samples
      (Self : in out BLIT_Saw)
    is
-      Impulse_Time : Period;
-      CSample_Nb : Natural;
+      Impulse_Time  : Natural;
+      Impulse_Phase : Float;
+      Delta_Time    : Float;
+      CSample_Nb    : Natural;
    begin
       Update_Period (Self);
+
       for I in B_Range_T'Range loop
          CSample_Nb := Natural (Sample_Nb) + Natural (I);
-         if Period (CSample_Nb) > Self.Next_Impulse_Time - 1.0
-         then
-            Impulse_Time := Self.Next_Impulse_Time;
-            Self.Next_Impulse_Time := Impulse_Time + (Self.P_Buffer (I));
 
-            for I in Natural (Impulse_Time) + Step_Width
-              .. Natural (Self.Next_Impulse_Time)
-            loop
+         if Self.Next_Impulse_Time <= CSample_Nb then
+            Impulse_Time := Self.Next_Impulse_Time;
+            Impulse_Phase := Self.Next_Impulse_Phase;
+
+            Delta_Time := Float (Self.P_Buffer (I)) + Self.Next_Impulse_Phase;
+
+            Self.Next_Impulse_Time := Self.Next_Impulse_Time +
+              Natural (Float'Floor (Delta_Time));
+            Self.Next_Impulse_Phase := Delta_Time - Float'Floor (Delta_Time);
+
+            for I in Impulse_Time + Step_Width .. Self.Next_Impulse_Time loop
                Self.Ring_Buffer (I mod Ring_Buf_HB) := 0.0;
             end loop;
 
-            Add_Step (BLIT_Generator (Self), Impulse_Time, 1.0);
+            Add_Step (BLIT_Generator (Self), Impulse_Time, Impulse_Phase, 1.0);
          end if;
 
          Self.Last_Sum :=
@@ -197,9 +211,13 @@ package body BLIT is
 
          Self.Last_Sum := Self.Last_Sum
            - (Self.Last_Sum
-           / Sample (Self.Next_Impulse_Time - Period (CSample_Nb)));
+              / (Sample (Self.Next_Impulse_Time - CSample_Nb)));
 
-         Self.Buffer (I) := Self.Last_Sum - 0.5;
+         if Self.Last_Sum'Valid then
+            Self.Buffer (I) := Self.Last_Sum - 0.5;
+         else
+            Self.Last_Sum := 0.0;
+         end if;
       end loop;
    end Next_Samples;
 
@@ -211,7 +229,8 @@ package body BLIT is
    begin
       Base_Reset (Self);
       Self.Ring_Buffer := (others => 0.0);
-      Self.Next_Impulse_Time := 0.0;
+      Self.Next_Impulse_Time := 0;
+      Self.Next_Impulse_Phase := 0.0;
       Self.Last_Sum := 0.0;
       Self.Current_Sample := 0;
       Self.State := Down;
@@ -227,7 +246,8 @@ package body BLIT is
    begin
       Base_Reset (Self);
       Self.Ring_Buffer := (others => 0.0);
-      Self.Next_Impulse_Time := 0.0;
+      Self.Next_Impulse_Time := 0;
+      Self.Next_Impulse_Phase := 0.0;
       Self.Last_Sum := 0.0;
       Self.Current_Sample := 0;
       Reset_Not_Null (Self.Frequency_Provider);

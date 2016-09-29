@@ -5,7 +5,7 @@ with Interfaces; use Interfaces;
 procedure Write_To_Stdout (G : access Generator'Class)
 is
    function Sample_To_Int16 is new Sample_To_Int (Short_Integer);
-   function Sample_To_UInt16 is new Sample_To_UInt (Unsigned_16);
+   --  function Sample_To_UInt16 is new Sample_To_UInt (Unsigned_16);
    Int_Smp : Short_Integer := 0;
    Ignore : Integer;
 begin
@@ -23,6 +23,5 @@ begin
       exit when Sample_Nb > 10_000_000;
       Sample_Nb := Sample_Nb + Generator_Buffer_Length;
    end loop;
-
 
 end Write_To_Stdout;

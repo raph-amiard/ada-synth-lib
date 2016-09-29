@@ -8,10 +8,11 @@ package BLIT is
    type BLIT_State is (Up, Down);
 
    type BLIT_Generator is abstract new Wave_Generator with record
-      Current_Sample    : Natural;
-      Ring_Buffer       : Ring_Buffer_T;
-      Next_Impulse_Time : Period := 0.0;
-      Last_Sum          : Sample := 0.0;
+      Current_Sample     : Natural;
+      Ring_Buffer        : Ring_Buffer_T;
+      Next_Impulse_Time  : Natural := 0;
+      Next_Impulse_Phase : Float := 0.0;
+      Last_Sum           : Sample := 0.0;
    end record;
 
    overriding function Children
@@ -22,9 +23,7 @@ package BLIT is
       State : BLIT_State := Down;
    end record;
 
-   type BLIT_Saw is new BLIT_Generator with record
-      null;
-   end record;
+   type BLIT_Saw is new BLIT_Generator with null record;
 
    overriding procedure Reset (Self : in out BLIT_Square);
    overriding procedure Reset (Self : in out BLIT_Saw);
