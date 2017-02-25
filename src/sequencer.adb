@@ -62,6 +62,8 @@ package body Sequencer is
         (Seq_Note'(Start => Current_P, others => <>));
       Note      : Seq_Note;
 
+      procedure Set_Next_Notes;
+
       procedure Set_Next_Notes is
       begin
 
