@@ -42,7 +42,7 @@ package body BLIT is
          declare
             Amplitude : constant Float := Gain / Float (H);
             To_Angle : constant Float :=
-              Pi * 2.0 / Float (Sine_Size) *
+              Utils.Pi * 2.0 / Float (Sine_Size) *
               Float (H);
          begin
             for I in 0 .. Master_Size - 1 loop
