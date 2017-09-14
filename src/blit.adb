@@ -142,7 +142,8 @@ package body BLIT is
             Impulse_Time := Self.Next_Impulse_Time;
             Impulse_Phase := Self.Next_Impulse_Phase;
 
-            Delta_Time := Float (Self.P_Buffer (I)) / 2.0 + Self.Next_Impulse_Phase;
+            Delta_Time := Float (Self.P_Buffer (I)) / 2.0
+              + Self.Next_Impulse_Phase;
 
             Self.Next_Impulse_Time := Self.Next_Impulse_Time +
               Natural (Float'Floor (Delta_Time));

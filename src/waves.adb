@@ -97,12 +97,10 @@ package body Waves is
       Ret : constant access Sine_Generator :=
         new Sine_Generator'(Frequency_Provider =>
                               Generator_Access (Freq_Provider),
-                            Current_Sample => 0,
-                            Current_P => 0.0,
+                            Phase => 0.0,
                             others => <>);
    begin
       Update_Period (Ret.all);
-      Ret.Current_P := 0.0;
       return Ret;
    end Create_Sine;
 
@@ -112,19 +110,19 @@ package body Waves is
 
    overriding procedure Next_Samples
      (Self : in out Sine_Generator) is
+      Phase_Increment : Float;
    begin
       Update_Period (Self);
       for I in B_Range_T'Range loop
-         Self.Current_Sample := Self.Current_Sample + 1;
-         if Period (Self.Current_Sample) >= Self.Current_P then
-            Self.Current_P := Self.P_Buffer (I) * 2.0;
-            Self.Current_Sample := 0;
+         Phase_Increment := Float (Self.P_Buffer (I));
+         if Phase_Increment /= 0.0 then
+            Phase_Increment := 2.0 * Pi / Phase_Increment;
          end if;
-         Self.Buffer (I) :=
-           Sample
-             (Sin
-                (Float (Self.Current_Sample)
-                 / Float (Self.Current_P) * Pi * 2.0));
+         Self.Phase := Self.Phase + Phase_Increment;
+         if Self.Phase >= 2.0 * Pi then
+            Self.Phase := Self.Phase - 2.0 * Pi;
+         end if;
+         Self.Buffer (I) := Sample (Sin (Self.Phase));
       end loop;
    end Next_Samples;
 
@@ -135,7 +133,7 @@ package body Waves is
    function Create_Chain
      (Gen : access Generator'Class;
       Sig_Procs : Signal_Processors
-        := No_Signal_Processors) return access Chain
+      := No_Signal_Processors) return access Chain
    is
       Ret : constant access Chain :=
         new Chain'(Gen => Generator_Access (Gen), others => <>);
@@ -217,16 +215,15 @@ package body Waves is
       Ret : Sample;
    begin
       for I in B_Range_T'Range loop
-         case Self.Source.Buffer (I).Kind is
-         when On =>
-            Self.Current_P := 0;
-            Self.State := Running;
-         when Off =>
-            Self.State := Release;
-            Self.Cur_Sustain := Scale (Self.Memo_Sample);
-            Self.Current_P := 0;
-         when No_Signal => null;
-         end case;
+         if Self.Source /= null then
+            case Self.Source.Buffer (I).Kind is
+            when On =>
+               Self.Gate_On;
+            when Off =>
+               Self.Gate_Off;
+            when No_Signal => null;
+            end case;
+         end if;
 
          Self.Current_P := Self.Current_P + 1;
 
@@ -244,7 +241,7 @@ package body Waves is
                     / Float (Self.Decay));
 
                Ret := Ret
-               * Sample (1.0 - Self.Sustain)
+                 * Sample (1.0 - Self.Sustain)
                  + Sample (Self.Sustain);
             else
                Ret := Sample (Self.Sustain);
@@ -256,7 +253,7 @@ package body Waves is
                  Exp8_Transfer
                    (Sample (Self.Release - Self.Current_P)
                     / Sample (Self.Release))
-                 * Sample (Self.Cur_Sustain);
+                     * Sample (Self.Cur_Sustain);
             else
                Self.State := Off;
                Ret := 0.0;
@@ -267,6 +264,21 @@ package body Waves is
          Self.Buffer (I) := Ret;
       end loop;
    end Next_Samples;
+
+   procedure Gate_On (Self : in out ADSR)
+   is
+   begin
+      Self.Current_P := 0;
+      Self.State := Running;
+   end Gate_On;
+
+   procedure Gate_Off (Self : in out ADSR)
+   is
+   begin
+      Self.State := Release;
+      Self.Cur_Sustain := Scale (Self.Memo_Sample);
+      Self.Current_P := 0;
+   end Gate_Off;
 
    ----------------------
    -- Next_Sample --
@@ -412,7 +424,7 @@ package body Waves is
       Base_Reset (Self);
       Reset_Not_Null (Self.Frequency_Provider);
       Self.P_Buffer := (others => 0.0);
-      Self.Current_Sample := 0;
+      Self.Phase := 0.0;
    end Reset;
 
    -----------
@@ -462,7 +474,7 @@ package body Waves is
    -----------
 
    function Fixed
-     (Freq        : Frequency;
+     (Freq        : Frequency := 0.0;
       Modulator   : Generator_Access := null;
       Name        : String := "";
       Min         : Float := 0.0;
