@@ -229,7 +229,7 @@ package body Waves is
 
          case Self.State is
          when Running =>
-            if Self.Current_P in 0 .. Self.Attack then
+            if Self.Current_P <= Self.Attack then
                Ret := Exp8_Transfer
                  (Sample (Self.Current_P) / Sample (Self.Attack));
             elsif
@@ -248,7 +248,7 @@ package body Waves is
             end if;
             Self.Memo_Sample := Ret;
          when Release =>
-            if Self.Current_P in 0 .. Self.Release then
+            if Self.Current_P <= Self.Release then
                Ret :=
                  Exp8_Transfer
                    (Sample (Self.Release - Self.Current_P)
