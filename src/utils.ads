@@ -84,6 +84,6 @@ package Utils is
    is
      (Exp ((F - 1.0) * 8.0));
 
-   function Img (F : Float) return String;
+   --  function Img (F : Float) return String;
 
 end Utils;

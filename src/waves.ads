@@ -52,8 +52,7 @@ package Waves is
    --------------------
 
    type Sine_Generator is new Wave_Generator with record
-      Current_Sample : Sample_Period;
-      Current_P      : Period;
+      Phase : Float;
    end record;
 
    function Create_Sine
@@ -120,7 +119,7 @@ package Waves is
    type Fixed_Generator is access all Fixed_Gen;
 
    function Fixed
-     (Freq        : Frequency;
+     (Freq        : Frequency := 0.0;
       Modulator   : Generator_Access := null;
       Name        : String := "";
       Min         : Float := 0.0;
@@ -281,5 +280,9 @@ package Waves is
      (Self : in out ADSR; I : Natural) return Param_Scale_T is
      (case I is
       when 0 | 1 | 3 => Exp, when others => Linear);
+
+   procedure Gate_On (Self : in out ADSR);
+
+   procedure Gate_Off (Self : in out ADSR);
 
 end Waves;

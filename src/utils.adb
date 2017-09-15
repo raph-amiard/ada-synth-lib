@@ -1,5 +1,4 @@
 with Utils.Tan_Table; use Utils.Tan_Table;
-with Ada.Float_Text_IO;
 
 package body Utils is
 
@@ -284,12 +283,12 @@ package body Utils is
    -- Img --
    ---------
 
-   function Img (F : Float) return String
-   is
-      S : String (1 .. 10);
-   begin
-      Ada.Float_Text_IO.Put (S, F, 2, 0);
-      return S;
-   end Img;
+--     function Img (F : Float) return String
+--     is
+--        S : String (1 .. 10);
+--     begin
+--        Ada.Float_IO.Put (S, F, 2, 0);
+--        return S;
+--     end Img;
 
 end Utils;
