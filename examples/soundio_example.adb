@@ -23,6 +23,10 @@ begin
    Err := Outstream_Open (Out_Stream);
    Err := Outstream_Start (Out_Stream);
 
+   Put_Line ("Backend used : " & IO.Current_Backend'Img);
+   Put_Line ("BACKEND = " & IO.Current_Backend'Image);
+
+   Play (Out_Stream);
    loop
       Wait_Events (IO);
    end loop;
