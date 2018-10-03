@@ -23,19 +23,19 @@ package Effects is
      (Self : in out Attenuator; I : Natural; Val : Float);
 
    overriding function Get_Value
-     (Self : in out Attenuator; I : Natural) return Float
+     (Self : in out Attenuator; Dummy : Natural) return Float
    is (Self.Level);
 
    overriding function Get_Name
-     (Self : in out Attenuator; I : Natural) return String
+     (Self : in out Attenuator; Dummy : Natural) return String
    is
      ("Attenuator");
 
    overriding function Get_Min_Value
-     (Self : in out Attenuator; I : Natural) return Float is (0.0);
+     (Self : in out Attenuator; Dummy : Natural) return Float is (0.0);
 
    overriding function Get_Max_Value
-     (Self : in out Attenuator; I : Natural) return Float is (5_000.0);
+     (Self : in out Attenuator; Dummy : Natural) return Float is (5_000.0);
 
    overriding procedure Next_Samples
      (Self : in out Attenuator);
@@ -162,19 +162,19 @@ package Effects is
      (Self : in out Low_Pass_Filter; I : Natural; Val : Float);
 
    overriding function Get_Value
-     (Self : in out Low_Pass_Filter; I : Natural) return Float
+     (Self : in out Low_Pass_Filter; Dummy : Natural) return Float
    is (Self.Res);
 
    overriding function Get_Name
-     (Self : in out Low_Pass_Filter; I : Natural) return String
+     (Self : in out Low_Pass_Filter; Dummy : Natural) return String
    is
      ("Q");
 
    overriding function Get_Min_Value
-     (Self : in out Low_Pass_Filter; I : Natural) return Float is (0.0);
+     (Self : in out Low_Pass_Filter; Dummy : Natural) return Float is (0.0);
 
    overriding function Get_Max_Value
-     (Self : in out Low_Pass_Filter; I : Natural) return Float is (1.0);
+     (Self : in out Low_Pass_Filter; Dummy : Natural) return Float is (1.0);
 
    -----------
    -- Mixer --
