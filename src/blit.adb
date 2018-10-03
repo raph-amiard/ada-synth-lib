@@ -136,7 +136,7 @@ package body BLIT is
    begin
       Update_Period (Self, P_Buffer);
 
-      for I in B_Range_T'Range loop
+      for I in Buffer'Range loop
          CSample_Nb := Natural (Sample_Nb) + Natural (I);
          if Self.Next_Impulse_Time <= CSample_Nb then
             Impulse_Time := Self.Next_Impulse_Time;
@@ -186,7 +186,7 @@ package body BLIT is
    begin
       Update_Period (Self, P_Buffer);
 
-      for I in B_Range_T'Range loop
+      for I in Buffer'Range loop
          CSample_Nb := Natural (Sample_Nb) + Natural (I);
 
          if Self.Next_Impulse_Time <= CSample_Nb then

@@ -30,7 +30,7 @@ package body Command is
      (Self : in out Simple_Command)
    is
    begin
-      for I in B_Range_T'Range loop
+      for I in Self.Buffer'Range loop
          Self.Current_P := Self.Current_P + 1;
          if Self.Current_P = Self.On_Period then
             Self.Buffer (I) := Note_Signal'(Kind => On, Note => Self.Note);
@@ -78,7 +78,7 @@ package body Command is
       Cur_Note  : Sequencer_Note;
       Current_P : Sample_Period;
    begin
-      for I in B_Range_T'Range loop
+      for I in Self.Buffer'Range loop
          Cur_Note :=
            Self.Notes ((Natural
                        ((Sample_Nb + Sample_Period (I)) / Self.Interval)

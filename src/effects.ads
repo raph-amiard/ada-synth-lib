@@ -219,7 +219,7 @@ package Effects is
 
    type Delay_Line is new Generator with record
       Source           : access Generator'Class;
-      Delay_In_Samples : B_Range_T;
+      Delay_In_Samples : Buffer_Range_Type;
       Decay            : Sample;
       Last_Buffer      : Generator_Buffer := (others => 0.0);
    end record;

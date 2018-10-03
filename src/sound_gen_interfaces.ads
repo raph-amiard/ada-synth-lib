@@ -4,14 +4,22 @@ with Array_Utils;
 package Sound_Gen_Interfaces is
 
    Sample_Nb : Sample_Period := 0;
+   --  Global state for ASL: This is the state of the sound simulation, eg. at
+   --  which sample we are right now. TODO: Put this in a context, rather than
+   --  in a global.
+
+   -------------
+   -- Buffers --
+   -------------
+
+   Generator_Buffer_Length : constant := 512;
+
+   type Buffer_Range_Type is range 0 .. Generator_Buffer_Length - 1;
+   type Generator_Buffer is array (Buffer_Range_Type) of Sample;
 
    ---------------
    -- Generator --
    ---------------
-
-   Generator_Buffer_Length : constant := 512;
-   type B_Range_T is range 0 .. Generator_Buffer_Length - 1;
-   type Generator_Buffer is array (B_Range_T) of Sample;
 
    type Generator;
    type Generator_Access is access all Generator'Class;
@@ -109,7 +117,7 @@ package Sound_Gen_Interfaces is
    function Name
      (Self : in out I_Simulation_Listener) return String is abstract;
 
-   type Note_Signal_Buffer is array (B_Range_T) of Note_Signal;
+   type Note_Signal_Buffer is array (Buffer_Range_Type) of Note_Signal;
 
    type Note_Generator is abstract tagged record
       Buffer            : Note_Signal_Buffer;

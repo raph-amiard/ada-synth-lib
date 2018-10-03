@@ -67,7 +67,7 @@ package body Effects is
          Self.Generators (I).Gen.Next_Samples (Tmp_Buffer);
 
          --  And add the samples to the buffer
-         for J in B_Range_T'Range loop
+         for J in Buffer'Range loop
             Buffer (J) :=
               Buffer (J)
               + (Tmp_Buffer (J) * Sample (Self.Generators (I).Level));
@@ -175,7 +175,7 @@ package body Effects is
 
       Self.Source.Next_Samples (Buffer);
 
-      for I in B_Range_T'Range loop
+      for I in Buffer'Range loop
          Cut_Freq := Float (Tmp_Buffer (I));
          if Cut_Freq /= Self.Cut_Freq then
             Self.Cut_Freq := Cut_Freq;
@@ -245,7 +245,7 @@ package body Effects is
    begin
       Self.Source.Next_Samples (Buffer);
 
-      for I in B_Range_T'Range loop
+      for I in Buffer'Range loop
          Invert := False;
          S := Buffer (I) * 0.5;
          if S < 0.0 then
@@ -285,7 +285,7 @@ package body Effects is
    is
    begin
       Self.Source.Next_Samples (Buffer);
-      for I in B_Range_T'Range loop
+      for I in Buffer'Range loop
          Buffer (I) := (Buffer (I) * Sample (Self.Level));
       end loop;
    end Next_Samples;
@@ -303,7 +303,7 @@ package body Effects is
 
       Self.Level_Provider.Next_Samples (Tmp_Buffer);
 
-      for I in B_Range_T'Range loop
+      for I in Buffer'Range loop
          Buffer (I) := Buffer (I) * Tmp_Buffer (I);
       end loop;
    end Next_Samples;
@@ -317,7 +317,7 @@ package body Effects is
    is
    begin
       Self.Source.Next_Samples (Buffer);
-      for I in B_Range_T'Range loop
+      for I in Buffer'Range loop
          Buffer (I) := (Buffer (I) + 1.0) / 2.0;
       end loop;
    end Next_Samples;
@@ -334,7 +334,7 @@ package body Effects is
       return new Delay_Line'
         (Source           => Source,
          Delay_In_Samples =>
-           B_Range_T (Float (Dlay) * SAMPLE_RATE / 1000.0),
+           Buffer_Range_Type (Float (Dlay) * SAMPLE_RATE / 1000.0),
          Decay            => Decay,
          others           => <>);
    end Create_Delay_Line;
@@ -353,11 +353,11 @@ package body Effects is
          Buffer (I) :=
            Buffer (I) +
            (Self.Last_Buffer
-              (B_Range_T'Last - Self.Delay_In_Samples + I) * Self.Decay);
+              (Buffer_Range_Type'Last - Self.Delay_In_Samples + I) * Self.Decay);
       end loop;
 
       for I in
-        B_Range_T'First .. B_Range_T'Last - Self.Delay_In_Samples
+        Buffer_Range_Type'First .. Buffer_Range_Type'Last - Self.Delay_In_Samples
       loop
          Buffer (I + Self.Delay_In_Samples) :=
            Buffer (I + Self.Delay_In_Samples) +

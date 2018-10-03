@@ -4,7 +4,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 package Waves is
 
-   type Period_Buffer is array (B_Range_T) of Period;
+   type Period_Buffer is array (Buffer_Range_Type) of Period;
 
    type Wave_Generator is abstract new Generator with record
       Frequency_Provider : Generator_Access := null;

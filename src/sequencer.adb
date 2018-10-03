@@ -87,9 +87,10 @@ package body Sequencer is
 
       Set_Next_Notes;
 
-      for J in B_Range_T'Range loop
+      for J in Buffer_Range_Type'Range loop
 
-         Current_P := (Sample_Nb + Sample_Period (J)) mod Self.Interval;
+         Current_P :=
+           (Sample_Nb + Sample_Period (J)) mod Self.Interval;
 
          if Current_P = 0 and Last_P /= 0 then
             Put_Line ("DAFUQ");

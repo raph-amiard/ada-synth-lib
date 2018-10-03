@@ -85,7 +85,7 @@ package body Soundio_Output is
      (G : User_Data_Access) return Float
    is
    begin
-      if G.Current_Sample = B_Range_T'Last then
+      if G.Current_Sample = Buffer_Range_Type'Last then
          Next_Steps;
          G.G.Next_Samples (G.G_Buffer);
          Sample_Nb := Sample_Nb + Generator_Buffer_Length;
@@ -207,7 +207,7 @@ package body Soundio_Output is
 
    procedure Write_Samples
      (Out_Stream : access SoundIo_Out_Stream;
-      Max_Nb_Samples : Natural := Natural (B_Range_T'Last))
+      Max_Nb_Samples : Natural := Natural (Buffer_Range_Type'Last))
    is
       U : constant User_Data_Access := Get_User_Data (Out_Stream);
       Available_Frames : Natural := FRB.Available_Write_Frames (U.Ring_Buf);

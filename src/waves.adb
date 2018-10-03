@@ -15,7 +15,7 @@ package body Waves is
       Tmp_Buffer : Generator_Buffer;
    begin
       Self.Frequency_Provider.Next_Samples (Tmp_Buffer);
-      for I in B_Range_T'Range loop
+      for I in Buffer'Range loop
          Buffer (I) :=
            Utils.Period_In_Samples
              (Frequency (Tmp_Buffer (I)));
@@ -44,7 +44,7 @@ package body Waves is
       P_Buffer : Period_Buffer;
    begin
       Update_Period (Self, P_Buffer);
-      for I in B_Range_T'Range loop
+      for I in Buffer'Range loop
          Self.Step := 2.0 / Float (P_Buffer (I));
          Self.Current := Self.Current + Sample (Self.Step);
          if Self.Current > 1.0 then
@@ -78,7 +78,7 @@ package body Waves is
       P_Buffer : Period_Buffer;
    begin
       Update_Period (Self, P_Buffer);
-      for I in B_Range_T'Range loop
+      for I in Buffer'Range loop
          Self.Current_Sample := Self.Current_Sample + 1;
          declare
             A : constant Period := Period (Self.Current_Sample)
@@ -121,7 +121,7 @@ package body Waves is
       P_Buffer : Period_Buffer;
    begin
       Update_Period (Self, P_Buffer);
-      for I in B_Range_T'Range loop
+      for I in Buffer'Range loop
          Self.Current_Sample := Self.Current_Sample + 1;
          if Period (Self.Current_Sample) >= Self.Current_P then
             Self.Current_P := P_Buffer (I) * 2.0;
@@ -174,7 +174,7 @@ package body Waves is
       S : Sample;
    begin
       Self.Gen.Next_Samples (Buffer);
-      for J in B_Range_T'Range loop
+      for J in Buffer'Range loop
          S := Buffer (J);
          for I in 0 .. Self.Nb_Processors - 1 loop
             S := Self.Processors (I).Process (S);
@@ -224,7 +224,7 @@ package body Waves is
    is
       Ret : Sample;
    begin
-      for I in B_Range_T'Range loop
+      for I in Buffer'Range loop
          case Self.Source.Buffer (I).Kind is
          when On =>
             Self.Current_P := 0;
@@ -289,7 +289,7 @@ package body Waves is
          Self.Proc.Next_Samples (Buffer);
       end if;
 
-      for I in B_Range_T'Range loop
+      for I in Buffer'Range loop
          case Self.Source.Buffer (I).Kind is
          when On =>
             Self.Current_Note := Self.Source.Buffer (I).Note;
@@ -349,7 +349,7 @@ package body Waves is
    is
       pragma Unreferenced (Self);
    begin
-      for I in B_Range_T'Range loop
+      for I in Buffer'Range loop
          G_X1 := G_X1 xor G_X2;
          Buffer (I) := Sample (Mod_To_Int (G_X2)) * F_Level;
          G_X2 := G_X2 + G_X1;
@@ -366,11 +366,11 @@ package body Waves is
 
       if Self.Proc /= null then
          Self.Proc.Next_Samples (Buffer);
-         for I in B_Range_T'Range loop
+         for I in Buffer'Range loop
             Buffer (I) := Self.Val + Buffer (I);
          end loop;
       else
-         for I in B_Range_T'Range loop
+         for I in Buffer'Range loop
             Buffer (I) := Self.Val;
          end loop;
       end if;
