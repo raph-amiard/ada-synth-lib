@@ -15,6 +15,7 @@ package Soundio_Output is
    type Soundio_User_Data (Mode : Soundio_Mode) is record
       S              : State;
       G              : access Generator'Class;
+      G_Buffer       : Generator_Buffer;
       Current_Sample : B_Range_T := B_Range_T'Last;
 
       case Mode is

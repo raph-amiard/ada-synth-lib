@@ -32,11 +32,11 @@ package Sound_Gen_Interfaces is
    procedure Add_To_Current (G : Generator_Access);
 
    type Generator is abstract tagged record
-      Buffer       : Generator_Buffer;
       Params_Scope : Params_Aggregator;
    end record;
 
-   procedure Next_Samples (Self : in out Generator) is abstract;
+   procedure Next_Samples
+     (Self : in out Generator; Buffer : in out Generator_Buffer) is abstract;
    pragma Inline (Next_Samples);
 
    procedure Base_Reset (Self : in out Generator);
@@ -63,6 +63,7 @@ package Sound_Gen_Interfaces is
    function Nb_Values (Self : in out Generator) return Natural is (0);
    procedure Set_Value
      (Self : in out Generator; I : Natural; Val : Float) is null;
+
    function Get_Value
      (Self : in out Generator; Dummy : Natural) return Float is (0.0);
    function Get_Name

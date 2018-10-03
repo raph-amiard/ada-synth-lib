@@ -38,7 +38,7 @@ package Effects is
      (Self : in out Attenuator; Dummy : Natural) return Float is (5_000.0);
 
    overriding procedure Next_Samples
-     (Self : in out Attenuator);
+     (Self : in out Attenuator; Buffer : in out Generator_Buffer);
 
    overriding procedure Reset (Self : in out Attenuator);
 
@@ -60,7 +60,7 @@ package Effects is
                            Level_Provider => G, others => <>));
 
    overriding procedure Next_Samples
-     (Self : in out Dyn_Attenuator);
+     (Self : in out Dyn_Attenuator; Buffer : in out Generator_Buffer);
 
    overriding procedure Reset (Self : in out Dyn_Attenuator);
 
@@ -77,7 +77,7 @@ package Effects is
    end record;
 
    overriding procedure Next_Samples
-     (Self : in out Transposer);
+     (Self : in out Transposer; Buffer : in out Generator_Buffer);
 
    overriding procedure Reset (Self : in out Transposer);
 
@@ -114,7 +114,7 @@ package Effects is
       Clip_Level : Float; Coeff : Float := 10.0) return access Disto;
 
    overriding procedure Next_Samples
-     (Self : in out Disto);
+     (Self : in out Disto; Buffer : in out Generator_Buffer);
 
    overriding procedure Reset (Self : in out Disto);
 
@@ -147,7 +147,7 @@ package Effects is
    is (True);
 
    overriding procedure Next_Samples
-     (Self : in out Low_Pass_Filter);
+     (Self : in out Low_Pass_Filter; Buffer : in out Generator_Buffer);
 
    overriding procedure Reset (Self : in out Low_Pass_Filter);
 
@@ -209,7 +209,8 @@ package Effects is
    procedure Add_Generator
      (Self : in out Mixer; G : access Generator'Class; Level : Float);
 
-   overriding procedure Next_Samples (Self : in out Mixer);
+   overriding procedure Next_Samples
+     (Self : in out Mixer; Buffer : in out Generator_Buffer);
 
    overriding procedure Reset (Self : in out Mixer);
 
@@ -227,7 +228,8 @@ package Effects is
                                Dlay : Millisecond;
                                Decay : Sample) return access Delay_Line;
 
-   overriding procedure Next_Samples (Self : in out Delay_Line);
+   overriding procedure Next_Samples
+     (Self : in out Delay_Line; Buffer : in out Generator_Buffer);
 
    overriding procedure Reset (Self : in out Delay_Line);
 

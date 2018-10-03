@@ -8,10 +8,10 @@ package Waves is
 
    type Wave_Generator is abstract new Generator with record
       Frequency_Provider : Generator_Access := null;
-      P_Buffer           : Period_Buffer;
    end record;
 
-   procedure Update_Period (Self : in out Wave_Generator'Class);
+   procedure Update_Period
+     (Self : in out Wave_Generator'Class; Buffer : in out Period_Buffer);
 
    overriding function Children
      (Self : in out Wave_Generator) return Generator_Array
@@ -29,7 +29,7 @@ package Waves is
    function Create_Saw
      (Freq_Provider : Generator_Access) return access Saw_Generator;
    overriding procedure Next_Samples
-     (Self : in out Saw_Generator);
+     (Self : in out Saw_Generator; Buffer : in out Generator_Buffer);
    overriding procedure Reset (Self : in out Saw_Generator);
 
    ----------------------
@@ -44,7 +44,7 @@ package Waves is
    function Create_Square
      (Freq_Provider : access Generator'Class) return access Square_Generator;
    overriding procedure Next_Samples
-     (Self : in out Square_Generator);
+     (Self : in out Square_Generator; Buffer : in out Generator_Buffer);
    overriding procedure Reset (Self : in out Square_Generator);
 
    --------------------
@@ -59,7 +59,7 @@ package Waves is
    function Create_Sine
      (Freq_Provider : access Generator'Class) return access Sine_Generator;
    overriding procedure Next_Samples
-     (Self : in out Sine_Generator);
+     (Self : in out Sine_Generator; Buffer : in out Generator_Buffer);
    overriding procedure Reset (Self : in out Sine_Generator);
 
    ---------------------
@@ -71,7 +71,7 @@ package Waves is
    function Create_Noise return access Noise_Generator;
 
    overriding procedure Next_Samples
-     (Self : in out Noise_Generator);
+     (Self : in out Noise_Generator; Buffer : in out Generator_Buffer);
    overriding procedure Reset (Self : in out Noise_Generator);
 
    ---------------
@@ -97,7 +97,7 @@ package Waves is
                      others => <>));
 
    overriding procedure Next_Samples
-     (Self : in out Pitch_Gen);
+     (Self : in out Pitch_Gen; Buffer : in out Generator_Buffer);
    overriding procedure Reset (Self : in out Pitch_Gen);
 
    overriding function Children
@@ -128,7 +128,8 @@ package Waves is
       Param_Scale : Param_Scale_T := Linear)
       return access Fixed_Gen;
 
-   overriding procedure Next_Samples (Self : in out Fixed_Gen);
+   overriding procedure Next_Samples
+     (Self : in out Fixed_Gen; Buffer : in out Generator_Buffer);
    overriding procedure Reset (Self : in out Fixed_Gen);
 
    overriding function Children
@@ -190,7 +191,7 @@ package Waves is
      (Self : in out Chain; P : Signal_Processor_Access);
 
    overriding procedure Next_Samples
-     (Self : in out Chain);
+     (Self : in out Chain; Buffer : in out Generator_Buffer);
    overriding procedure Reset (Self : in out Chain);
 
    overriding function Children
@@ -223,7 +224,8 @@ package Waves is
       Sustain : Scale;
       Source : access Note_Generator'Class := null) return access ADSR;
 
-   overriding procedure Next_Samples (Self : in out ADSR);
+   overriding procedure Next_Samples
+     (Self : in out ADSR; Buffer : in out Generator_Buffer);
    overriding procedure Reset (Self : in out ADSR);
 
    overriding function Children

@@ -126,15 +126,15 @@ package body BLIT is
    -----------------
 
    overriding procedure Next_Samples
-     (Self : in out BLIT_Square)
+     (Self : in out BLIT_Square; Buffer : in out Generator_Buffer)
    is
       Impulse_Time  : Natural;
       Impulse_Phase : Float;
       Delta_Time    : Float;
       CSample_Nb    : Natural;
-
+      P_Buffer      : Period_Buffer;
    begin
-      Update_Period (Self);
+      Update_Period (Self, P_Buffer);
 
       for I in B_Range_T'Range loop
          CSample_Nb := Natural (Sample_Nb) + Natural (I);
@@ -142,7 +142,7 @@ package body BLIT is
             Impulse_Time := Self.Next_Impulse_Time;
             Impulse_Phase := Self.Next_Impulse_Phase;
 
-            Delta_Time := Float (Self.P_Buffer (I)) / 2.0 + Self.Next_Impulse_Phase;
+            Delta_Time := Float (P_Buffer (I)) / 2.0 + Self.Next_Impulse_Phase;
 
             Self.Next_Impulse_Time := Self.Next_Impulse_Time +
               Natural (Float'Floor (Delta_Time));
@@ -167,7 +167,7 @@ package body BLIT is
            Self.Last_Sum +
              Self.Ring_Buffer (CSample_Nb mod Ring_Buf_HB);
 
-         Self.Buffer (I) :=  Self.Last_Sum - 0.5;
+         Buffer (I) :=  Self.Last_Sum - 0.5;
       end loop;
    end Next_Samples;
 
@@ -176,14 +176,15 @@ package body BLIT is
    -----------------
 
    overriding procedure Next_Samples
-     (Self : in out BLIT_Saw)
+     (Self : in out BLIT_Saw; Buffer : in out Generator_Buffer)
    is
       Impulse_Time  : Natural;
       Impulse_Phase : Float;
       Delta_Time    : Float;
       CSample_Nb    : Natural;
+      P_Buffer      : Period_Buffer;
    begin
-      Update_Period (Self);
+      Update_Period (Self, P_Buffer);
 
       for I in B_Range_T'Range loop
          CSample_Nb := Natural (Sample_Nb) + Natural (I);
@@ -192,7 +193,7 @@ package body BLIT is
             Impulse_Time := Self.Next_Impulse_Time;
             Impulse_Phase := Self.Next_Impulse_Phase;
 
-            Delta_Time := Float (Self.P_Buffer (I)) + Self.Next_Impulse_Phase;
+            Delta_Time := Float (P_Buffer (I)) + Self.Next_Impulse_Phase;
 
             Self.Next_Impulse_Time := Self.Next_Impulse_Time +
               Natural (Float'Floor (Delta_Time));
@@ -214,7 +215,7 @@ package body BLIT is
               / (Sample (Self.Next_Impulse_Time - CSample_Nb)));
 
          if Self.Last_Sum'Valid then
-            Self.Buffer (I) := Self.Last_Sum - 0.5;
+            Buffer (I) := Self.Last_Sum - 0.5;
          else
             Self.Last_Sum := 0.0;
          end if;
@@ -235,7 +236,6 @@ package body BLIT is
       Self.Current_Sample := 0;
       Self.State := Down;
       Reset_Not_Null (Self.Frequency_Provider);
-      Self.P_Buffer := (others => 0.0);
    end Reset;
 
    -----------
@@ -251,7 +251,6 @@ package body BLIT is
       Self.Last_Sum := 0.0;
       Self.Current_Sample := 0;
       Reset_Not_Null (Self.Frequency_Provider);
-      Self.P_Buffer := (others => 0.0);
    end Reset;
 
 begin

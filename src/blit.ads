@@ -35,9 +35,9 @@ package BLIT is
      (Freq_Provider : access Generator'Class) return access BLIT_Saw;
 
    overriding procedure Next_Samples
-     (Self : in out BLIT_Square);
+     (Self : in out BLIT_Square; Buffer : in out Generator_Buffer);
 
    overriding procedure Next_Samples
-     (Self : in out BLIT_Saw);
+     (Self : in out BLIT_Saw; Buffer : in out Generator_Buffer);
 
 end BLIT;

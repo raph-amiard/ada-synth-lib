@@ -9,13 +9,16 @@ package body Waves is
    -- Update_Period --
    -------------------
 
-   procedure Update_Period (Self : in out Wave_Generator'Class) is
+   procedure Update_Period
+     (Self : in out Wave_Generator'Class; Buffer : in out Period_Buffer)
+   is
+      Tmp_Buffer : Generator_Buffer;
    begin
-      Self.Frequency_Provider.Next_Samples;
+      Self.Frequency_Provider.Next_Samples (Tmp_Buffer);
       for I in B_Range_T'Range loop
-         Self.P_Buffer (I) :=
+         Buffer (I) :=
            Utils.Period_In_Samples
-             (Frequency (Self.Frequency_Provider.Buffer (I)));
+             (Frequency (Tmp_Buffer (I)));
       end loop;
    end Update_Period;
 
@@ -36,16 +39,18 @@ package body Waves is
    -----------------
 
    overriding procedure Next_Samples
-     (Self : in out Saw_Generator) is
+     (Self : in out Saw_Generator; Buffer : in out Generator_Buffer)
+   is
+      P_Buffer : Period_Buffer;
    begin
-      Update_Period (Self);
+      Update_Period (Self, P_Buffer);
       for I in B_Range_T'Range loop
-         Self.Step := 2.0 / Float (Self.P_Buffer (I));
+         Self.Step := 2.0 / Float (P_Buffer (I));
          Self.Current := Self.Current + Sample (Self.Step);
          if Self.Current > 1.0 then
             Self.Current := Self.Current - 2.0;
          end if;
-         Self.Buffer (I) := Self.Current;
+         Buffer (I) := Self.Current;
       end loop;
    end Next_Samples;
 
@@ -68,21 +73,22 @@ package body Waves is
    -----------------
 
    overriding procedure Next_Samples
-     (Self : in out Square_Generator)
+     (Self : in out Square_Generator; Buffer : in out Generator_Buffer)
    is
+      P_Buffer : Period_Buffer;
    begin
-      Update_Period (Self);
+      Update_Period (Self, P_Buffer);
       for I in B_Range_T'Range loop
          Self.Current_Sample := Self.Current_Sample + 1;
          declare
             A : constant Period := Period (Self.Current_Sample)
-              / Self.P_Buffer (I);
+              / P_Buffer (I);
          begin
             if A >= 1.0 then
                Self.Current_Sample := 0;
-               Self.Buffer (I) := 1.0;
+               Buffer (I) := 1.0;
             end if;
-            Self.Buffer (I) := (if A >= 0.5 then 1.0 else -1.0);
+            Buffer (I) := (if A >= 0.5 then 1.0 else -1.0);
          end;
       end loop;
    end Next_Samples;
@@ -101,7 +107,6 @@ package body Waves is
                             Current_P => 0.0,
                             others => <>);
    begin
-      Update_Period (Ret.all);
       Ret.Current_P := 0.0;
       return Ret;
    end Create_Sine;
@@ -111,16 +116,18 @@ package body Waves is
    -----------------
 
    overriding procedure Next_Samples
-     (Self : in out Sine_Generator) is
+     (Self : in out Sine_Generator; Buffer : in out Generator_Buffer)
+   is
+      P_Buffer : Period_Buffer;
    begin
-      Update_Period (Self);
+      Update_Period (Self, P_Buffer);
       for I in B_Range_T'Range loop
          Self.Current_Sample := Self.Current_Sample + 1;
          if Period (Self.Current_Sample) >= Self.Current_P then
-            Self.Current_P := Self.P_Buffer (I) * 2.0;
+            Self.Current_P := P_Buffer (I) * 2.0;
             Self.Current_Sample := 0;
          end if;
-         Self.Buffer (I) :=
+         Buffer (I) :=
            Sample
              (Sin
                 (Float (Self.Current_Sample)
@@ -162,17 +169,17 @@ package body Waves is
    -----------------
 
    overriding procedure Next_Samples
-     (Self : in out Chain)
+     (Self : in out Chain; Buffer : in out Generator_Buffer)
    is
       S : Sample;
    begin
-      Self.Gen.Next_Samples;
+      Self.Gen.Next_Samples (Buffer);
       for J in B_Range_T'Range loop
-         S := Self.Gen.Buffer (J);
+         S := Buffer (J);
          for I in 0 .. Self.Nb_Processors - 1 loop
             S := Self.Processors (I).Process (S);
          end loop;
-         Self.Buffer (J) := S;
+         Buffer (J) := S;
       end loop;
    end Next_Samples;
 
@@ -212,7 +219,8 @@ package body Waves is
    -- Next_Sample --
    -----------------
 
-   overriding procedure Next_Samples (Self : in out ADSR)
+   overriding procedure Next_Samples
+     (Self : in out ADSR; Buffer : in out Generator_Buffer)
    is
       Ret : Sample;
    begin
@@ -264,7 +272,7 @@ package body Waves is
          when Off  => Ret := 0.0;
          end case;
 
-         Self.Buffer (I) := Ret;
+         Buffer (I) := Ret;
       end loop;
    end Next_Samples;
 
@@ -273,12 +281,12 @@ package body Waves is
    ----------------------
 
    overriding procedure Next_Samples
-     (Self : in out Pitch_Gen)
+     (Self : in out Pitch_Gen; Buffer : in out Generator_Buffer)
    is
       Ret : Sample;
    begin
       if Self.Proc /= null then
-         Self.Proc.Next_Samples;
+         Self.Proc.Next_Samples (Buffer);
       end if;
 
       for I in B_Range_T'Range loop
@@ -293,10 +301,10 @@ package body Waves is
          Ret := Sample (Self.Current_Freq);
 
          if Self.Proc /= null then
-            Ret := Ret + Self.Proc.Buffer (I);
+            Ret := Ret + Buffer (I);
          end if;
 
-         Self.Buffer (I) := Ret;
+         Buffer (I) := Ret;
       end loop;
    end Next_Samples;
 
@@ -337,12 +345,13 @@ package body Waves is
    ------------------
 
    overriding procedure Next_Samples
-     (Self : in out Noise_Generator)
+     (Self : in out Noise_Generator; Buffer : in out Generator_Buffer)
    is
+      pragma Unreferenced (Self);
    begin
       for I in B_Range_T'Range loop
          G_X1 := G_X1 xor G_X2;
-         Self.Buffer (I) := Sample (Mod_To_Int (G_X2)) * F_Level;
+         Buffer (I) := Sample (Mod_To_Int (G_X2)) * F_Level;
          G_X2 := G_X2 + G_X1;
       end loop;
    end Next_Samples;
@@ -352,17 +361,17 @@ package body Waves is
    ------------------
 
    overriding procedure Next_Samples
-     (Self : in out Fixed_Gen) is
+     (Self : in out Fixed_Gen; Buffer : in out Generator_Buffer) is
    begin
 
       if Self.Proc /= null then
-         Self.Proc.Next_Samples;
+         Self.Proc.Next_Samples (Buffer);
          for I in B_Range_T'Range loop
-            Self.Buffer (I) := Self.Val + Self.Proc.Buffer (I);
+            Buffer (I) := Self.Val + Buffer (I);
          end loop;
       else
          for I in B_Range_T'Range loop
-            Self.Buffer (I) := Self.Val;
+            Buffer (I) := Self.Val;
          end loop;
       end if;
    end Next_Samples;
@@ -386,7 +395,6 @@ package body Waves is
    begin
       Base_Reset (Self);
       Reset_Not_Null (Self.Frequency_Provider);
-      Self.P_Buffer := (others => 0.0);
       Self.Current := -1.0;
    end Reset;
 
@@ -398,7 +406,6 @@ package body Waves is
    begin
       Base_Reset (Self);
       Reset_Not_Null (Self.Frequency_Provider);
-      Self.P_Buffer := (others => 0.0);
       Self.Current_Sample := 0;
       Self.Is_High := True;
    end Reset;
@@ -411,7 +418,6 @@ package body Waves is
    begin
       Base_Reset (Self);
       Reset_Not_Null (Self.Frequency_Provider);
-      Self.P_Buffer := (others => 0.0);
       Self.Current_Sample := 0;
    end Reset;
 
@@ -423,7 +429,6 @@ package body Waves is
    begin
       Base_Reset (Self);
       Reset_Not_Null (Self.Frequency_Provider);
-      Self.P_Buffer := (others => 0.0);
    end Reset;
 
    -----------

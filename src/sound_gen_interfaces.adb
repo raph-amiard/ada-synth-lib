@@ -38,7 +38,7 @@ package body Sound_Gen_Interfaces is
 
    procedure Base_Reset (Self : in out Generator) is
    begin
-      Self.Buffer := (others => 0.0);
+      null;
    end Base_Reset;
 
    --------------------
