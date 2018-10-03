@@ -64,13 +64,13 @@ package Sound_Gen_Interfaces is
    procedure Set_Value
      (Self : in out Generator; I : Natural; Val : Float) is null;
    function Get_Value
-     (Self : in out Generator; I : Natural) return Float is (0.0);
+     (Self : in out Generator; Dummy : Natural) return Float is (0.0);
    function Get_Name
-     (Self : in out Generator; I : Natural) return String is ("");
+     (Self : in out Generator; Dummy : Natural) return String is ("");
    function Get_Min_Value
-     (Self : in out Generator; I : Natural) return Float is (0.0);
+     (Self : in out Generator; Dummy : Natural) return Float is (0.0);
    function Get_Max_Value
-     (Self : in out Generator; I : Natural) return Float is (0.0);
+     (Self : in out Generator; Dummy : Natural) return Float is (0.0);
 
    type Scaled_Value_T is new Float range 0.0 .. 1.0;
 
@@ -80,7 +80,8 @@ package Sound_Gen_Interfaces is
    type Param_Scale_T is (Linear, Exp);
 
    function Get_Scale
-     (Self : in out Generator; I : Natural) return Param_Scale_T is (Linear);
+     (Self : in out Generator; Dummy : Natural) return Param_Scale_T
+   is (Linear);
 
    ----------------------
    -- Signal_Processor --

@@ -145,22 +145,22 @@ package Waves is
      (Self : in out Fixed_Gen; I : Natural; Val : Float);
 
    overriding function Get_Value
-     (Self : in out Fixed_Gen; I : Natural) return Float
+     (Self : in out Fixed_Gen; Dummy : Natural) return Float
    is (Float (Self.Val));
 
    overriding function Get_Name
-     (Self : in out Fixed_Gen; I : Natural) return String
+     (Self : in out Fixed_Gen; Dummy : Natural) return String
    is
      (To_String (Self.Name));
 
    overriding function Get_Min_Value
-     (Self : in out Fixed_Gen; I : Natural) return Float is (Self.Min);
+     (Self : in out Fixed_Gen; Dummy : Natural) return Float is (Self.Min);
 
    overriding function Get_Max_Value
-     (Self : in out Fixed_Gen; I : Natural) return Float is (Self.Max);
+     (Self : in out Fixed_Gen; Dummy : Natural) return Float is (Self.Max);
 
    overriding function Get_Scale
-     (Self : in out Fixed_Gen; I : Natural) return Param_Scale_T
+     (Self : in out Fixed_Gen; Dummy : Natural) return Param_Scale_T
    is
       (Self.Param_Scale);
 

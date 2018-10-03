@@ -1,5 +1,5 @@
 with Ada.Numerics.Elementary_Functions;
-use Ada.Numerics, Ada.Numerics.Elementary_Functions;
+use Ada.Numerics;
 
 package body BLIT is
    Low_Pass : constant := 0.999;
