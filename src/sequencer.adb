@@ -70,7 +70,6 @@ package body Sequencer is
          while Has_Element (C) loop
             Note := Element (C);
             exit when Note.Start >= Current_P + Generator_Buffer_Length;
-            Put_Line ("SETTING NOTE ON CHANNEL " & Self.Next_Channel'Img);
             Self.Current_Notes (Self.Next_Channel) := Note;
             Self.Next_Channel :=
               (Self.Next_Channel + 1) mod Self.Nb_Generators;
@@ -80,11 +79,6 @@ package body Sequencer is
 
       Last_P : Sample_Period := Current_P;
    begin
-      if Has_Element (C) then
-         Put_Line ("IN NEXT STEP, Cureent_P : "
-                   & Current_P'Img & " HAS NOTE : " & Has_Element (C)'Img);
-      end if;
-
       Set_Next_Notes;
 
       for J in Buffer_Range_Type'Range loop
