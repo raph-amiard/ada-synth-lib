@@ -353,11 +353,13 @@ package body Effects is
          Buffer (I) :=
            Buffer (I) +
            (Self.Last_Buffer
-              (Buffer_Range_Type'Last - Self.Delay_In_Samples + I) * Self.Decay);
+              (Buffer_Range_Type'Last - Self.Delay_In_Samples + I)
+            * Self.Decay);
       end loop;
 
       for I in
-        Buffer_Range_Type'First .. Buffer_Range_Type'Last - Self.Delay_In_Samples
+        Buffer_Range_Type'First ..
+          Buffer_Range_Type'Last - Self.Delay_In_Samples
       loop
          Buffer (I + Self.Delay_In_Samples) :=
            Buffer (I + Self.Delay_In_Samples) +
