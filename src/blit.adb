@@ -119,7 +119,7 @@ package body BLIT is
         Natural (Float'Floor (Phase * Float (Phase_Count)));
    begin
       for I in Step_Range loop
-         Self.Ring_Buffer ((Time + I) mod Ring_Buf_HB)
+         Self.Ring_Buffer ((Time + I) mod Ring_Buffer_Size)
            := Steps (Phase_Index, I) * Delt;
       end loop;
 
@@ -171,7 +171,7 @@ package body BLIT is
          if Self.Remaining_BLIT_Samples > 0 then
             Self.Last_Sum :=
               Self.Last_Sum +
-                Self.Ring_Buffer (CSample_Nb mod Ring_Buf_HB);
+                Self.Ring_Buffer (CSample_Nb mod Ring_Buffer_Size);
             Self.Remaining_BLIT_Samples := Self.Remaining_BLIT_Samples - 1;
          end if;
 
@@ -217,7 +217,7 @@ package body BLIT is
          if Self.Remaining_BLIT_Samples > 0 then
             Self.Last_Sum :=
               Self.Last_Sum +
-                Self.Ring_Buffer (CSample_Nb mod Ring_Buf_HB);
+                Self.Ring_Buffer (CSample_Nb mod Ring_Buffer_Size);
             Self.Remaining_BLIT_Samples := Self.Remaining_BLIT_Samples - 1;
          end if;
 

@@ -3,8 +3,9 @@ with Utils; use Utils;
 with Waves; use Waves;
 
 package BLIT is
-   Ring_Buf_HB : constant := 1024;
-   type Ring_Buffer_T is array (Natural range 0 .. Ring_Buf_HB - 1) of Sample;
+   Ring_Buffer_Size : constant := 16;
+
+   type Ring_Buffer_T is array (0 .. Ring_Buffer_Size - 1) of Sample;
    type BLIT_State is (Up, Down);
 
    type BLIT_Generator is abstract new Wave_Generator with record
