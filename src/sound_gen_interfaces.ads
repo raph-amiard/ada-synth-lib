@@ -29,18 +29,21 @@ package Sound_Gen_Interfaces is
    subtype Generator_Array is Generator_Arrays.Array_Type;
    subtype Generator_Vector is Generator_Arrays.Vectors.Vector;
    Empty_Generator_Array : Generator_Array := Generator_Arrays.Empty_Array;
+   ----------------------
+   --  Parameter scope --
+   ---------------------------
 
-   type Params_Aggregator_Type is record
+   type Params_Scope_Type is record
       Generators : Generator_Arrays.Vector_Type;
    end record;
-   type Params_Aggregator is access all Params_Aggregator_Type;
+   type Params_Scope is access all Params_Scope_Type;
 
-   procedure Enter (F : Params_Aggregator);
-   procedure Leave (F : Params_Aggregator);
+   procedure Enter (F : Params_Scope);
+   procedure Leave (F : Params_Scope);
    procedure Add_To_Current (G : Generator_Access);
 
    type Generator is abstract tagged record
-      Params_Scope : Params_Aggregator;
+      Parameters : Params_Scope;
    end record;
 
    procedure Next_Samples

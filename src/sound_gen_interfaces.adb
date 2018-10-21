@@ -3,11 +3,11 @@ with Ada.Containers.Vectors;
 package body Sound_Gen_Interfaces is
 
    package PA_Vectors
-   is new Ada.Containers.Vectors (Natural, Params_Aggregator);
+   is new Ada.Containers.Vectors (Natural, Params_Scope);
 
    Params_Aggregators : PA_Vectors.Vector;
 
-   function Current_FPA return Params_Aggregator is
+   function Current_FPA return Params_Scope is
      (Params_Aggregators.Last_Element);
 
    -----------------------------
@@ -83,17 +83,17 @@ package body Sound_Gen_Interfaces is
       end Internal;
 
    begin
-      Self.Params_Scope := new Params_Aggregator_Type;
-      Enter (Self.Params_Scope);
+      Self.Parameters := new Params_Scope_Type;
+      Enter (Self.Parameters);
       Internal (Self);
-      Leave (Self.Params_Scope);
+      Leave (Self.Parameters);
    end Compute_Params;
 
    -----------
    -- Enter --
    -----------
 
-   procedure Enter (F : Params_Aggregator) is
+   procedure Enter (F : Params_Scope) is
    begin
       Params_Aggregators.Append (F);
    end Enter;
@@ -102,7 +102,7 @@ package body Sound_Gen_Interfaces is
    -- Leave --
    -----------
 
-   procedure Leave (F : Params_Aggregator) is
+   procedure Leave (F : Params_Scope) is
    begin
       pragma Assert (F = Current_FPA);
       Params_Aggregators.Delete_Last;
@@ -158,8 +158,8 @@ package body Sound_Gen_Interfaces is
       function Internal
         (G : Generator_Access) return Generator_Arrays.Array_Type
       is
-        (if G.Params_Scope /= null
-         then Generator_Arrays.To_Array (G.Params_Scope.Generators)
+        (if G.Parameters /= null
+         then Generator_Arrays.To_Array (G.Parameters.Generators)
          else Generator_Arrays.Empty_Array) with Inline_Always;
 
       function Cat_Arrays
