@@ -5,14 +5,16 @@ package body BLIT is
    Low_Pass : constant := 0.999;
    --  lower values filter more high frequency
 
-   Phase_Count : constant := 32;
+   subtype Phase_Range is Natural range 0 .. 31;
    --  number of phase offsets to sample band-limited step at
 
-   Step_Width : constant := 16;
-   --  number of samples in each final band-limited step
+   Phase_Count : constant := Phase_Range'Range_Length;
 
-   Steps : array (Natural range 0 .. Phase_Count - 1,
-                  Natural range 0 .. Step_Width - 1) of Sample;
+   subtype Step_Range is Natural range 0 .. 15;
+   --  number of samples in each final band-limited step
+   Step_Width : constant := Step_Range'Range_Length;
+
+   Steps : array (Phase_Range, Step_Range) of Sample;
    --  would use short for speed in a real program
 
    procedure Init_Steps;
@@ -56,12 +58,12 @@ package body BLIT is
          H := H + 2;
       end loop;
 
-      for Phase in 0 .. Phase_Count - 1 loop
+      for Phase in Phase_Range loop
          declare
             Error : Long_Float := 1.0;
             Prev : Long_Float := 0.0;
          begin
-            for I in 0 .. Step_Width - 1 loop
+            for I in Step_Range loop
                declare
                   Cur : constant Long_Float := Long_Float
                     (Master (I * Phase_Count + (Phase_Count - 1 - Phase)));
@@ -113,11 +115,12 @@ package body BLIT is
    procedure Add_Step (Self : in out BLIT_Generator;
                        Time : Natural; Phase : Float; Delt : Sample)
    is
-      P : constant Natural :=
-            Natural (Float'Floor (Phase * Float (Phase_Count)));
+      Phase_Index : constant Natural :=
+        Natural (Float'Floor (Phase * Float (Phase_Count)));
    begin
-      for I in 0 .. Step_Width - 1 loop
-         Self.Ring_Buffer ((Time + I) mod Ring_Buf_HB) := Steps (P, I) * Delt;
+      for I in Step_Range loop
+         Self.Ring_Buffer ((Time + I) mod Ring_Buf_HB)
+           := Steps (Phase_Index, I) * Delt;
       end loop;
    end Add_Step;
 
