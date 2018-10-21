@@ -12,13 +12,12 @@ package body Waves is
    procedure Update_Period
      (Self : in out Wave_Generator'Class; Buffer : in out Period_Buffer)
    is
-      Tmp_Buffer : Generator_Buffer;
    begin
-      Self.Frequency_Provider.Next_Samples (Tmp_Buffer);
+      Self.Frequency_Provider.Next_Samples (Buffer);
       for I in Buffer'Range loop
          Buffer (I) :=
            Utils.Period_In_Samples
-             (Frequency (Tmp_Buffer (I)));
+             (Frequency (Buffer (I)));
       end loop;
    end Update_Period;
 

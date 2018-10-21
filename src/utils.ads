@@ -5,8 +5,8 @@ with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
 package Utils is
    type Frequency is new Float;
    type Sample_Period is new Natural;
-   type Period is new Float;
    subtype Sample is Float;
+   subtype Period is Sample;
 
    subtype Millisecond is Natural;
    type Scale is new Float range 0.0 .. 1.0;
