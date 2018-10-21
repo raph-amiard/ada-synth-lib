@@ -55,7 +55,7 @@ package body Effects is
    overriding procedure Next_Samples
      (Self : in out Mixer; Buffer : in out Generator_Buffer)
    is
-      Tmp_Buffer : Generator_Buffer;
+      Work_Buffer : Generator_Buffer renames Self.Work_Buffer;
    begin
       --  Set every element of the buffer to 0.0
       Buffer := (others => 0.0);
@@ -64,25 +64,25 @@ package body Effects is
       for I in 0 .. Self.Length - 1 loop
 
          --  Compute the samples of the channel's generator
-         Self.Generators (I).Gen.Next_Samples (Tmp_Buffer);
+         Self.Generators (I).Gen.Next_Samples (Work_Buffer);
 
          --  And add the samples to the buffer
          for J in Buffer'Range loop
             Buffer (J) :=
               Buffer (J)
-              + (Tmp_Buffer (J) * Sample (Self.Generators (I).Level));
+              + (Work_Buffer (J) * Sample (Self.Generators (I).Level));
          end loop;
       end loop;
 
       if Self.Env /= null then
-         Self.Env.Next_Samples (Tmp_Buffer);
+         Self.Env.Next_Samples (Work_Buffer);
          for J in Buffer'Range loop
-            Buffer (J) := Buffer (J) * Tmp_Buffer (J);
+            Buffer (J) := Buffer (J) * Work_Buffer (J);
          end loop;
       elsif Self.Env /= null and then Self.Saturate then
-         Self.Env.Next_Samples (Tmp_Buffer);
+         Self.Env.Next_Samples (Work_Buffer);
          for J in Buffer'Range loop
-            Buffer (J) := Saturate (Buffer (J) * Tmp_Buffer (J));
+            Buffer (J) := Saturate (Buffer (J) * Work_Buffer (J));
          end loop;
       elsif Self.Saturate then
          for J in Buffer'Range loop

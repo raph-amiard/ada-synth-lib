@@ -192,6 +192,7 @@ package Effects is
       Length     : Natural := 0;
       Env        : access ADSR;
       Saturate   : Boolean := False;
+      Work_Buffer : Generator_Buffer;
    end record;
 
    type Generators_Arg_Array is array (Natural range <>) of Mixer_Generator;
