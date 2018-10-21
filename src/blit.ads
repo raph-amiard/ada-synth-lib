@@ -2,7 +2,26 @@ with Sound_Gen_Interfaces; use Sound_Gen_Interfaces;
 with Utils; use Utils;
 with Waves; use Waves;
 
+--  This package contains implementation for minimum phase bandlimited step
+--  oscillators. Those oscillators will produce alias free sound, which is
+--  important for musicality. If you seek aliasing oscilators, for performance
+--  or because you like aliasing, check the Waves package.
+
 package BLIT is
+
+   type BLIT_Generator is abstract new Wave_Generator with private;
+
+   type BLIT_Square is new BLIT_Generator with private;
+   type BLIT_Saw is new BLIT_Generator with private;
+
+   function Create_Square
+     (Freq_Provider : access Generator'Class) return access BLIT_Square;
+
+   function Create_Saw
+     (Freq_Provider : access Generator'Class) return access BLIT_Saw;
+
+private
+
    Ring_Buffer_Size : constant := 16;
 
    type Ring_Buffer_T is array (0 .. Ring_Buffer_Size - 1) of Sample;
@@ -29,12 +48,6 @@ package BLIT is
 
    overriding procedure Reset (Self : in out BLIT_Square);
    overriding procedure Reset (Self : in out BLIT_Saw);
-
-   function Create_Square
-     (Freq_Provider : access Generator'Class) return access BLIT_Square;
-
-   function Create_Saw
-     (Freq_Provider : access Generator'Class) return access BLIT_Saw;
 
    overriding procedure Next_Samples
      (Self : in out BLIT_Square; Buffer : in out Generator_Buffer);
