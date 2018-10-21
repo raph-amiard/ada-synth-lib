@@ -122,6 +122,8 @@ package body BLIT is
          Self.Ring_Buffer ((Time + I) mod Ring_Buf_HB)
            := Steps (Phase_Index, I) * Delt;
       end loop;
+
+      Self.Remaining_BLIT_Samples := Step_Width;
    end Add_Step;
 
    -----------------
@@ -141,6 +143,8 @@ package body BLIT is
 
       for I in Buffer'Range loop
          CSample_Nb := Natural (Sample_Nb) + Natural (I);
+
+         --  If it is time, compute the next BLIT step
          if Self.Next_Impulse_Time <= CSample_Nb then
             Impulse_Time := Self.Next_Impulse_Time;
             Impulse_Phase := Self.Next_Impulse_Phase;
@@ -149,11 +153,8 @@ package body BLIT is
 
             Self.Next_Impulse_Time := Self.Next_Impulse_Time +
               Natural (Float'Floor (Delta_Time));
-            Self.Next_Impulse_Phase := Delta_Time - Float'Floor (Delta_Time);
 
-            for I in Impulse_Time .. Self.Next_Impulse_Time loop
-               Self.Ring_Buffer (I mod Ring_Buf_HB) := 0.0;
-            end loop;
+            Self.Next_Impulse_Phase := Delta_Time - Float'Floor (Delta_Time);
 
             if Self.State = Up then
                Add_Step
@@ -166,9 +167,13 @@ package body BLIT is
             end if;
          end if;
 
-         Self.Last_Sum :=
-           Self.Last_Sum +
-             Self.Ring_Buffer (CSample_Nb mod Ring_Buf_HB);
+         --  Do the square! _|¯|_|¯|_
+         if Self.Remaining_BLIT_Samples > 0 then
+            Self.Last_Sum :=
+              Self.Last_Sum +
+                Self.Ring_Buffer (CSample_Nb mod Ring_Buf_HB);
+            Self.Remaining_BLIT_Samples := Self.Remaining_BLIT_Samples - 1;
+         end if;
 
          Buffer (I) :=  Self.Last_Sum - 0.5;
       end loop;
@@ -192,6 +197,7 @@ package body BLIT is
       for I in Buffer'Range loop
          CSample_Nb := Natural (Sample_Nb) + Natural (I);
 
+         --  If it is time, compute the next BLIT step
          if Self.Next_Impulse_Time <= CSample_Nb then
             Impulse_Time := Self.Next_Impulse_Time;
             Impulse_Phase := Self.Next_Impulse_Phase;
@@ -202,24 +208,29 @@ package body BLIT is
               Natural (Float'Floor (Delta_Time));
             Self.Next_Impulse_Phase := Delta_Time - Float'Floor (Delta_Time);
 
-            for I in Impulse_Time + Step_Width .. Self.Next_Impulse_Time loop
-               Self.Ring_Buffer (I mod Ring_Buf_HB) := 0.0;
-            end loop;
-
             Add_Step (BLIT_Generator (Self), Impulse_Time, Impulse_Phase, 1.0);
          end if;
 
-         Self.Last_Sum :=
-           Self.Last_Sum +
-             Self.Ring_Buffer (CSample_Nb mod Ring_Buf_HB);
+         --  Do the ramp /|/|/|
 
+         --  Add the impulse sample if necessary
+         if Self.Remaining_BLIT_Samples > 0 then
+            Self.Last_Sum :=
+              Self.Last_Sum +
+                Self.Ring_Buffer (CSample_Nb mod Ring_Buf_HB);
+            Self.Remaining_BLIT_Samples := Self.Remaining_BLIT_Samples - 1;
+         end if;
+
+         --  Make it ramp up
          Self.Last_Sum := Self.Last_Sum
            - (Self.Last_Sum
               / (Sample (Self.Next_Impulse_Time - CSample_Nb)));
 
          if Self.Last_Sum'Valid then
+            --  Offset so that the sawtooth is centered
             Buffer (I) := Self.Last_Sum - 0.5;
          else
+            --  TODO: Don't remember why on not 'Valid
             Self.Last_Sum := 0.0;
          end if;
       end loop;
