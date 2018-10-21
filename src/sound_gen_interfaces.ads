@@ -16,12 +16,17 @@ package Sound_Gen_Interfaces is
 
    type Buffer_Range_Type is range 0 .. Generator_Buffer_Length - 1;
    type Generator_Buffer is array (Buffer_Range_Type) of Sample;
+   --  Type for a generator buffer, used as work areas for generators.
 
    ---------------
    -- Generator --
    ---------------
 
    type Generator;
+   --  Base type for a generator. A generator is the basic building block to
+   --  create synth graphs in Ada synth lib. By creating a tree of generators,
+   --  the user can create complex instruments.
+
    type Generator_Access is access all Generator'Class;
 
    package Generator_Arrays
@@ -29,6 +34,8 @@ package Sound_Gen_Interfaces is
    subtype Generator_Array is Generator_Arrays.Array_Type;
    subtype Generator_Vector is Generator_Arrays.Vectors.Vector;
    Empty_Generator_Array : Generator_Array := Generator_Arrays.Empty_Array;
+   --  Utility types to handle collection of generators
+
    ----------------------
    --  Parameter scope --
    ---------------------------

@@ -135,6 +135,8 @@ package Effects is
       D1, D2, D3, D4     : Float := 0.0;
    end record;
 
+   --  TODO: Why Res/Q should probably have a provider.
+
 --     overriding function Has_Params_Scope
 --       (Self : in out Low_Pass_Filter) return Boolean is (True);
 
