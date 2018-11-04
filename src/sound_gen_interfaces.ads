@@ -115,11 +115,11 @@ package Sound_Gen_Interfaces is
    -- Trigger --
    -------------
 
-   type Note_Signal_T is (On, Off, No_Signal);
+   type Note_Event_T is (On, Off, No_Signal);
 
-   type Note_Signal is record
+   type Note_Event is record
       Note : Note_T;
-      Kind : Note_Signal_T := No_Signal;
+      Kind : Note_Event_T := No_Signal;
    end record;
 
    type I_Simulation_Listener is interface;
@@ -127,7 +127,7 @@ package Sound_Gen_Interfaces is
    function Name
      (Self : in out I_Simulation_Listener) return String is abstract;
 
-   type Note_Signal_Buffer is array (Buffer_Range_Type) of Note_Signal;
+   type Note_Signal_Buffer is array (Buffer_Range_Type) of Note_Event;
 
    type Note_Generator is abstract tagged record
       Buffer            : Note_Signal_Buffer;

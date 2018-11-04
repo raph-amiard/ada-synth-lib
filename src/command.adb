@@ -33,11 +33,11 @@ package body Command is
       for I in Self.Buffer'Range loop
          Self.Current_P := Self.Current_P + 1;
          if Self.Current_P = Self.On_Period then
-            Self.Buffer (I) := Note_Signal'(Kind => On, Note => Self.Note);
+            Self.Buffer (I) := Note_Event'(Kind => On, Note => Self.Note);
          elsif Self.Current_P = Self.Off_Period then
-            Self.Buffer (I) := Note_Signal'(Kind => Off, Note => <>);
+            Self.Buffer (I) := Note_Event'(Kind => Off, Note => <>);
          else
-            Self.Buffer (I) := Note_Signal'(Kind => No_Signal, Note => <>);
+            Self.Buffer (I) := Note_Event'(Kind => No_Signal, Note => <>);
          end if;
       end loop;
    end Next_Step;
