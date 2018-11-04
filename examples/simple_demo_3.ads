@@ -57,11 +57,9 @@ package Simple_Demo_3 is
                     (Saturate => False,
                      Sources =>
                        (1 =>
-                          (Create_ADSR
-                               (3, 75, 50, 0.005, Synth_Source),
+                          (Create_ADSR (3, 75, 50, 0.005, Synth_Source),
                            Level => 800.0),
-                        2 =>
-                          (LFO (0.1, 400.0), 1.0))))
+                        2 => (LFO (0.1, 400.0), 1.0))))
                ),
            Q => 0.2,
            Source =>
@@ -97,8 +95,8 @@ package Simple_Demo_3 is
                   Sources =>
                     (1 =>
                        (Create_ADSR
-                            (3, 75, 50, 0.005, Synth_Source_2),
-                        Level => 1100.0),
+                            (3, 75, 500, 0.5, Synth_Source_2),
+                        Level => 800.0),
                      2 =>
                        (LFO (0.1, 400.0), 1.0))))
             ),
@@ -114,7 +112,7 @@ package Simple_Demo_3 is
                       (Create_Pitch_Gen
                            (Rel_Pitch => -14,
                             Source => Synth_Source_2,
-                            Proc => Generator_Access (Fixed (4.0)))),
+                            Proc => Generator_Access (Fixed (2.0)))),
                       Level => 0.6),
                 3 => (BLIT.Create_Square
                       (Create_Pitch_Gen
@@ -124,7 +122,7 @@ package Simple_Demo_3 is
                       (Create_Pitch_Gen
                            (Rel_Pitch => -21,
                             Source => Synth_Source_2,
-                            Proc => Generator_Access (Fixed (4.0)))),
+                            Proc => Generator_Access (Fixed (-2.0)))),
                       Level => 0.6))));
 
    H : constant Sequencer_Note := (Note => (G, 3), Duration => 100);
@@ -154,26 +152,23 @@ package Simple_Demo_3 is
    Kick : constant access Mixer :=
      Create_Mixer
        ((
-        1 => (Create_Sine
-              (Create_Pitch_Gen
-                 (0, Kick_Source)),
-              0.1),
+        1 => (Create_Sine (Create_Pitch_Gen (-12, Kick_Source)), 0.0),
 
         2 => (Create_Sine (Create_Pitch_Gen
-              (-24, Kick_Source,
+              (-28, Kick_Source,
                  Proc => new Attenuator'
-                   (Level => 300.0,
-                    Source => Create_ADSR (0, 50, 100, 0.1, Kick_Source),
+                   (Level => 500.0,
+                    Source => Create_ADSR (1, 30, 260, 0.15, Kick_Source),
                     others => <>))),
 
               0.7)
-       ), Env => Create_ADSR (1, 100, 100, 0.2, Kick_Source));
+       ), Env => Create_ADSR (1, 100, 500, 0.5, Kick_Source));
 
    Main : constant access Generator'Class :=
      Create_Mixer ((1 => (Hat,         0.7),
                     2 => (Kick,        0.7),
-                    3 => (Synth_2, 0.05),
-                    4 => (Synth,       0.7)));
+                    3 => (Synth_2,     0.008),
+                    4 => (Synth,       0.9)));
 
 
 end Simple_Demo_3;
