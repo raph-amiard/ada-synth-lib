@@ -27,13 +27,11 @@ package Command is
 
    No_Notes    : Notes_Array (1 .. 0) := (others => <>);
 
-   type Simple_Sequencer (Nb_Steps : Natural) is new
-     Note_Generator and I_Simulation_Listener
-     with record
+   type Simple_Sequencer (Nb_Steps : Natural)
+   is new Note_Generator and I_Simulation_Listener with record
       BPM          : Natural := 120;
       Notes        : Notes_Array (1 .. Nb_Steps) := (others => No_Seq_Note);
       Interval     : Sample_Period := 0;
-      Current_Note : Natural := 0;
       Track_Name   : Unbounded_String;
    end record;
 
@@ -42,7 +40,7 @@ package Command is
       D   : Sample_Period;
       Oct : Octave_T) return Notes_Array;
 
-   overriding procedure Reset (Self : in out Simple_Sequencer);
+   overriding procedure Reset (Self : in out Simple_Sequencer) is null;
 
    function Create_Sequencer
      (Nb_Steps, BPM : Natural;

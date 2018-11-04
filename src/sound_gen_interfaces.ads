@@ -154,4 +154,10 @@ package Sound_Gen_Interfaces is
 
    No_Seq_Note : Sequencer_Note := (Note => No_Note, Duration => 0);
 
+   type Note is record
+      Note     : Note_T;
+      Duration : Sample_Period;
+      Time     : Sample_Period;
+   end record;
+
 end Sound_Gen_Interfaces;
