@@ -87,7 +87,6 @@ package body Sequencer is
            (Sample_Nb + Sample_Period (J)) mod Self.Interval;
 
          if Current_P = 0 and Last_P /= 0 then
-            Put_Line ("DAFUQ");
             C := Self.Notes.First;
             Set_Next_Notes;
          end if;

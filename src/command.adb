@@ -30,11 +30,9 @@ package body Command is
      (Self : in out Simple_Command)
    is
    begin
-      Put_Line ("In next step");
       for I in Self.Buffer'Range loop
          Self.Current_P := Self.Current_P + 1;
          if Self.Current_P = Self.On_Period then
-            Put_Line ("Simple command: ON!");
             Self.Buffer (I) := Note_Event'(Kind => On, Note => Self.Note);
          elsif Self.Current_P = Self.Off_Period then
             Self.Buffer (I) := Note_Event'(Kind => Off, Note => <>);

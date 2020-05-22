@@ -27,7 +27,6 @@ begin
    Err := Outstream_Start (Out_Stream);
 
    Put_Line ("Backend used : " & IO.Current_Backend'Img);
-   Put_Line ("BACKEND = " & IO.Current_Backend'Image);
 
    Play (Out_Stream);
    loop
