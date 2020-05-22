@@ -3,7 +3,7 @@ with Config; use Config;
 package body Effects is
 
    function Add_Generator
-     (Self : in out Mixer; G : Mixer_Generator) return Natural;
+     (Self : in out Mixer; G : Track) return Natural;
 
    procedure Filter_Init (Self : in out Low_Pass_Filter);
 
@@ -13,7 +13,7 @@ package body Effects is
 
    function Add_Generator
      (Self : in out Mixer;
-      G    : Mixer_Generator) return Natural
+      G    : Track) return Natural
    is
    begin
       Self.Generators (Self.Length) := G;
@@ -31,8 +31,8 @@ package body Effects is
       Level : Float) return Natural
    is
       pragma Suppress (Accessibility_Check);
-      MG : constant Mixer_Generator := Mixer_Generator'(Gen   => G,
-                                                        Level => Level);
+      MG : constant Track := Track'(Gen   => G,
+                                    Level => Level);
    begin
       return Add_Generator (Self, MG);
    end Add_Generator;

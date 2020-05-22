@@ -167,12 +167,12 @@ package Effects is
    -- Mixer --
    -----------
 
-   type Mixer_Generator is record
+   type Track is record
       Gen   : access Generator'Class;
       Level : Float;
    end record;
 
-   type Generator_Vector is array (Natural range 0 .. 32) of Mixer_Generator;
+   type Generator_Vector is array (Natural range 0 .. 32) of Track;
 
    type Mixer is new Generator with record
       Generators  : Generator_Vector;
@@ -183,7 +183,7 @@ package Effects is
    end record;
    type Mixer_Access is access all Mixer;
 
-   type Generators_Arg_Array is array (Natural range <>) of Mixer_Generator;
+   type Generators_Arg_Array is array (Natural range <>) of Track;
    No_Generators : constant Generators_Arg_Array (1 .. 0) := (others => <>);
 
    function Create_Mixer
@@ -201,11 +201,15 @@ package Effects is
          (Mixer_Access'(Create_Mixer (Sources, Volume_Mod, Saturate))));
 
    function Add_Generator
-     (Self : in out Mixer; G : access Generator'Class;
+     (Self  : in out Mixer;
+      G     : access Generator'Class;
       Level : Float) return Natural;
+   --  Add a new generator to the mixer, with level ``Level``. Return the index
+   --  of the generator in the mixer.
 
    procedure Add_Generator
      (Self : in out Mixer; G : access Generator'Class; Level : Float);
+   --  Add a new generator to the mixer, with level ``Level``.
 
    overriding procedure Next_Samples
      (Self : in out Mixer; Buffer : in out Generator_Buffer);
@@ -214,6 +218,10 @@ package Effects is
 
    overriding function Children
      (Self : in out Mixer) return Generator_Array;
+
+   -----------------
+   --  Delay line --
+   -----------------
 
    type Delay_Line is new Generator with record
       Source           : access Generator'Class;
