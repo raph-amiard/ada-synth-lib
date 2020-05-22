@@ -26,7 +26,7 @@ package body Waves is
    ------------
 
    function Create_Saw
-     (Freq_Provider : Generator_Access) return access Saw_Generator
+     (Freq_Provider : Generator_Access) return Generator_Access
    is
    begin
       return new Saw_Generator'(Frequency_Provider => Freq_Provider,
@@ -58,10 +58,9 @@ package body Waves is
    ------------
 
    function Create_Square
-     (Freq_Provider : access Generator'Class) return access Square_Generator is
+     (Freq_Provider : Generator_Access) return Generator_Access is
    begin
-      return new Square_Generator'(Frequency_Provider =>
-                                     Generator_Access (Freq_Provider),
+      return new Square_Generator'(Frequency_Provider => Freq_Provider,
                                    Is_High => True,
                                    Current_Sample => 0,
                                    others => <>);
@@ -97,16 +96,14 @@ package body Waves is
    ------------
 
    function Create_Sine
-     (Freq_Provider : access Generator'Class) return access Sine_Generator
+     (Freq_Provider : Generator_Access) return Generator_Access
    is
-      Ret : constant access Sine_Generator :=
-        new Sine_Generator'(Frequency_Provider =>
-                              Generator_Access (Freq_Provider),
+      Ret : constant Generator_Access :=
+        new Sine_Generator'(Frequency_Provider => Freq_Provider,
                             Current_Sample => 0,
                             Current_P => 0.0,
                             others => <>);
    begin
-      Ret.Current_P := 0.0;
       return Ret;
    end Create_Sine;
 
@@ -139,17 +136,17 @@ package body Waves is
    ------------
 
    function Create_Chain
-     (Gen : access Generator'Class;
+     (Gen : Generator_Access;
       Sig_Procs : Signal_Processors
-        := No_Signal_Processors) return access Chain
+        := No_Signal_Processors) return Generator_Access
    is
-      Ret : constant access Chain :=
-        new Chain'(Gen => Generator_Access (Gen), others => <>);
+      Ret : constant Chain_Access :=
+        new Chain'(Gen => Gen, others => <>);
    begin
       for P of Sig_Procs loop
          Ret.Add_Processor (P);
       end loop;
-      return Ret;
+      return Generator_Access (Ret);
    end Create_Chain;
 
    -------------------
@@ -201,7 +198,7 @@ package body Waves is
 
    function Create_ADSR
      (Attack, Decay, Release : Millisecond; Sustain : Scale;
-      Source : access Note_Generator'Class := null) return access ADSR
+      Source : Note_Generator_Access := null) return Generator_Access
    is
    begin
       return new ADSR'
@@ -311,11 +308,10 @@ package body Waves is
    -- Create_Noise --
    ------------------
 
-   function Create_Noise return access Noise_Generator
+   function Create_Noise return Generator_Access
    is
-      N : constant access Noise_Generator := new Noise_Generator;
    begin
-      return N;
+      return new Noise_Generator;
    end Create_Noise;
 
    F_Level : constant Sample := 2.0 / Sample (16#FFFFFFFF#);
@@ -472,7 +468,7 @@ package body Waves is
       Min         : Float := 0.0;
       Max         : Float := 5_000.0;
       Param_Scale : Param_Scale_T := Linear)
-      return access Fixed_Gen
+      return Generator_Access
    is
    begin
       return new

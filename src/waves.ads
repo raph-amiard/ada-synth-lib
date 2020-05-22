@@ -27,7 +27,7 @@ package Waves is
    end record;
 
    function Create_Saw
-     (Freq_Provider : Generator_Access) return access Saw_Generator;
+     (Freq_Provider : Generator_Access) return Generator_Access;
    overriding procedure Next_Samples
      (Self : in out Saw_Generator; Buffer : in out Generator_Buffer);
    overriding procedure Reset (Self : in out Saw_Generator);
@@ -42,7 +42,7 @@ package Waves is
    end record;
 
    function Create_Square
-     (Freq_Provider : access Generator'Class) return access Square_Generator;
+     (Freq_Provider : Generator_Access) return Generator_Access;
    overriding procedure Next_Samples
      (Self : in out Square_Generator; Buffer : in out Generator_Buffer);
    overriding procedure Reset (Self : in out Square_Generator);
@@ -57,7 +57,7 @@ package Waves is
    end record;
 
    function Create_Sine
-     (Freq_Provider : access Generator'Class) return access Sine_Generator;
+     (Freq_Provider : Generator_Access) return Generator_Access;
    overriding procedure Next_Samples
      (Self : in out Sine_Generator; Buffer : in out Generator_Buffer);
    overriding procedure Reset (Self : in out Sine_Generator);
@@ -68,7 +68,7 @@ package Waves is
 
    type Noise_Generator is new Wave_Generator with null record;
 
-   function Create_Noise return access Noise_Generator;
+   function Create_Noise return Generator_Access;
 
    overriding procedure Next_Samples
      (Self : in out Noise_Generator; Buffer : in out Generator_Buffer);
@@ -82,14 +82,14 @@ package Waves is
       Current_Note   : Note_T := (C, 4);
       Current_Freq   : Frequency;
       Relative_Pitch : Integer;
-      Source         : access Note_Generator'Class;
+      Source         : Note_Generator_Access;
       Proc           : Generator_Access := null;
    end record;
 
    function Create_Pitch_Gen
      (Rel_Pitch : Integer;
-      Source : access Note_Generator'Class; Proc : Generator_Access := null)
-      return access Pitch_Gen
+      Source : Note_Generator_Access; Proc : Generator_Access := null)
+      return Generator_Access
    is
      (new Pitch_Gen'(Relative_Pitch => Rel_Pitch, Source => Source,
                      Proc => Proc,
@@ -126,7 +126,7 @@ package Waves is
       Min         : Float := 0.0;
       Max         : Float := 5_000.0;
       Param_Scale : Param_Scale_T := Linear)
-      return access Fixed_Gen;
+      return Generator_Access;
 
    overriding procedure Next_Samples
      (Self : in out Fixed_Gen; Buffer : in out Generator_Buffer);
@@ -181,11 +181,12 @@ package Waves is
       Processors    : Signal_Processor_Vector;
       Nb_Processors : Natural := 0;
    end record;
+   type Chain_Access is access all Chain;
 
    function Create_Chain
-     (Gen : access Generator'Class;
+     (Gen : Generator_Access;
       Sig_Procs : Signal_Processors
-         := No_Signal_Processors) return access Chain;
+         := No_Signal_Processors) return Generator_Access;
 
    procedure Add_Processor
      (Self : in out Chain; P : Signal_Processor_Access);
@@ -222,7 +223,7 @@ package Waves is
    function Create_ADSR
      (Attack, Decay, Release : Millisecond;
       Sustain : Scale;
-      Source : access Note_Generator'Class := null) return access ADSR;
+      Source : Note_Generator_Access := null) return Generator_Access;
 
    overriding procedure Next_Samples
      (Self : in out ADSR; Buffer : in out Generator_Buffer);

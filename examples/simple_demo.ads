@@ -37,7 +37,7 @@ package Simple_Demo is
                     others => <>))),
 
               0.7)
-       ), Env => Create_ADSR (10, 1000, 200, 0.2, Kick_Source));
+       ), Volume_Mod => Create_ADSR (10, 1000, 200, 0.2, Kick_Source));
 
    Snare_Seq : constant access Simple_Sequencer :=
      Create_Sequencer
@@ -64,7 +64,7 @@ package Simple_Demo is
                          Create_ADSR (0, 200, 10000, 0.5, Snare_Source),
                        others => <>))),
               0.1)
-       ), Env => Create_ADSR (0, 100, 100, 0.2, Snare_Source));
+       ), Volume_Mod => Create_ADSR (0, 100, 100, 0.2, Snare_Source));
 
    Hat_Seq : constant access Simple_Sequencer :=
      Create_Sequencer
@@ -76,7 +76,7 @@ package Simple_Demo is
      Create_Mixer
        ((
         1 => (Create_Noise, 0.5)
-       ), Env => Create_ADSR (0, 20, 0, 0.0, Hat_Source));
+       ), Volume_Mod => Create_ADSR (0, 20, 0, 0.0, Hat_Source));
 
    SNL : constant Sample_Period := 4000;
    S1 : constant Sequencer_Note := ((C, 4), SNL);
@@ -97,7 +97,7 @@ package Simple_Demo is
    Synth_Source : constant Note_Generator_Access :=
      Note_Generator_Access (Synth_Seq);
 
-   Synth : constant access Disto :=
+   Synth : constant Generator_Access :=
      Create_Dist
        (Create_LP
           (Create_Mixer
@@ -113,8 +113,8 @@ package Simple_Demo is
                          (-12, Synth_Source)), 0.3),
               1 => (BLIT.Create_Saw
                     (Create_Pitch_Gen
-                         (-17, Synth_Source)), 0.5)
-          )),
+                         (-17, Synth_Source)), 0.5))
+          ),
         Fixed (200.0,
           Modulator => new Attenuator'
             (Level => 1500.0,

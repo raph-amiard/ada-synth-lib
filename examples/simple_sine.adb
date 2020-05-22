@@ -12,22 +12,22 @@ procedure Simple_Sine is
      To_Seq_Notes ((C, G, F, G, C, G, F, A, C, G, F, G, C, G, F, G), 400, 4);
 
    function Simple_Synth
-     (S    : access Simple_Sequencer; Tune : Integer := 0; Decay : Integer)
+     (S    : Note_Generator_Access; Tune : Integer := 0; Decay : Integer)
       return access Mixer
    is
      (Create_Mixer
         ((0 => (Create_Sine (Create_Pitch_Gen (Tune, S)), 0.5)),
-         Env => Create_ADSR (5, 50, Decay, 0.5, S)));
+         Volume_Mod => Create_ADSR (5, 50, Decay, 0.5, S)));
 
    Volume     : Float   := 0.9;
    Decay      : Integer := 800;
-   Seq        : access Simple_Sequencer;
+   Seq        : Simple_Sequencer_Access;
    Sine_Gen   : access Mixer;
    Main       : constant access Mixer := Create_Mixer (No_Generators);
 begin
    for I in -3 .. 1 loop
       Seq      := Create_Sequencer (16, BPM, 1, Notes);
-      Sine_Gen := Simple_Synth (Seq, I * 12, Decay);
+      Sine_Gen := Simple_Synth (Note_Generator_Access (Seq), I * 12, Decay);
       Main.Add_Generator (Sine_Gen, Volume);
       BPM    := BPM * 2;
       Volume := Volume / 1.8;

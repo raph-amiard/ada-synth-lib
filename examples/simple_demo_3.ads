@@ -43,7 +43,7 @@ package Simple_Demo_3 is
    Synth_Source_2 : constant Note_Generator_Access :=
      Note_Generator_Access (Synth_Seq_2);
 
-   Synth : constant access Disto :=
+   Synth : constant Generator_Access :=
      Create_Dist
        (Clip_Level => 1.00001,
         Coeff      => 1.5,
@@ -53,14 +53,14 @@ package Simple_Demo_3 is
              Fixed
                (Freq      => 200.0,
                 Modulator =>
-                  Generator_Access (Create_Mixer
+                  Create_Mixer
                     (Saturate => False,
-                     Sources =>
+                     Sources  =>
                        (1 =>
                           (Create_ADSR (3, 75, 50, 0.005, Synth_Source),
                            Level => 800.0),
-                        2 => (LFO (0.1, 400.0), 1.0))))
-               ),
+                        2 => (LFO (0.1, 400.0), 1.0)))
+          ),
            Q => 0.2,
            Source =>
              Create_Mixer
@@ -80,17 +80,17 @@ package Simple_Demo_3 is
                               (Rel_Pitch => -33, Source => Synth_Source)),
                            Level => 0.6)
                     ),
-                Env => Create_ADSR
+                Volume_Mod => Create_ADSR
                   (3, 100, 100, 0.2, Synth_Source))
           ));
 
-   Synth_2 : constant access Low_Pass_Filter :=
+   Synth_2 : constant Generator_Access :=
      Create_LP
        (Cut_Freq =>
           Fixed
             (Freq      => 300.0,
              Modulator =>
-               Generator_Access (Create_Mixer
+               Create_Mixer
                  (Saturate => False,
                   Sources =>
                     (1 =>
@@ -98,7 +98,7 @@ package Simple_Demo_3 is
                             (3, 75, 500, 0.5, Synth_Source_2),
                         Level => 800.0),
                      2 =>
-                       (LFO (0.1, 400.0), 1.0))))
+                       (LFO (0.1, 400.0), 1.0)))
             ),
         Q => 0.7,
         Source =>
@@ -134,11 +134,11 @@ package Simple_Demo_3 is
         Notes => (H, o, H, H, H, o, H, H, HH, o, H, H, H, o, H, H));
    Hat_Source : constant Note_Generator_Access :=
      Note_Generator_Access (Hat_Seq);
-   Hat : constant access Mixer :=
+   Hat : constant Generator_Access :=
      Create_Mixer
        ((
         1 => (Create_Noise, 0.5)
-       ), Env => Create_ADSR (5, 20, 20, 0.00001, Hat_Source));
+       ), Volume_Mod => Create_ADSR (5, 20, 20, 0.00001, Hat_Source));
 
    Kick_Source : constant Note_Generator_Access :=
      Note_Generator_Access
@@ -149,7 +149,7 @@ package Simple_Demo_3 is
             K, o, o, K, o, o, o, o, K, o, K, o, o, K, o, o,
             K, o, o, K, o, o, o, o, K, o, K, o, o, o, o, K)));
 
-   Kick : constant access Mixer :=
+   Kick : constant Generator_Access :=
      Create_Mixer
        ((
         1 => (Create_Sine (Create_Pitch_Gen (-12, Kick_Source)), 0.0),
@@ -162,9 +162,9 @@ package Simple_Demo_3 is
                     others => <>))),
 
               0.7)
-       ), Env => Create_ADSR (1, 100, 500, 0.5, Kick_Source));
+       ), Volume_Mod => Create_ADSR (1, 100, 500, 0.5, Kick_Source));
 
-   Main : constant access Generator'Class :=
+   Main : constant Generator_Access :=
      Create_Mixer ((1 => (Hat,         0.7),
                     2 => (Kick,        0.7),
                     3 => (Synth_2,     0.008),

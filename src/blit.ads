@@ -15,10 +15,10 @@ package BLIT is
    type BLIT_Saw is new BLIT_Generator with private;
 
    function Create_Square
-     (Freq_Provider : access Generator'Class) return access BLIT_Square;
+     (Freq_Provider : access Generator'Class) return Generator_Access;
 
    function Create_Saw
-     (Freq_Provider : access Generator'Class) return access BLIT_Saw;
+     (Freq_Provider : access Generator'Class) return Generator_Access;
 
 private
 

@@ -45,12 +45,14 @@ package Sequencer is
       BPM             : Natural := 120;
       Track_Name      : Unbounded_String;
    end record;
+   type Sequencer_Access is access all Sequencer;
 
    function Create
      (BPM        : Natural;
       Measures   : Natural;
       Nb_Voices  : Natural := 8;
-      Track_Name : String := "") return access Sequencer;
+      Track_Name : String := "") return Sequencer_Access;
+
    procedure Add_Note (Self : in out Sequencer; Note : Seq_Note);
    procedure Remove_Note (Self : in out Sequencer; Note : Seq_Note);
    overriding procedure Next_Step (Self : in out Sequencer);

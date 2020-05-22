@@ -1,4 +1,5 @@
 with Config; use Config;
+with Ada.Text_IO; use Ada.Text_IO;
 
 package body Command is
 
@@ -8,18 +9,17 @@ package body Command is
 
    function Create_Simple_Command
      (On_Period, Off_Period : Sample_Period;
-      Note : Note_T) return access Simple_Command'Class
+      Note : Note_T) return Note_Generator_Access
    is
-   begin
-      return N : constant access Simple_Command'Class
+      N : constant Simple_Command_Access
         := new Simple_Command'(Note       => Note,
                                Buffer     => <>,
                                On_Period  => On_Period,
                                Off_Period => Off_Period,
-                               Current_P  => 0)
-      do
-         Register_Simulation_Listener (N);
-      end return;
+                               Current_P  => 0);
+   begin
+      Register_Simulation_Listener (N);
+      return Note_Generator_Access (N);
    end Create_Simple_Command;
 
    -----------------------
@@ -30,9 +30,11 @@ package body Command is
      (Self : in out Simple_Command)
    is
    begin
+      Put_Line ("In next step");
       for I in Self.Buffer'Range loop
          Self.Current_P := Self.Current_P + 1;
          if Self.Current_P = Self.On_Period then
+            Put_Line ("Simple command: ON!");
             Self.Buffer (I) := Note_Event'(Kind => On, Note => Self.Note);
          elsif Self.Current_P = Self.Off_Period then
             Self.Buffer (I) := Note_Event'(Kind => Off, Note => <>);
@@ -50,9 +52,9 @@ package body Command is
      (Nb_Steps, BPM : Natural;
       Measures      : Natural := 1;
       Notes         : Notes_Array := No_Notes;
-      Track_Name    : String := "") return access Simple_Sequencer
+      Track_Name    : String := "") return Simple_Sequencer_Access
    is
-      Ret : constant access Simple_Sequencer :=
+      Ret : constant Simple_Sequencer_Access :=
         new Simple_Sequencer'
           (BPM => BPM,
            Nb_Steps => Nb_Steps * Measures,

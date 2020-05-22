@@ -1,6 +1,5 @@
 with Utils; use Utils;
 with Sound_Gen_Interfaces; use Sound_Gen_Interfaces;
-with Waves; use Waves;
 
 package Effects is
 
@@ -10,7 +9,7 @@ package Effects is
 
    type Attenuator is new Generator with record
       Level : Float;
-      Source : access Generator'Class;
+      Source : Generator_Access;
    end record;
 
    overriding function Is_Param (Self : in out Attenuator) return Boolean
@@ -55,7 +54,7 @@ package Effects is
    end record;
 
    function VCA (Source : Generator_Access;
-                 G : Generator_Access) return access Dyn_Attenuator
+                 G : Generator_Access) return Generator_Access
    is (new Dyn_Attenuator'(Source => Source,
                            Level_Provider => G, others => <>));
 
@@ -85,23 +84,9 @@ package Effects is
      (Self : in out Transposer) return Generator_Array
    is ((0 => Self.Source));
 
-   -------------------
-   -- Digital_Disto --
-   -------------------
-
-   type Digital_Disto is new Signal_Processor with record
-      Clip_Level : Sample;
-   end record;
-
-   function Create_Digi_Dist
-     (Clip_Level : Float) return access Digital_Disto;
-
-   overriding function Process
-     (Self : in out Digital_Disto; S : Sample) return Sample;
-
-   -------------------
-   -- Digital_Disto --
-   -------------------
+   -----------
+   -- Disto --
+   -----------
 
    type Disto is new Generator with record
       Clip_Level : Sample;
@@ -111,7 +96,7 @@ package Effects is
 
    function Create_Dist
      (Source : access Generator'Class;
-      Clip_Level : Float; Coeff : Float := 10.0) return access Disto;
+      Clip_Level : Float; Coeff : Float := 10.0) return Generator_Access;
 
    overriding procedure Next_Samples
      (Self : in out Disto; Buffer : in out Generator_Buffer);
@@ -141,9 +126,9 @@ package Effects is
 --       (Self : in out Low_Pass_Filter) return Boolean is (True);
 
    function Create_LP
-     (Source   : access Generator'Class;
-      Cut_Freq : access Generator'Class;
-      Q        : Float) return access Low_Pass_Filter;
+     (Source   : Generator_Access;
+      Cut_Freq : Generator_Access;
+      Q        : Float) return Generator_Access;
 
    overriding function Is_Param (Self : in out Low_Pass_Filter) return Boolean
    is (True);
@@ -190,20 +175,30 @@ package Effects is
    type Generator_Vector is array (Natural range 0 .. 32) of Mixer_Generator;
 
    type Mixer is new Generator with record
-      Generators : Generator_Vector;
-      Length     : Natural := 0;
-      Env        : access ADSR;
-      Saturate   : Boolean := False;
+      Generators  : Generator_Vector;
+      Length      : Natural := 0;
+      Env         : Generator_Access;
+      Saturate    : Boolean := False;
       Work_Buffer : Generator_Buffer;
    end record;
+   type Mixer_Access is access all Mixer;
 
    type Generators_Arg_Array is array (Natural range <>) of Mixer_Generator;
    No_Generators : constant Generators_Arg_Array (1 .. 0) := (others => <>);
 
    function Create_Mixer
-     (Sources : Generators_Arg_Array;
-      Env : access ADSR := null;
-      Saturate : Boolean := True) return access Mixer;
+     (Sources    : Generators_Arg_Array;
+      Volume_Mod : Generator_Access := null;
+      Saturate   : Boolean := True) return Mixer_Access;
+   --  Create a mixer. Will clip if ``Saturate`` is ``True``. If ``Volume_Mod``
+   --  is passed it will be used to modulate the output volume of the mixer.
+
+   function Create_Mixer
+     (Sources    : Generators_Arg_Array;
+      Volume_Mod : Generator_Access := null;
+      Saturate   : Boolean := True) return Generator_Access
+   is (Generator_Access
+         (Mixer_Access'(Create_Mixer (Sources, Volume_Mod, Saturate))));
 
    function Add_Generator
      (Self : in out Mixer; G : access Generator'Class;
@@ -229,7 +224,7 @@ package Effects is
 
    function Create_Delay_Line (Source : access Generator'Class;
                                Dlay : Millisecond;
-                               Decay : Sample) return access Delay_Line;
+                               Decay : Sample) return Generator_Access;
 
    overriding procedure Next_Samples
      (Self : in out Delay_Line; Buffer : in out Generator_Buffer);

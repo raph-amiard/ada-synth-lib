@@ -160,4 +160,7 @@ package Sound_Gen_Interfaces is
       Time     : Sample_Period;
    end record;
 
+   function Img (N : Note) return String is
+     ("<" & Note_Img (N.Note) & " "
+      & N.Time'Image & " " & N.Duration'Image & ">");
 end Sound_Gen_Interfaces;

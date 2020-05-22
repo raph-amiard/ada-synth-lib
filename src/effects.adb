@@ -12,7 +12,8 @@ package body Effects is
    -------------------
 
    function Add_Generator
-     (Self : in out Mixer; G : Mixer_Generator) return Natural
+     (Self : in out Mixer;
+      G    : Mixer_Generator) return Natural
    is
    begin
       Self.Generators (Self.Length) := G;
@@ -25,7 +26,8 @@ package body Effects is
    -------------------
 
    function Add_Generator
-     (Self : in out Mixer; G : access Generator'Class;
+     (Self  : in out Mixer;
+      G     : access Generator'Class;
       Level : Float) return Natural
    is
       pragma Suppress (Accessibility_Check);
@@ -97,11 +99,11 @@ package body Effects is
    ------------------
 
    function Create_Mixer
-     (Sources : Generators_Arg_Array;
-      Env : access ADSR := null;
-      Saturate : Boolean := True) return access Mixer
+     (Sources    : Generators_Arg_Array;
+      Volume_Mod : Generator_Access := null;
+      Saturate   : Boolean := True) return Mixer_Access
    is
-      Ret : constant access Mixer := new Mixer;
+      Ret     : constant Mixer_Access := new Mixer;
       Discard : Natural;
    begin
 
@@ -109,7 +111,7 @@ package body Effects is
          Discard := Add_Generator (Ret.all, Source);
       end loop;
 
-      Ret.Env := Env;
+      Ret.Env := Volume_Mod;
       Ret.Saturate := Saturate;
       return Ret;
    end Create_Mixer;
@@ -118,18 +120,15 @@ package body Effects is
    -- Create --
    ------------
 
-   function Create_LP (Source : access Generator'Class;
-                       Cut_Freq : access Generator'Class;
-                       Q : Float) return access Low_Pass_Filter
+   function Create_LP (Source   : Generator_Access;
+                       Cut_Freq : Generator_Access;
+                       Q        : Float) return Generator_Access
    is
    begin
-      return LPF : access Low_Pass_Filter do
-         LPF := new Low_Pass_Filter'(Source => Generator_Access (Source),
-                                     Cut_Freq_Provider =>
-                                       Generator_Access (Cut_Freq),
-                                     Res               => Q,
-                                     others            => <>);
-      end return;
+      return new Low_Pass_Filter'(Source            => Source,
+                                  Cut_Freq_Provider => Cut_Freq,
+                                  Res               => Q,
+                                  others            => <>);
    end Create_LP;
 
    -----------------
@@ -165,7 +164,8 @@ package body Effects is
    -------------
 
    overriding procedure Next_Samples
-     (Self : in out Low_Pass_Filter; Buffer : in out Generator_Buffer)
+     (Self   : in out Low_Pass_Filter;
+      Buffer : in out Generator_Buffer)
    is
       X, Y : Float;
       Cut_Freq : Float;
@@ -196,35 +196,13 @@ package body Effects is
       end loop;
    end Next_Samples;
 
-   ----------------------
-   -- Create_Digi_Dist --
-   ----------------------
-
-   function Create_Digi_Dist
-     (Clip_Level : Float) return access Digital_Disto is
-   begin
-      return new Digital_Disto'(Clip_Level => Sample (Clip_Level));
-   end Create_Digi_Dist;
-
-   -------------
-   -- Process --
-   -------------
-
-   overriding function Process
-     (Self : in out Digital_Disto; S : Sample) return Sample is
-   begin
-      return (if S > Self.Clip_Level then Self.Clip_Level
-              elsif S < -Self.Clip_Level then -Self.Clip_Level
-              else S);
-   end Process;
-
    -----------------
    -- Create_Dist --
    -----------------
 
    function Create_Dist
      (Source : access Generator'Class;
-      Clip_Level : Float; Coeff : Float := 10.0) return access Disto
+      Clip_Level : Float; Coeff : Float := 10.0) return Generator_Access
    is
    begin
       return new Disto'(Clip_Level => Sample (Clip_Level),
@@ -328,7 +306,7 @@ package body Effects is
 
    function Create_Delay_Line (Source : access Generator'Class;
                                Dlay : Millisecond;
-                               Decay : Sample) return access Delay_Line
+                               Decay : Sample) return Generator_Access
    is
    begin
       return new Delay_Line'

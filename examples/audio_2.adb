@@ -17,19 +17,17 @@ procedure Audio_2 is
    S5 : constant Sequencer_Note := ((G, 4), SNL);
    S6 : constant Sequencer_Note := ((D_Sh, 4), SNL);
 
-   Synth_Seq : constant access Simple_Sequencer :=
-     Create_Sequencer
-       (8, BPM, 4,
-        Notes =>
-          (S1, S1, S1, S1, S1, S2, S2, S2,
-           S3, S3, S3, S3, S3, S4, S4, S4,
-           S1, S1, S1, S1, S1, S2, S2, S2,
-           S5, S5, S5, S5, S5, S6, S6, S6));
+   Synth_Seq : constant Note_Generator_Access :=
+     Note_Generator_Access
+       (Create_Sequencer
+          (8, BPM, 4,
+           Notes =>
+             (S1, S1, S1, S1, S1, S2, S2, S2,
+              S3, S3, S3, S3, S3, S4, S4, S4,
+              S1, S1, S1, S1, S1, S2, S2, S2,
+              S5, S5, S5, S5, S5, S6, S6, S6)));
 
-   Synth_Source : constant Note_Generator_Access :=
-     Note_Generator_Access (Synth_Seq);
-
-   Synth : constant access Disto :=
+   Synth : constant Generator_Access :=
      --  We distort the output signal of the synthetizer with a soft clipper
      Create_Dist
        (Clip_Level => 1.00001,
@@ -47,7 +45,7 @@ procedure Audio_2 is
                (Freq      => 200.0,
                 Modulator => new Attenuator'
                   (Level  => 1500.0,
-                   Source => Create_ADSR (10, 150, 200, 0.005, Synth_Source),
+                   Source => Create_ADSR (10, 150, 200, 0.005, Synth_Seq),
                    others => <>)),
 
            --  Q is the resonance of the filter, very high values will give a
@@ -61,22 +59,22 @@ procedure Audio_2 is
                (Sources =>
                     (4 => (Create_Sine
                            (Create_Pitch_Gen
-                              (Rel_Pitch => -30, Source => Synth_Source)),
+                              (Rel_Pitch => -30, Source => Synth_Seq)),
                            Level => 0.6),
                      3 => (BLIT.Create_Saw
                            (Create_Pitch_Gen
-                              (Rel_Pitch => -24, Source => Synth_Source)),
+                              (Rel_Pitch => -24, Source => Synth_Seq)),
                            Level => 0.3),
                      2 => (BLIT.Create_Saw
                            (Create_Pitch_Gen
-                              (Rel_Pitch => -12, Source => Synth_Source)),
+                              (Rel_Pitch => -12, Source => Synth_Seq)),
                            Level => 0.3),
                      1 => (BLIT.Create_Saw
                            (Create_Pitch_Gen
-                              (Rel_Pitch => -17, Source => Synth_Source)),
+                              (Rel_Pitch => -17, Source => Synth_Seq)),
                            Level => 0.5)))));
 
-   Main_Mixer : constant access Mixer :=
+   Main_Mixer : constant Mixer_Access :=
      Create_Mixer ((1 => (Synth, 0.5)));
 
 begin

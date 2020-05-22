@@ -87,7 +87,7 @@ package body BLIT is
    -------------------
 
    function Create_Square
-     (Freq_Provider : access Generator'Class) return access BLIT_Square is
+     (Freq_Provider : access Generator'Class) return Generator_Access is
    begin
       return new BLIT_Square'(Frequency_Provider =>
                                 Generator_Access (Freq_Provider),
@@ -100,7 +100,7 @@ package body BLIT is
    ----------------
 
    function Create_Saw
-     (Freq_Provider : access Generator'Class) return access BLIT_Saw is
+     (Freq_Provider : access Generator'Class) return Generator_Access is
    begin
       return new BLIT_Saw'(Frequency_Provider =>
                              Generator_Access (Freq_Provider),

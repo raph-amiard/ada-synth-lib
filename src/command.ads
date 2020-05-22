@@ -9,12 +9,13 @@ package Command is
       On_Period, Off_Period, Current_P : Sample_Period;
       Note                             : Note_T;
    end record;
+   type Simple_Command_Access is access all Simple_Command'Class;
 
    overriding procedure Reset (Self : in out Simple_Command);
 
    function Create_Simple_Command
      (On_Period, Off_Period : Sample_Period;
-      Note                  : Note_T) return access Simple_Command'Class;
+      Note                  : Note_T) return Note_Generator_Access;
 
    overriding procedure Next_Step
      (Self : in out Simple_Command);
@@ -34,6 +35,7 @@ package Command is
       Interval     : Sample_Period := 0;
       Track_Name   : Unbounded_String;
    end record;
+   type Simple_Sequencer_Access is access all Simple_Sequencer'Class;
 
    function To_Seq_Notes
      (A   : Utils.Scales_Arrays.Array_Type;
@@ -46,7 +48,7 @@ package Command is
      (Nb_Steps, BPM : Natural;
       Measures      : Natural := 1;
       Notes         : Notes_Array := No_Notes;
-      Track_Name    : String := "") return access Simple_Sequencer;
+      Track_Name    : String := "") return Simple_Sequencer_Access;
 
    overriding procedure Next_Step
      (Self : in out Simple_Sequencer);

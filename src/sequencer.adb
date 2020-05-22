@@ -11,9 +11,9 @@ package body Sequencer is
      (BPM        : Natural;
       Measures   : Natural;
       Nb_Voices  : Natural := 8;
-      Track_Name : String := "") return access Sequencer
+      Track_Name : String := "") return Sequencer_Access
    is
-      Ret : constant access Sequencer := new Sequencer'
+      Ret : constant Sequencer_Access := new Sequencer'
         (Notes           => <>,
          Current_Notes   => (others => No_Seq_Note),
          Next_Channel    => 0,
