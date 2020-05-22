@@ -89,7 +89,6 @@ package body Soundio_Output is
          Next_Steps;
          G.G.Next_Samples (G.G_Buffer);
          Sample_Nb := Sample_Nb + Generator_Buffer_Length;
-         Put_Line ("Current sample: " & Sample_Nb'Image);
          G.Current_Sample := 0;
       else
          G.Current_Sample := G.Current_Sample + 1;
