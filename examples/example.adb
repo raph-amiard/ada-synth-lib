@@ -10,7 +10,7 @@ with Soundio_Output;       use Soundio_Output;
 with ASL_Examples;
 with Write_To_Stdout;
 
-procedure Soundio_Example is
+procedure Example is
 
    package Arg is
       Parser : Argument_Parser := Create_Argument_Parser
@@ -75,4 +75,4 @@ begin
          Write_To_Stdout (Arg.Generator);
       end case;
    end if;
-end Soundio_Example;
+end Example;

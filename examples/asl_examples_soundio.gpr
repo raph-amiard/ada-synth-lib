@@ -11,7 +11,7 @@ project ASL_Examples_Soundio is
    package Linker renames Soundio.Linker;
    package Compiler renames Ada_Synth_Lib_Soundio.Compiler;
 
-   for Main use ("soundio_example.adb");
+   for Main use ("example.adb");
 
 end ASL_Examples_Soundio;
 
