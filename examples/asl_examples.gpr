@@ -1,8 +1,0 @@
-with "../ada_synth_lib";
-
-project ASL_Examples is
-   for Object_Dir use "obj";
-   for Source_Dirs use (".");
-   for Main use ("simple_sine.adb", "simple_sine_2.adb",
-                 "audio_2.adb", "audio_3.adb", "poly.adb");
-end ASL_Examples;
