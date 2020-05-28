@@ -28,7 +28,7 @@ package Utils is
       G    => White,
       G_Sh => Black);
 
-   type Octave_T is range -1 .. 10;
+   subtype Octave_T is Integer range -1 .. 10;
 
    type Note_T is record
       Scale_Degree : Scale_Degree_T;
@@ -44,6 +44,9 @@ package Utils is
    package Scales_Arrays is new Array_Utils (Scale_Degree_T);
 
    No_Note : constant Note_T := (A, -1);
+
+   function Transpose (Note : Note_T; Semitones : Integer := 0) return Note_T;
+   --  Transpose `Note` by `Semitones` semitones.
 
    function Note_To_Freq
      (N : Note_T; Rel_Pitch : Integer := 0) return Frequency;

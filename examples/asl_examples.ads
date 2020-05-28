@@ -4,6 +4,7 @@ with Sound_Gen_Interfaces; use Sound_Gen_Interfaces;
 with Effects; use Effects;
 with Waves; use Waves;
 with BLIT;
+with Polyphony;            use Polyphony;
 
 package ASL_Examples is
 
@@ -408,5 +409,54 @@ package ASL_Examples is
 
       procedure Init;
    end Programmatic_Drums;
+
+   package Poly_Synth is
+      BPM : constant := 120;
+
+      SNL : constant Sample_Period := 4000;
+      S1  : constant Sequencer_Note := ((C, 3), SNL);
+      S2  : constant Sequencer_Note := ((F, 4), SNL);
+      S3  : constant Sequencer_Note := ((D_Sh, 4), SNL);
+      S4  : constant Sequencer_Note := ((A_Sh, 4), SNL);
+      S5  : constant Sequencer_Note := ((G, 4), SNL);
+      S6  : constant Sequencer_Note := ((D_Sh, 4), SNL);
+
+      function Create_Voice
+        (Note_Gen : Note_Generator_Access) return Generator_Access
+      is
+        (Create_LP
+           (Create_Mixer
+                ((1 => (BLIT.Create_Saw (Create_Pitch_Gen (0, Note_Gen)), 0.5),
+                  2 => (BLIT.Create_Square
+                         (Create_Pitch_Gen (0, Note_Gen)), 0.5)),
+                 Volume_Mod => Create_ADSR (100, 1000, 100, 0.2, Note_Gen)),
+            Cut_Freq => Fixed
+              (200.0,
+               Modulator => new Attenuator'
+                 (Level  => 4500.0,
+                  Source => Create_ADSR
+                    (10, 1500, 200, 0.005, Note_Gen),
+                  others => <>)),
+            Q        => 0.4));
+
+      function Chord
+        (Base : Note_T; Base_Time : Sample_Period) return Note_Array
+      is
+        ((Base, 50_000, Base_Time),
+         (Transpose (Base, 3), 50_000, Base_Time + 100),
+         (Transpose (Base, 7), 50_000, Base_Time + 200),
+         (Transpose (Base, 14), 50_000, Base_Time + 400));
+
+      Synth : constant Poly :=
+        Create_Polyphonic (8, Create_Voice'Unrestricted_Access)
+        .Add_Notes (Chord ((C, 2), 1))
+        .Add_Notes (Chord ((F, 2), 50_000))
+        .Add_Notes (Chord ((C, 3), 100_000));
+
+      Main : constant Generator_Access :=
+        Create_Mixer ((
+                      0 => (Synth, 0.45)
+                     ));
+   end Poly_Synth;
 
 end ASL_Examples;

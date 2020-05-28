@@ -17,7 +17,7 @@ procedure Example is
         (Help => "Run an example for ada-synth-lib");
 
       type Example_Kind is (Full_Demo, Full_Demo_2, Trippy_Demo, Simple_Sine,
-                            Programmatic_Drums);
+                            Programmatic_Drums, Poly_Synth);
       type Backend_Kind is (Pulse_Audio, Stdout);
 
       package Example is new Parse_Enum_Option
@@ -36,7 +36,9 @@ procedure Example is
             when Full_Demo_2 => ASL_Examples.Full_Demo_2.Main_Mixer,
             when Trippy_Demo => ASL_Examples.Trippy_Demo.Main,
             when Simple_Sine => ASL_Examples.Simple_Sine.Main,
-            when Programmatic_Drums => ASL_Examples.Programmatic_Drums.Main);
+            when Programmatic_Drums => ASL_Examples.Programmatic_Drums.Main,
+            when Poly_Synth => ASL_Examples.Poly_Synth.Main
+        );
    end Arg;
 
    IO                   : constant access Soundio.SoundIo := Create;

@@ -20,6 +20,9 @@ package Polyphony is
    function Add_Note
      (Self : access Polyphonic_Instrument; N : Note) return Poly;
 
+   function Add_Notes
+     (Self : access Polyphonic_Instrument; N : Note_Array) return Poly;
+
 private
    function "<" (L, R : Note) return Boolean is
      (L.Time < R.Time);

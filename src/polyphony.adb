@@ -1,5 +1,5 @@
-with Effects; use Effects;
 with Ada.Text_IO; use Ada.Text_IO;
+with Effects; use Effects;
 
 package body Polyphony is
 
@@ -37,7 +37,6 @@ package body Polyphony is
       --  While we have notes, assign them to voices
       while Has_Element (Note_Cursor) loop
          N := Element (Note_Cursor);
-         Put_Line ("HAS NOTE ! " & N.Time'Image & " " & N.Duration'Image);
 
          exit when N.Time > Last_Sample;
          Self.Notes_Generators (Self.Current_Voice + 1) := Simple_Command'
@@ -83,13 +82,24 @@ package body Polyphony is
      (Self : access Polyphonic_Instrument; N : Note) return Poly
    is
    begin
-      Put_Line ("Adding note, " & Img (N));
       Self.Notes.Insert (N);
-      for El of Self.Notes loop
-         Put_Line (Img (El));
-      end loop;
-
+      Put_Line ("Adding note " & Img (N));
       return Poly (Self);
    end Add_Note;
+
+   ---------------
+   -- Add_Notes --
+   ---------------
+
+   function Add_Notes
+     (Self : access Polyphonic_Instrument; N : Note_Array) return Poly
+   is
+   begin
+      for Note of N loop
+         Put_Line ("Adding note " & Img (Note));
+         Self.Notes.Insert (Note);
+      end loop;
+      return Poly (Self);
+   end Add_Notes;
 
 end Polyphony;

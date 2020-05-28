@@ -160,6 +160,8 @@ package Sound_Gen_Interfaces is
       Time     : Sample_Period;
    end record;
 
+   type Note_Array is array (Positive range <>) of Note;
+
    function Img (N : Note) return String is
      ("<" & Note_Img (N.Note) & " "
       & N.Time'Image & " " & N.Duration'Image & ">");

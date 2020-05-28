@@ -92,6 +92,21 @@ package body Utils is
                              + Rel_Pitch);
    end Note_To_Freq;
 
+   ---------------
+   -- Transpose --
+   ---------------
+
+   function Transpose (Note : Note_T; Semitones : Integer := 0) return Note_T
+   is
+      Degree    : constant Integer := Scale_Degree_T'Pos (Note.Scale_Degree);
+      Oct_Shift : constant Integer :=
+        Integer (Float'Floor (Float (Degree + Semitones) / 12.0));
+   begin
+      return
+        (Octave => Note.Octave + Octave_T (Oct_Shift),
+         Scale_Degree => Scale_Degree_T'Val ((Degree + Semitones) mod 12));
+   end Transpose;
+
    ---------
    -- Sin --
    ---------
