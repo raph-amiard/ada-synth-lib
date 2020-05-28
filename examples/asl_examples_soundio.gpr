@@ -3,13 +3,11 @@ with "../ada-soundio/soundio.gpr";
 
 project ASL_Examples_Soundio is
 
-   type Build_Type is
-      ("Debug", "Release");
    for Object_Dir use "obj";
    for Source_Dirs use (".");
-   Build : Build_Type := external ("Build");
 
    package Linker renames Soundio.Linker;
+   package Compiler renames Ada_Synth_Lib_Soundio.Compiler;
 
    for Main use ("soundio_example.adb");
 
