@@ -1,4 +1,4 @@
-package body Ring_Buffer is
+package body Utils.Ring_Buffer is
 
    ------------
    -- Create --
@@ -85,4 +85,4 @@ package body Ring_Buffer is
       end if;
    end Available_Write_Frames;
 
-end Ring_Buffer;
+end Utils.Ring_Buffer;

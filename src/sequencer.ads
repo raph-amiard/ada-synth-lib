@@ -29,7 +29,7 @@ package Sequencer is
    overriding procedure Reset (Self : in out Dummy_Note_Generator);
 
    type Note_Generator_Array
-   is array (Natural range <>) of access Dummy_Note_Generator;
+   is array (Natural range <>) of Note_Generator_Access;
    type Note_Array is array (Natural range <>) of Seq_Note;
 
    Max_Polyphony : constant := 16;

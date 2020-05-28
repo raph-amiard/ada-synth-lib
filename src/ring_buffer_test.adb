@@ -1,9 +1,9 @@
 with GNAT.Random_Numbers; use GNAT.Random_Numbers;
-with Ring_Buffer;
+with Utils.Ring_Buffer;
 with Ada.Text_IO; use Ada.Text_IO;
 
 procedure Ring_Buffer_Test is
-   package FRB is new Ring_Buffer
+   package FRB is new Utils.Ring_Buffer
      (Checks => True, Element_Type => Float, Default_Value => 0.0);
 
    RB : FRB.Ring_Buffer := FRB.Create (16);

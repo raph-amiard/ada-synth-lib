@@ -6,11 +6,12 @@ with Poly_Demo;
 
 procedure Soundio_Example is
 
-   IO                   : access Soundio.SoundIo := Create;
+   IO                   : constant access Soundio.SoundIo := Create;
    Default_Device_Index : int;
    Device               : access SoundIo_Device;
    Out_Stream           : access SoundIo_Out_Stream;
    Err                  : SoundIo_Error;
+   pragma Unreferenced (Err);
 begin
    --  SoundIO connection boilerplate
    Err := Connect (IO);
@@ -26,7 +27,7 @@ begin
    Err := Outstream_Open (Out_Stream);
    Err := Outstream_Start (Out_Stream);
 
-   Put_Line ("Backend used : " & IO.Current_Backend'Img);
+   Put_Line ("Backend used : " & IO.current_backend'Img);
 
    Play (Out_Stream);
    loop

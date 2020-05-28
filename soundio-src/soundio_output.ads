@@ -1,7 +1,7 @@
 with Soundio;              use Soundio;
 with Interfaces.C;         use Interfaces.C;
 with Sound_Gen_Interfaces; use Sound_Gen_Interfaces;
-with Ring_Buffer;
+with Utils.Ring_Buffer;
 
 package Soundio_Output is
 
@@ -10,7 +10,7 @@ package Soundio_Output is
    type Soundio_Mode is (Callback, Buffer);
 
    package FRB
-   is new Ring_Buffer (Float, Checks => True, Default_Value => 0.0);
+   is new Utils.Ring_Buffer (Float, Checks => True, Default_Value => 0.0);
 
    type Soundio_User_Data (Mode : Soundio_Mode) is record
       S              : State;

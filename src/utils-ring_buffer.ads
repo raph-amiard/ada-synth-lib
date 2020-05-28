@@ -2,7 +2,7 @@ generic
    type Element_Type is private;
    Checks : Boolean := False;
    Default_Value : Element_Type;
-package Ring_Buffer is
+package Utils.Ring_Buffer is
 
    type Ring_Buffer is private;
 
@@ -31,4 +31,4 @@ private
 
    type Ring_Buffer is access all Ring_Buffer_Type;
 
-end Ring_Buffer;
+end Utils.Ring_Buffer;

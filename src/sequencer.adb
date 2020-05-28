@@ -1,5 +1,4 @@
 with Config; use Config;
-with Ada.Text_IO; use Ada.Text_IO;
 
 package body Sequencer is
 
