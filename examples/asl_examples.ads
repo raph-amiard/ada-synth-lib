@@ -7,6 +7,8 @@ with BLIT;
 
 package ASL_Examples is
 
+   pragma Elaborate_Body;
+
    package Full_Demo is
       BPM : constant := 120;
 
@@ -372,5 +374,39 @@ package ASL_Examples is
                        3 => (Synth_2,     0.06),
                        4 => (Synth,       0.9)));
    end Trippy_Demo;
+
+   package Simple_Sine is
+      Sine_Gen : constant Generator_Access :=
+        Create_Sine (Fixed (200.0, LFO (6.0, 30.0)));
+
+      Main     : constant Generator_Access :=
+        Create_Mixer ((1 => (Sine_Gen, 0.7)));
+   end Simple_Sine;
+
+   package Programmatic_Drums is
+      Main       : constant Generator_Access;
+   private
+      BPM   : Natural := 15;
+      Notes : Notes_Array :=
+        To_Seq_Notes
+          ((C, G, F, G, C, G, F, A, C, G, F, G, C, G, F, G), 400, 4);
+
+      function Simple_Synth
+        (S    : Note_Generator_Access; Tune : Integer := 0; Decay : Integer)
+         return Mixer_Access
+      is
+        (Create_Mixer
+           ((0 => (Create_Sine (Create_Pitch_Gen (Tune, S)), 0.5)),
+            Volume_Mod => Create_ADSR (5, 50, Decay, 0.5, S)));
+
+      Volume     : Float   := 0.9;
+      Decay      : Integer := 800;
+      Seq        : Simple_Sequencer_Access;
+      Sine_Gen   : access Mixer;
+      Mixer      : constant Mixer_Access := Create_Mixer (No_Generators);
+      Main       : constant Generator_Access := Generator_Access (Mixer);
+
+      procedure Init;
+   end Programmatic_Drums;
 
 end ASL_Examples;
