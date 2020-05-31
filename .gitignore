@@ -1,0 +1,33 @@
+# Python junk
+*.pyc
+__pycache__
+
+# Vim junk
+*.swp
+*.swo
+.*.swp
+.*.swo
+
+# Build/test artifacts
+obj
+lib
+*.o
+tmp
+core.*
+valgrind.out
+utils/obj-*
+
+# GNAT/GPS/GDB junk
+auto.cgpr
+gnatinspect.db
+gnatinspect.db-*
+*-loc.xml
+*.ali
+.gdb_history
+.gnatdebug
+
+# Ignore ada-soundio
+ada-soundio
+
+# Custom grab bag dir
+/misc
