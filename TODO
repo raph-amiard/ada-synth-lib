@@ -1,3 +1,0 @@
-- Optimize dynamic dispatch with generics/typeclass pattern
-- Correct oscillators working with integer periods
-- Use BLIT to do alias free saw & square oscillators
